@@ -10,7 +10,7 @@ An interactive site about **critical minerals and strategic supply security on t
 |---|---|
 | `index.html` (Explore) | NASA-style home page: Artemis II "Earthset" hero, key numbers, the interactive Moon map, a resource fact sheet with primary-source facts, upcoming missions, and the supply chain teaser. |
 | `helium3.html` | Animated diagram of the solar wind putting helium-3 into Moon soil, a soil-grain close-up, Earth vs. Moon numbers, the digging math, uses and prices. |
-| `extraction.html` | How each resource could be extracted: is it ice or water (it's ice), three ways to get water out, turning it into rocket fuel, helium-3 company plans, four ways to split rock into oxygen and metals, why rare earths and platinum have no method yet, and a comparison table. Every method is labeled as lab-tested, field-tested or concept, since nothing has been mined on the Moon yet. |
+| `extraction.html` | One tab per resource (water ice, helium-3, oxygen, iron, titanium, aluminum & silicon, rare earths, platinum-group metals, compare). Each tab: why extract it, how it could help Earth and humanity (labeled Today or Possible future), the catch, and the proposed extraction methods (labeled lab-tested, field-tested, company plan or idea). Water tab answers "is it ice or water?". |
 | `countries.html` (Missions) | The two blocs (Artemis Accords vs. China-Russia ILRS), a 2026-2036 timeline of planned landings, and a card for each country. |
 | `companies.html` | Front-runner companies and a four-step supply chain (Earth factories → landers → Moon miners → buyers), with company records from TradeVerifyd. |
 | `sources.html` | Method, limits, and every source. |
@@ -35,5 +35,8 @@ Done on 19 November 2026.
 Notes are in `research/moon-resources-2026-11.json`.
 
 ## Writing style
+
+Headings, big numbers and the menu use the Orbitron space-style font; body text uses Inter.
+
 
 Plain language for a general reader. No "we," "our" or "us" in site text. Every fact links to a source. Future dates are labeled as targets.

@@ -6,7 +6,7 @@
 <title>Moon Resource Atlas</title>
 <meta name="description" content="Where the Moon's helium-3, water ice, metals and rare earths are, who plans to land there, and the companies racing to mine them.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root { --black: #000; --ink: #1d1d1d; --gray: #58595b; --light: #f6f6f6; --rule: #d1d1d1; --red: #fc3d21; --blue: #1c67e3; }
   * { box-sizing: border-box; }
@@ -171,6 +171,16 @@
     footer .wrap { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) { .wrap { padding: 0 16px; } .nums, .cards, .split, .flow { grid-template-columns: 1fr; } .nums div, .nums div + div { padding: 1.2rem 0; border-right: 0; border-bottom: 1px solid var(--rule); } }
+
+  /* ---- space typography ---- */
+  .hero h1, .head h2, .split h2 { font-family: Orbitron, Inter, system-ui, sans-serif; font-weight: 800; letter-spacing: 0; }
+  .hero h1 { font-size: clamp(2.3rem, 5vw, 4.3rem); line-height: 1.06; }
+  .head h2, .split h2 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); line-height: 1.12; }
+  .nums b, .fact .num, .mrow .date { font-family: Orbitron, Inter, sans-serif; letter-spacing: 0; }
+  .nums b { font-size: clamp(1.8rem, 3.2vw, 2.8rem); } .fact .num { font-size: 2.2rem; }
+  .brand b { font-family: Orbitron, Inter, sans-serif; letter-spacing: .05em; }
+  header nav a { font-family: Orbitron, Inter, sans-serif; font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; }
+  #info h2 { font-family: Orbitron, Inter, sans-serif; font-size: 1.2rem; letter-spacing: 0; }
 </style>
 </head>
 <body>

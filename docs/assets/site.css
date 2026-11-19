@@ -89,3 +89,12 @@ th { background: var(--light); font: 500 .7rem "DM Mono", monospace; text-transf
   .cmp, .bloc { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ---- space typography: Orbitron for headings, numbers and the menu; Inter stays for reading ---- */
+h1, h2 { font-family: Orbitron, Inter, system-ui, sans-serif; font-weight: 800; letter-spacing: 0; }
+h1 { font-size: clamp(2rem, 4.4vw, 3.6rem); line-height: 1.12; }
+h2 { font-size: clamp(1.4rem, 2.6vw, 2.2rem); line-height: 1.15; }
+.site-nav .brand b { font-family: Orbitron, Inter, sans-serif; letter-spacing: .05em; font-weight: 800; }
+.site-nav nav a { font-family: Orbitron, Inter, sans-serif; font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700; }
+.tile .big, .country h3 > span:first-child { font-family: Orbitron, Inter, sans-serif; letter-spacing: 0; }
+.steps5 li::before { font-family: Orbitron, Inter, sans-serif; font-weight: 700; }

@@ -53,6 +53,19 @@ const SOURCES = {
   magnaFAQ:     { title: "Magna Petra FAQ", pub: "Magna Petra (company's own claim)", url: "https://magnapetra.com/faq", via: "Tavily" },
   mdpiREE:      { title: "Sources of Extraterrestrial Rare Earth Elements: To the Moon and Beyond", pub: "Resources (MDPI), 2017", url: "https://www.mdpi.com/2079-9276/6/3/40", via: "Tavily" },
 
+  // Why extract / benefits to Earth (checked with Tavily extract, 19 Nov 2026)
+  aaasHe3:      { title: "AAAS Workshop Explores How to Meet Demand for Helium-3 in Medicine, Industry, and Security", pub: "AAAS", url: "https://www.aaas.org/news/aaas-workshop-explores-how-meet-demand-helium-3-medicine-industry-and-security", via: "Tavily" },
+  uwFusion:     { title: "Fifty Years of Research in Helium-3 Fusion and Helium-3 Resources (UWFDM-935)", pub: "University of Wisconsin Fusion Technology Institute", url: "https://fti.neep.wisc.edu/fti.neep.wisc.edu/pdf/fdm935.pdf", via: "Tavily" },
+  wikiAneutronic:{ title: "Aneutronic fusion", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Aneutronic_fusion", via: "Tavily" },
+  mitSteel:     { title: "Making steel with electricity (Boston Metal began with NASA lunar oxygen research)", pub: "MIT Department of Materials Science and Engineering", url: "https://dmse.mit.edu/news/making-steel-with-electricity", via: "Tavily" },
+  ieaREE:       { title: "Rare Earth Elements: Executive summary", pub: "International Energy Agency", url: "https://www.iea.org/reports/rare-earth-elements/executive-summary", via: "Tavily" },
+  crsREE:       { title: "Rare Earth Elements and U.S. Supply Chains (IF13171)", pub: "Congressional Research Service", url: "https://www.everycrsreport.com/reports/IF13171.html", via: "Tavily" },
+  usgsPGE:      { title: "Platinum-group elements (Professional Paper 1802-N)", pub: "U.S. Geological Survey", url: "https://pubs.usgs.gov/publication/pp1802N", via: "Tavily" },
+  doePGM:       { title: "Platinum Group Metal Catalysts: Supply Chain Deep Dive Assessment", pub: "U.S. Department of Energy", url: "https://www.energy.gov/sites/default/files/2024-12/PGM%2520catalyst%2520supply%2520chain%2520report%2520-%2520final%2520draft%25202.25.22%5B1%5D.pdf", via: "Tavily" },
+  ulaProp:      { title: "Commercial Lunar Propellant Architecture (study led by industry, incl. United Launch Alliance)", pub: "ISRU Info, 2018", url: "https://isruinfo.com/public/docs/Commercial%20Lunar%20Propellant%20Architecture.pdf", via: "Tavily" },
+  niaBreakeven: { title: "Cost Breakeven Analysis of Cis-lunar ISRU for Propellant", pub: "NASA-sponsored study (National Institute of Aerospace), 2019", url: "http://bigidea.nianet.org/wp-content/uploads/2019/10/Cost_Breakeven_Analysis_of_Cis-Lunar_ISRU-FINAL.pdf", via: "Tavily" },
+  lmISRU:       { title: "A Water-Based Lunar Architecture", pub: "Lockheed Martin (company's own view)", url: "https://www.lockheedmartin.com/en-us/capabilities/space/human-space-exploration/water-based-lunar-architecture.html", via: "Tavily" },
+
   // Helium-3 market
   geekwireIL:   { title: "Interlune reveals partners and customers for lunar helium-3", pub: "GeekWire, May 2025", url: "https://www.geekwire.com/2025/interlune-moon-mining-vermeer-maybell-quantum-doe", via: "Tavily" },
   bluefors:     { title: "Bluefors Enters Deal to Secure Lunar Helium-3 Supply From Interlune", pub: "The Quantum Insider, Sept 2025", url: "https://thequantuminsider.com/2025/09/17/bluefors-enters-deal-to-secure-lunar-helium-3-supply-from-interlune", via: "Tavily" },

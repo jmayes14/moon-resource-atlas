@@ -4,44 +4,88 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How to Extract</title>
-<meta name="description" content="Proposed and tested ways to get water, helium-3, oxygen, metals and rare earths out of the Moon, and how far each has gotten.">
+<meta name="description" content="Each Moon resource on its own tab: why it matters, how it could help Earth and humanity, and the proposed ways to extract it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 <style>
-  .banner { display: grid; grid-template-columns: auto 1fr; gap: 1.2rem; align-items: start; background: var(--black); color: #fff; padding: 1.4rem 1.6rem; margin: 2rem 0 0; }
-  .banner b.big { font-size: 2.6rem; font-weight: 900; line-height: 1; color: var(--red); }
-  .banner p { margin: 0; color: #d4d4d4; } .banner strong { color: #fff; }
-  .toc { display: flex; flex-wrap: wrap; gap: .5rem; margin: 2rem 0 0; }
-  .toc a { font: 500 .72rem "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border: 1px solid var(--ink); padding: .45rem .75rem; }
-  .toc a:hover { background: var(--ink); color: #fff; }
-  .rsec { border-top: 2px solid var(--ink); margin-top: 4.5rem; padding-top: 1rem; scroll-margin-top: 5rem; }
-  .rsec > .eyebrow { display: flex; align-items: center; gap: .6rem; }
-  .rsec > .eyebrow i { width: 1.6rem; height: .35rem; display: inline-block; }
-  .rsec h2 { margin-top: .6rem; }
+  /* space hero */
+  .xhero { position: relative; background: #000; color: #fff; overflow: hidden; }
+  .xhero::before { content: ""; position: absolute; inset: 0; opacity: .75;
+    background-image: radial-gradient(1px 1px at 6% 20%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 18% 70%, #fff 50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 33% 30%, #cfe1ff 50%, transparent 51%), radial-gradient(1px 1px at 47% 82%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 62% 12%, #fff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 74% 58%, #ffe9c2 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 28%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 95% 86%, #fff 50%, transparent 51%);
+    background-size: 420px 300px; }
+  .xhero::after { content: ""; position: absolute; right: -14vw; top: -30%; width: 46vw; height: 46vw; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #8d8a83, #3a3833 60%, #121110 75%); box-shadow: 0 0 120px rgb(160 190 255 / 18%); opacity: .9; }
+  .xhero .in { position: relative; z-index: 1; max-width: 82rem; margin: 0 auto; padding: 4.5rem 2rem 3.5rem; }
+  .xhero .eyebrow { color: #a6a6a6; }
+  .xhero h1 { color: #fff; max-width: 48rem; }
+  .xhero p { color: #d4d4d4; max-width: 44rem; font-size: 1.15rem; }
+  .zero { display: inline-flex; gap: 1rem; align-items: center; margin-top: 1rem; border: 1px solid #444; padding: .9rem 1.1rem; max-width: 52rem; background: rgb(0 0 0 / 55%); }
+  .zero b { font: 900 2.6rem Orbitron, sans-serif; color: var(--red); line-height: 1; }
+  .zero span { color: #d4d4d4; font-size: .95rem; } .zero strong { color: #fff; }
+
+  /* tabs */
+  .tabbar { position: sticky; top: 4.2rem; z-index: 40; background: #fff; border-bottom: 1px solid var(--rule); }
+  .tabbar .in { max-width: 82rem; margin: 0 auto; padding: 0 2rem; display: flex; gap: .2rem; overflow-x: auto; scrollbar-width: thin; }
+  .tab { flex: none; display: flex; align-items: center; gap: .5rem; background: none; border: 0; border-bottom: 3px solid transparent; padding: 1rem .9rem .85rem; font: 700 .78rem Orbitron, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); cursor: pointer; white-space: nowrap; }
+  .tab i { width: .65rem; height: .65rem; border-radius: 50%; display: inline-block; outline: 1px solid rgb(0 0 0 / 15%); }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--red); }
+  .tab:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+
+  .panel { scroll-margin-top: 9rem; }
+  .panel[hidden] { display: none; }
+  .phead { display: grid; grid-template-columns: auto 1fr; gap: 1.6rem; align-items: center; margin: 2.8rem 0 1.8rem; }
+  .phead .orb { width: 5.5rem; height: 5.5rem; border-radius: 50%; position: relative; box-shadow: inset -12px -12px 24px rgb(0 0 0 / 35%), 0 0 0 1px rgb(0 0 0 / 10%); }
+  .phead .num { font: 500 .8rem "DM Mono", monospace; color: var(--gray); letter-spacing: .1em; }
+  .phead h2 { margin: .3rem 0 .4rem; }
+  .phead p { margin: 0; color: var(--gray); font-size: 1.12rem; max-width: 50rem; }
+
+  .why2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--ink); }
+  .why2 > div { padding: 1.5rem 1.6rem; }
+  .why2 > div + div { border-left: 1px solid var(--ink); background: #0b0f14; color: #fff; }
+  .why2 h3 { font: 700 .82rem Orbitron, sans-serif; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 1rem; display: flex; align-items: center; gap: .6rem; }
+  .why2 h3 svg { flex: none; }
+  .why2 ul { list-style: none; margin: 0; padding: 0; }
+  .why2 li { padding: .7rem 0; border-top: 1px dashed var(--rule); font-size: .97rem; }
+  .why2 > div + div li { border-top-color: #2a3340; color: #e6e6e6; }
+  .why2 li:first-child { border-top: 0; padding-top: 0; }
+  .why2 li strong { color: inherit; }
+  .when { display: inline-block; font: 500 .6rem "DM Mono", monospace; letter-spacing: .07em; text-transform: uppercase; padding: .12rem .45rem; margin-right: .4rem; vertical-align: 2px; }
+  .when.now { background: #3fd0a0; color: #062a1d; } .when.future { background: #ffcf5a; color: #2a1d00; } .when.none { background: #3a3f47; color: #d4d4d4; }
+  .why2 .src { margin-top: 1rem; } .why2 > div + div .src, .why2 > div + div .src a { color: #a6a6a6; }
+  .why2 > div + div .via { border-color: #444; color: #a6a6a6; }
+  .catch { margin-top: 1.2rem; border-left: 4px solid var(--red); background: var(--light); padding: 1rem 1.2rem; }
+  .catch b { font: 700 .74rem Orbitron, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--red); display: block; margin-bottom: .3rem; }
+  .sub { font: 700 1rem Orbitron, sans-serif; letter-spacing: .06em; text-transform: uppercase; margin: 2.6rem 0 0; }
+
   .qa { display: grid; grid-template-columns: 1fr 1.1fr; gap: 2.5rem; align-items: center; background: var(--light); padding: 2rem; margin-top: 1.5rem; }
   .qa .q { font: 500 .78rem "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
-  .qa h3 { font-size: 1.9rem; font-weight: 900; margin: .4rem 0 .8rem; }
+  .qa h3 { font: 800 1.6rem Orbitron, sans-serif; margin: .4rem 0 .8rem; letter-spacing: -.01em; }
   .qa ul { padding-left: 1.1rem; margin: 0; } .qa li { margin: .45rem 0; }
-  .methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1.4rem; margin-top: 1.5rem; }
+  .methods { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); gap: 1.4rem; margin-top: 1.2rem; }
   .method { border: 1px solid var(--rule); padding: 1.4rem 1.5rem 1.2rem; display: flex; flex-direction: column; }
   .method .tag { align-self: flex-start; font: 500 .62rem "DM Mono", monospace; letter-spacing: .07em; text-transform: uppercase; padding: .2rem .5rem; margin-bottom: .8rem; }
-  .t-lab { background: #e8f0ff; color: #1c4fb0; } .t-field { background: #e5f6ee; color: #11704a; } .t-moon { background: #fff0e0; color: #9a4a00; }
-  .t-concept { background: #f1e9fb; color: #6b3fa0; } .t-none { background: #f3f3f3; color: #58595b; }
-  .method h3 { margin: 0 0 .5rem; font-size: 1.3rem; }
+  .t-lab { background: #e8f0ff; color: #1c4fb0; } .t-field { background: #e5f6ee; color: #11704a; } .t-concept { background: #f1e9fb; color: #6b3fa0; } .t-none { background: #f3f3f3; color: #58595b; }
+  .method h4 { margin: 0 0 .5rem; font-size: 1.2rem; font-weight: 800; }
   .method ol { margin: .4rem 0 .8rem; padding-left: 1.2rem; font-size: .95rem; } .method li { margin: .3rem 0; }
   .method .result { font-size: .92rem; border-top: 1px dashed var(--rule); padding-top: .7rem; margin-top: auto; }
-  .method .result b { color: var(--ink); }
-  .diagram { background: #000; color: #fff; padding: 1.2rem; margin-top: 1.5rem; }
+  .diagram { background: #000; color: #fff; padding: 1.2rem; margin: 0; }
   .diagram svg { width: 100%; height: auto; display: block; }
   .diagram figcaption { color: #a6a6a6; font-size: .82rem; margin-top: .6rem; }
-  .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0; margin-top: 1.4rem; border-top: 1px solid var(--ink); }
+  .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); margin-top: 1.2rem; border-top: 1px solid var(--ink); }
   .flow div { padding: .9rem .9rem 1rem 0; border-bottom: 1px solid var(--rule); font-size: .92rem; }
-  .flow div b { display: block; font-size: 1rem; margin: .2rem 0 .2rem; }
-  .flow div span.n { font: 500 .72rem "DM Mono", monospace; color: var(--red); }
-  .warn { border-left: 4px solid var(--red); background: var(--light); padding: .9rem 1.1rem; margin-top: 1.2rem; font-size: .95rem; }
+  .flow div b { display: block; font-size: 1rem; margin: .2rem 0; }
+  .flow div span.n { font: 700 .74rem Orbitron, sans-serif; color: var(--red); }
+  .pager { display: flex; justify-content: space-between; gap: 1rem; margin: 3rem 0 0; border-top: 1px solid var(--rule); padding-top: 1.2rem; }
+  .pager button { background: none; border: 0; font: 700 .8rem Orbitron, sans-serif; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; color: var(--ink); padding: .4rem 0; }
+  .pager button:hover { color: var(--red); }
+  .pager button[hidden] { visibility: hidden; display: block; }
   .cmp-table td:first-child { font-weight: 700; white-space: nowrap; }
-  @media (max-width: 800px) { .qa { grid-template-columns: 1fr; padding: 1.3rem; } .banner { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) { .why2 { grid-template-columns: 1fr; } .why2 > div + div { border-left: 0; border-top: 1px solid var(--ink); } .qa { grid-template-columns: 1fr; padding: 1.3rem; } .phead { grid-template-columns: 1fr; } .phead .orb { width: 3.6rem; height: 3.6rem; } .xhero::after { opacity: .35; } }
 </style>
 </head>
 <body>
@@ -50,280 +94,332 @@
   <nav><a href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="extraction.html" aria-current="page">Extraction</a><a href="countries.html">Missions</a><a href="companies.html">Companies</a><a href="sources.html">Sources</a></nav>
 </div></nav>
 
-<main>
+<header class="xhero"><div class="in">
   <span class="eyebrow">How to extract</span>
-  <h1>How each resource could be taken out of the Moon</h1>
-  <p class="lede">Water, helium-3, oxygen and metals are locked in Moon soil in different ways, so each needs a different method. Here are the main ideas, how they work, and how far each has gotten.</p>
+  <h1>Mining the Moon, one resource at a time</h1>
+  <p>Pick a resource below to see why it's worth extracting, how it could help people on Earth, and the different ways it could be pulled out of the Moon.</p>
+  <div class="zero"><b>0</b><span><strong>Nothing has been mined on the Moon yet.</strong> The methods here are proposals and tests, mostly done on Earth with fake Moon soil in vacuum chambers. The first drill sent to hunt for ice at the south pole (NASA's PRIME-1, 2025) landed on its side and couldn't dig. These are ways it <em>could</em> be done, not settled answers.</span></div>
+  <div class="src" style="color:#a6a6a6" data-src="nasaPrime1"></div>
+</div></header>
 
-  <div class="banner">
-    <b class="big">0</b>
-    <p><strong>No resource has been mined on the Moon yet.</strong> Everything below is a proposal or a test, mostly done on Earth with fake Moon soil (called "simulant") in vacuum chambers. The first drill sent to look for ice at the south pole (NASA's PRIME-1, 2025) landed on its side and could not dig, though its instruments worked. Which methods work best will depend on what future landers find, so these are different ways it <em>could</em> be done, not settled answers.</p>
+<div class="tabbar" role="tablist" aria-label="Resources"><div class="in" id="tabs"></div></div>
+
+<main style="padding-top:0">
+
+<!-- ===================== WATER ===================== -->
+<section class="panel" id="water" role="tabpanel" data-name="Water ice" data-color="#7fdcff">
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#e6fbff,#7fdcff 45%,#1a6f8a)"></span>
+    <div><span class="num">01 · WATER ICE</span><h2>Water ice</h2><p>Frozen water hidden in craters at the poles that never see sunlight. It's the most useful resource on the Moon for people who live and travel there.</p></div></div>
+
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>Water is three things in one:</strong> drinking water, oxygen to breathe, and rocket fuel. Electricity splits it into hydrogen and oxygen.</li>
+        <li><strong>Less to launch from Earth.</strong> "The more material we can use on the Moon, the less we launch from Earth," as Lockheed Martin puts it.</li>
+        <li><strong>A gas station in space.</strong> Fuel made at the Moon could refuel ships headed to Mars and beyond.</li>
+        <li><strong>Big savings, if it works.</strong> An industry-led study found that refueling with Moon propellant could cut the cost of getting from Earth to the Moon's surface by more than three times.</li>
+      </ul>
+      <div class="src" data-src="ntrsPropellant,lmISRU,ulaProp"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when future">Possible future</span><strong>Cheaper space services.</strong> The same study names satellite companies as likely buyers of Moon fuel, which could lower the cost of launching the satellites people rely on.</li>
+        <li><span class="when now">Today</span><strong>Clues about the early solar system.</strong> The ice LCROSS found came with carbon, nitrogen and sulfur ices that point to comets. NASA says ice layers may hold long records of the Moon's environment.</li>
+        <li><span class="when future">Possible future</span><strong>Less launching from Earth</strong>, "unburdening our environment at home," in Lockheed Martin's words.</li>
+      </ul>
+      <div class="src" data-src="ulaProp,natLCROSS,nasaShackleton,lmISRU"></div></div>
   </div>
-  <div class="src" id="s-banner"></div>
+  <div class="catch"><b>The catch</b>It isn't proven to save money. A 2019 NASA-sponsored study found Moon-made propellant would cost 97% more than launching it from Earth, under its assumptions. Extraction systems would need to be 2–3 times more efficient to break even. <span class="src" data-src="niaBreakeven"></span></div>
 
-  <nav class="toc" aria-label="Jump to a resource">
-    <a href="#water">Water ice</a><a href="#he3">Helium-3</a><a href="#oxygen">Oxygen &amp; metals</a><a href="#ree">Rare earths</a><a href="#pgm">Platinum-group metals</a><a href="#compare">Compare all</a>
-  </nav>
-
-  <!-- ================= WATER ================= -->
-  <section class="rsec" id="water">
-    <span class="eyebrow"><i style="background:#7fdcff"></i>Water ice</span>
-    <h2>Getting water out of the dark craters</h2>
-
-    <div class="qa">
-      <div>
-        <span class="q">Common question</span>
-        <h3>Is it ice or water in the craters?</h3>
-        <ul>
-          <li><strong>It is ice, not liquid water.</strong> NASA says Moon water is "mainly in the form of ice and not pools of liquid water."</li>
-          <li><strong>It is mixed into the soil.</strong> It is not an ice sheet or a glacier. It is likely tiny ice grains mixed into the dirt, held at about −233 °C (40 kelvin) in craters that never see sunlight.</li>
-          <li><strong>It may also be buried or form layers.</strong> NASA notes the ice "may be mixed in with the lunar soil, buried deep below the surface, or it could be a sheet of ice." Nobody has dug into it yet.</li>
-          <li><strong>It never melts into liquid.</strong> In the Moon's vacuum, heated ice turns straight into vapor (sublimation). NASA's lab tests showed water coming off frozen soil well below its normal melting point.</li>
-          <li><strong>The sunny Moon has a little too.</strong> NASA's SOFIA found water molecules in sunlit Clavius crater at 100–412 parts per million, about one 12-ounce bottle spread through a cubic meter of soil.</li>
-        </ul>
-        <div class="src" id="s-qa"></div>
-      </div>
-      <figure class="diagram" style="margin:0">
-        <svg viewBox="0 0 520 330" role="img" aria-label="Cross-section of a polar crater: sunlit rim, permanently dark floor, soil with ice grains mixed in.">
-          <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#0b1118"/></linearGradient></defs>
-          <rect width="520" height="330" fill="url(#sky)"/>
-          <!-- sun rays from the left, low angle -->
-          <g stroke="#ffcf5a" stroke-width="2" opacity=".8"><line x1="0" y1="62" x2="88" y2="92"/><line x1="0" y1="80" x2="80" y2="104"/><line x1="0" y1="44" x2="96" y2="80"/></g>
-          <text x="8" y="28" fill="#ffcf5a" font-family="Inter" font-size="13" font-weight="700">Sun stays low on the horizon</text>
-          <!-- ground with crater -->
-          <path d="M0 120 L90 96 L118 104 C170 250 350 250 402 104 L430 96 L520 120 L520 330 L0 330 Z" fill="#4a4740"/>
-          <!-- shadow inside crater -->
-          <path d="M118 104 C170 250 350 250 402 104 L402 104 C330 120 210 140 118 104 Z" fill="#000" opacity="0"/>
-          <path d="M120 106 C165 240 355 240 400 106 L120 106 Z" fill="#06080b"/>
-          <!-- lit rim -->
-          <path d="M84 98 L118 104" stroke="#f5e6b8" stroke-width="5"/><path d="M402 104 L436 96" stroke="#f5e6b8" stroke-width="5" opacity=".6"/>
-          <text x="60" y="88" fill="#f5e6b8" font-family="Inter" font-size="12">sunlit rim</text>
-          <!-- soil layer with ice grains -->
-          <path d="M150 190 C200 248 320 248 370 190" fill="none" stroke="#7fdcff" stroke-width="22" stroke-opacity=".18"/>
-          <g fill="#7fdcff" id="icegr"></g>
-          <text x="260" y="150" fill="#9fb4c8" font-family="Inter" font-size="13" text-anchor="middle">Permanent shadow · about −233 °C</text>
-          <!-- callouts -->
-          <line x1="300" y1="228" x2="420" y2="268" stroke="#7fdcff"/>
-          <text x="424" y="262" fill="#7fdcff" font-family="Inter" font-size="12.5" font-weight="700">ice grains</text>
-          <text x="424" y="278" fill="#7fdcff" font-family="Inter" font-size="12.5">mixed in soil</text>
-          <text x="20" y="300" fill="#a6a6a6" font-family="Inter" font-size="12">No liquid water: in a vacuum, warmed ice turns straight to vapor.</text>
-        </svg>
-        <figcaption>Simplified drawing, not to scale.</figcaption>
-      </figure>
+  <div class="qa">
+    <div>
+      <span class="q">Common question</span>
+      <h3>Is it ice or water in the craters?</h3>
+      <ul>
+        <li><strong>Ice, not liquid water.</strong> NASA says Moon water is "mainly in the form of ice and not pools of liquid water."</li>
+        <li><strong>Mixed into the soil.</strong> Not an ice sheet or a glacier: most likely tiny ice grains in the dirt, at about −233 °C (40 kelvin).</li>
+        <li><strong>Maybe buried or in layers too.</strong> NASA says it "may be mixed in with the lunar soil, buried deep below the surface, or it could be a sheet of ice." Nobody has dug into it yet.</li>
+        <li><strong>It never becomes liquid.</strong> In the Moon's vacuum, warmed ice turns straight into vapor (sublimation).</li>
+        <li><strong>The sunny Moon has a trace too.</strong> NASA's SOFIA found about one 12-ounce bottle's worth per cubic meter of soil in sunlit Clavius crater.</li>
+      </ul>
+      <div class="src" data-src="nasaWaterQA,mitIce,ntrsMicrowave,sofia"></div>
     </div>
+    <figure class="diagram">
+      <svg viewBox="0 0 520 330" role="img" aria-label="Cross-section of a polar crater: sunlit rim, permanently dark floor, soil with ice grains mixed in.">
+        <rect width="520" height="330" fill="#05080c"/>
+        <g stroke="#ffcf5a" stroke-width="2" opacity=".8"><line x1="0" y1="62" x2="88" y2="92"/><line x1="0" y1="80" x2="80" y2="104"/><line x1="0" y1="44" x2="96" y2="80"/></g>
+        <text x="8" y="28" fill="#ffcf5a" font-family="Orbitron, sans-serif" font-size="12" font-weight="700">SUN STAYS LOW ON THE HORIZON</text>
+        <path d="M0 120 L90 96 L118 104 C170 250 350 250 402 104 L430 96 L520 120 L520 330 L0 330 Z" fill="#4a4740"/>
+        <path d="M120 106 C165 240 355 240 400 106 L120 106 Z" fill="#06080b"/>
+        <path d="M84 98 L118 104" stroke="#f5e6b8" stroke-width="5"/><path d="M402 104 L436 96" stroke="#f5e6b8" stroke-width="5" opacity=".6"/>
+        <text x="60" y="88" fill="#f5e6b8" font-family="Inter" font-size="12">sunlit rim</text>
+        <path d="M150 190 C200 248 320 248 370 190" fill="none" stroke="#7fdcff" stroke-width="22" stroke-opacity=".18"/>
+        <g fill="#7fdcff" id="icegr"></g>
+        <text x="260" y="150" fill="#9fb4c8" font-family="Inter" font-size="13" text-anchor="middle">Permanent shadow · about −233 °C</text>
+        <line x1="300" y1="228" x2="420" y2="268" stroke="#7fdcff"/>
+        <text x="424" y="262" fill="#7fdcff" font-family="Inter" font-size="12.5" font-weight="700">ice grains</text>
+        <text x="424" y="278" fill="#7fdcff" font-family="Inter" font-size="12.5">mixed in soil</text>
+        <text x="20" y="300" fill="#a6a6a6" font-family="Inter" font-size="12">No liquid water: in a vacuum, warmed ice turns straight to vapor.</text>
+      </svg>
+      <figcaption>Simplified drawing, not to scale.</figcaption>
+    </figure>
+  </div>
 
-    <h3 style="margin-top:2.5rem">Three main ways it could be extracted</h3>
-    <div class="methods">
-      <div class="method">
-        <span class="tag t-lab">Lab-tested</span>
-        <h3>1. Dig it up and bake it</h3>
-        <ol>
-          <li>A rover or excavator scoops icy soil.</li>
-          <li>The soil goes into a heated chamber (an oven).</li>
-          <li>The ice turns to vapor and refreezes on a very cold surface (a "cold trap"), where it is collected.</li>
-        </ol>
-        <p class="result"><b>Trade-off:</b> simple and well understood, but means digging in −233 °C ground, where ice-rich soil may be as hard as rock.</p>
-        <div class="src" id="s-w1"></div>
-      </div>
-      <div class="method">
-        <span class="tag t-concept">NASA-funded concept</span>
-        <h3>2. Heat it where it lies ("thermal mining")</h3>
-        <ol>
-          <li>Mirrors on the sunlit crater rim bounce sunlight down into the dark crater.</li>
-          <li>A clear tent over the ground traps the water vapor that rises.</li>
-          <li>The vapor refreezes in cold-trap tanks, which robots haul to a plant.</li>
-        </ol>
-        <p class="result"><b>Trade-off:</b> no digging, but needs large mirrors and moving the tent from spot to spot. Proposed by the Colorado School of Mines with NASA funding.</p>
-        <div class="src" id="s-w2"></div>
-      </div>
-      <div class="method">
-        <span class="tag t-lab">Lab-tested</span>
-        <h3>3. Microwave it</h3>
-        <ol>
-          <li>A microwave emitter points at the ground, like a kitchen microwave aimed at the soil.</li>
-          <li>The microwaves heat the soil from the inside, so it doesn't have to be dug up.</li>
-          <li>The vapor is caught in a cold trap.</li>
-        </ol>
-        <p class="result"><b>Result:</b> in a NASA test on frozen fake Moon soil in a vacuum, <b>85%</b> of the water came out in <b>5 minutes</b>, and <b>99%</b> of that was caught.</p>
-        <div class="src" id="s-w3"></div>
-      </div>
-    </div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>1. Dig it up and bake it</h4>
+      <ol><li>A rover or excavator scoops icy soil.</li><li>The soil goes into a heated chamber.</li><li>The ice turns to vapor and refreezes on a very cold surface (a "cold trap").</li></ol>
+      <p class="result"><b>Trade-off:</b> simple, but means digging in −233 °C ground, where icy soil may be as hard as rock.</p><div class="src" data-src="spaceMaunaKea,ntrsPropellant"></div></div>
+    <div class="method"><span class="tag t-concept">NASA-funded concept</span><h4>2. Heat it where it lies</h4>
+      <ol><li>Mirrors on the sunlit rim bounce sunlight into the dark crater.</li><li>A clear tent over the ground traps the rising vapor.</li><li>Cold-trap tanks refreeze it, and robots haul them to a plant.</li></ol>
+      <p class="result"><b>Trade-off:</b> no digging, but needs big mirrors and moving the tent. Proposed by the Colorado School of Mines with NASA funding ("thermal mining").</p><div class="src" data-src="mitIce,nasaThermal"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>3. Microwave it</h4>
+      <ol><li>A microwave emitter points at the ground.</li><li>The soil heats from the inside, with no digging.</li><li>The vapor is caught in a cold trap.</li></ol>
+      <p class="result"><b>Result:</b> in a NASA test on frozen fake Moon soil in a vacuum, <b>85%</b> of the water came out in <b>5 minutes</b>, and <b>99%</b> of that was caught.</p><div class="src" data-src="ntrsMicrowave"></div></div>
+  </div>
+  <h3 class="sub">Then: ice into rocket fuel and air</h3>
+  <div class="flow">
+    <div><span class="n">01</span><b>Collect</b>Ice from the cold traps.</div>
+    <div><span class="n">02</span><b>Clean</b>Freeze-distill and filter out dust and other frozen gases.</div>
+    <div><span class="n">03</span><b>Split</b>Electricity splits water into hydrogen and oxygen.</div>
+    <div><span class="n">04</span><b>Chill</b>Cool the gases into liquids.</div>
+    <div><span class="n">05</span><b>Use</b>Rocket fuel, breathing air, drinking water.</div>
+  </div>
+  <div class="catch"><b>Biggest worry</b>Cleaning the water. Moon ice comes mixed with other frozen chemicals, and impurities could make the fuel unusable or unstable. Filters can't be fully tested without real samples. <span class="src" data-src="ntrsPropellant,mitIce"></span></div>
+</section>
 
-    <h3 style="margin-top:2.5rem">Then: turning ice into rocket fuel and air</h3>
-    <div class="flow">
-      <div><span class="n">01</span><b>Collect</b>Ice from the cold traps.</div>
-      <div><span class="n">02</span><b>Clean</b>Freeze-distill and filter out dust and other frozen gases.</div>
-      <div><span class="n">03</span><b>Split</b>Electricity splits water into hydrogen and oxygen (electrolysis).</div>
-      <div><span class="n">04</span><b>Chill</b>Cool the gases into liquids for storage.</div>
-      <div><span class="n">05</span><b>Use</b>Rocket fuel, breathing air and drinking water.</div>
-    </div>
-    <div class="warn"><strong>Biggest worry: cleaning the water.</strong> Moon ice comes mixed with other frozen chemicals: NASA's LCROSS found carbon-, nitrogen- and sulfur-bearing ices along with the water. Impurities could make the fuel unusable or even unstable. Researchers can't fully test filters without real samples.</div>
-    <div class="src" id="s-w4"></div>
-  </section>
+<!-- ===================== HELIUM-3 ===================== -->
+<section class="panel" id="he3" role="tabpanel" data-name="Helium-3" data-color="#ffcf5a" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#fff6d5,#ffcf5a 45%,#8a6510)"></span>
+    <div><span class="num">02 · HELIUM-3</span><h2>Helium-3</h2><p>A rare, light form of helium the Sun has been depositing in Moon soil for billions of years. Earth has almost none.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>Earth is running short.</strong> Earth's reserves are under 10 kg, and the main reliable source is the slow decay of tritium. Demand outran supply after 2001.</li>
+        <li><strong>Buyers are already lined up.</strong> Bluefors agreed to buy up to 10,000 liters a year from 2028 to 2037, before any has been mined.</li>
+        <li><strong>The Moon may hold over a million tonnes,</strong> though how much can really be collected is unknown.</li>
+      </ul>
+      <div class="src" data-src="natureHe3,aaasHe3,bluefors,cnsaHe3"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when now">Today</span><strong>Security:</strong> neutron detectors at borders and ports that catch smuggled nuclear material. About 80% of U.S. helium-3 use goes here.</li>
+        <li><span class="when now">Today</span><strong>Medicine:</strong> special lung imaging. For some of these uses there is no known alternative.</li>
+        <li><span class="when now">Today</span><strong>Quantum computers:</strong> the refrigerators that cool their chips to near absolute zero need helium-3.</li>
+        <li><span class="when future">Possible future</span><strong>Cleaner fusion power.</strong> Fusing deuterium with helium-3 releases a proton instead of a neutron, so the reactor would be less radioactive and could turn the energy straight into electricity. About 1% of the energy would still come out as neutrons.</li>
+      </ul>
+      <div class="src" data-src="aaasHe3,natureHe3,bluefors,uwFusion"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>Helium-3 fusion needs far higher temperatures than today's fusion fuel and hasn't worked in a power plant. Collecting 1 kg means processing 100,000 to 1 million tonnes of soil. <span class="src" data-src="wikiAneutronic,spacenewsUsgs"></span></div>
 
-  <!-- ================= HELIUM-3 ================= -->
-  <section class="rsec" id="he3">
-    <span class="eyebrow"><i style="background:#ffcf5a"></i>Helium-3</span>
-    <h2>Shaking a rare gas loose from huge amounts of soil</h2>
-    <p class="lede" style="font-size:1.1rem">Helium-3 is stuck in the outer skin of soil grains at a few parts per billion, so getting 1 kg means handling 100,000 to 1 million tonnes of soil. Two companies have published different plans.</p>
-    <div class="methods">
-      <div class="method">
-        <span class="tag t-concept">Company plan · tests on Earth</span>
-        <h3>Interlune: dig, sort, extract, separate</h3>
-        <ol>
-          <li><strong>Excavate:</strong> machines built with Vermeer scoop soil, about 100 tonnes an hour for the prototype.</li>
-          <li><strong>Sort:</strong> keep the finest grains, which hold the most helium-3; throw the coarse ones back.</li>
-          <li><strong>Extract:</strong> release the trapped gases. Interlune says its method uses ten times less power than heating; the classic method is heating to about 700 °C.</li>
-          <li><strong>Separate:</strong> chill the gas mix to extreme cold (cryogenic distillation) to pull helium-3 out from helium-4 and hydrogen.</li>
-        </ol>
-        <p class="result"><b>Status:</b> parts tested on Earth and on a reduced-gravity flight. A small test on the Moon is planned for 2028.</p>
-        <div class="src" id="s-h1"></div>
-      </div>
-      <div class="method">
-        <span class="tag t-concept">Company plan</span>
-        <h3>Magna Petra: till the top few centimeters</h3>
-        <ol>
-          <li>A device pulled by a rover shakes only the top few centimeters of soil, "like a tractor pulling a till."</li>
-          <li>Loosely held helium-3 escapes and is captured in pressurized tanks.</li>
-          <li>Heavier gases are vented off, leaving the lighter helium-3 to ship back to Earth.</li>
-        </ol>
-        <p class="result"><b>Trade-off:</b> much lighter equipment and almost no digging, but it only gets the loosely held helium-3, so yields are lower.</p>
-        <div class="src" id="s-h2"></div>
-      </div>
-    </div>
-    <p style="margin-top:1rem"><a class="btn" href="helium3.html">How the helium-3 got there</a></p>
-  </section>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-concept">Company plan · tests on Earth</span><h4>Interlune: dig, sort, extract, separate</h4>
+      <ol><li><strong>Excavate:</strong> machines built with Vermeer scoop soil, about 100 tonnes an hour for the prototype.</li><li><strong>Sort:</strong> keep the finest grains, which hold the most helium-3.</li><li><strong>Extract:</strong> release the trapped gases. Interlune says its method uses ten times less power than heating; the classic method heats soil to about 700 °C.</li><li><strong>Separate:</strong> chill the gas to extreme cold to pull helium-3 apart from helium-4 and hydrogen.</li></ol>
+      <p class="result"><b>Status:</b> parts tested on Earth and on a reduced-gravity flight; a small Moon test is planned for 2028.</p><div class="src" data-src="interlunePlan,vermeer,ntrsHe3,prospectMoon"></div></div>
+    <div class="method"><span class="tag t-concept">Company plan</span><h4>Magna Petra: till the top few centimeters</h4>
+      <ol><li>A device pulled by a rover shakes only the top few centimeters, "like a tractor pulling a till."</li><li>Loosely held helium-3 escapes into pressurized tanks.</li><li>Heavier gases are vented, leaving helium-3 to ship to Earth.</li></ol>
+      <p class="result"><b>Trade-off:</b> light equipment and almost no digging, but it only gets the loosely held helium-3, so yields are lower.</p><div class="src" data-src="magnaFAQ,he3Rivals"></div></div>
+  </div>
+  <p style="margin-top:1.4rem"><a class="btn" href="helium3.html">How the Sun put it there</a></p>
+</section>
 
-  <!-- ================= OXYGEN & METALS ================= -->
-  <section class="rsec" id="oxygen">
-    <span class="eyebrow"><i style="background:#ff7a45"></i>Oxygen, iron, titanium, aluminum &amp; silicon</span>
-    <h2>Splitting rock into air and metal</h2>
-    <p class="lede" style="font-size:1.1rem">Moon rock is 40–45% oxygen, but the oxygen is chemically locked to metals. Pulling it free gives breathable air or rocket fuel, and leaves metals behind. These methods get both at once.</p>
-    <div class="methods">
-      <div class="method">
-        <span class="tag t-field">Field-tested on Earth</span>
-        <h3>Hydrogen + ilmenite</h3>
-        <ol>
-          <li>Separate the iron-titanium mineral ilmenite from the soil.</li>
-          <li>Heat it with hydrogen gas to 700–1,000 °C. Out come <strong>iron</strong>, <strong>titanium dioxide</strong> and <strong>water</strong>.</li>
-          <li>Split the water into oxygen (kept) and hydrogen (reused).</li>
-        </ol>
-        <p class="result"><b>Result:</b> a NASA test reactor on Hawaii's Mauna Kea volcano made <b>660 kg of oxygen</b> in a year from volcanic soil.</p>
-        <div class="src" id="s-o1"></div>
-      </div>
-      <div class="method">
-        <span class="tag t-lab">Lab-tested · company scale-up</span>
-        <h3>Melt it and run electricity through it</h3>
-        <ol>
-          <li>Heat crushed soil to about <strong>1,600 °C</strong> until it melts.</li>
-          <li>Pass an electric current through the melt (molten regolith electrolysis).</li>
-          <li>Oxygen bubbles off one side; <strong>iron, silicon and aluminum</strong> collect at the other.</li>
-        </ol>
-        <p class="result"><b>Status:</b> NASA finished a reactor test in 2025. Blue Origin's Blue Alchemist aims to turn the metals into solar cells and wire.</p>
-        <div class="src" id="s-o2"></div>
-      </div>
-      <div class="method">
-        <span class="tag t-lab">Lab-tested</span>
-        <h3>Molten salt (soil stays solid)</h3>
-        <ol>
-          <li>Put powdered soil in a basket inside molten calcium-chloride salt at <strong>950 °C</strong>. The soil does not melt.</li>
-          <li>Electricity pulls the oxygen out.</li>
-          <li>What's left is a <strong>mixed metal alloy</strong>.</li>
-        </ol>
-        <p class="result"><b>Result:</b> ESA got "virtually all the oxygen" out of fake Moon soil.</p>
-        <div class="src" id="s-o3"></div>
-      </div>
-      <div class="method">
-        <span class="tag t-lab">Lab-tested</span>
-        <h3>Concentrated sunlight + carbon</h3>
-        <ol>
-          <li>Mirrors focus sunlight to heat soil inside a reactor (carbothermal reduction).</li>
-          <li>Carbon pulls oxygen out as carbon monoxide.</li>
-          <li>The process then releases oxygen that can be collected.</li>
-        </ol>
-        <p class="result"><b>Status:</b> NASA and Sierra Space confirmed oxygen production from fake Moon soil using sunlight in 2026.</p>
-        <div class="src" id="s-o4"></div>
-      </div>
-    </div>
-  </section>
+<!-- ===================== OXYGEN ===================== -->
+<section class="panel" id="oxygen" role="tabpanel" data-name="Oxygen" data-color="#d9e2ea" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#ffffff,#d9e2ea 45%,#6c7a87)"></span>
+    <div><span class="num">03 · OXYGEN</span><h2>Oxygen</h2><p>The most common element in Moon soil, locked inside rock. Freeing it gives breathable air and half of rocket fuel.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>It's everywhere:</strong> 40–45% of Moon soil by weight, so it can be made at any landing site, not just the poles.</li>
+        <li><strong>Air and fuel:</strong> NASA studies describe oxygen plants as "refueling stations" for life support and propellant.</li>
+        <li><strong>Cheaper landings:</strong> Blue Origin says making oxygen on the Moon could make landings up to 60% cheaper (company's own estimate).</li>
+      </ul>
+      <div class="src" data-src="esaOxygen,ntrsIlmenite,blueAlchemist"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when now">Today</span><strong>Cleaner steel, born from Moon research.</strong> In the mid-2000s NASA paid MIT professor Donald Sadoway to find ways to make oxygen for Moon bases. Running electricity through iron-rich rock made oxygen, with metal left over. That idea became Boston Metal, which is developing steel made this way. Its only byproduct is oxygen, not carbon dioxide.</li>
+        <li><span class="when future">Possible future</span><strong>Cleaner steelmaking.</strong> Boston Metal aims to clean up the steel industry. It has built a prototype "green steel" reactor and already recovers valuable metals from mining waste in Brazil.</li>
+      </ul>
+      <div class="src" data-src="mitSteel"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>Every method needs very high temperatures (950–1,600 °C) and lots of power, which on the Moon means big solar arrays or nuclear power. <span class="src" data-src="aiaaMRE,ntrsIlmenite"></span></div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-field">Field-tested on Earth</span><h4>Hydrogen + ilmenite</h4>
+      <ol><li>Separate the iron-titanium mineral ilmenite from the soil.</li><li>Heat it with hydrogen to 700–1,000 °C. Out come iron, titanium dioxide and water.</li><li>Split the water into oxygen (kept) and hydrogen (reused).</li></ol>
+      <p class="result"><b>Result:</b> a NASA test reactor on Hawaii's Mauna Kea volcano made <b>660 kg of oxygen</b> in a year.</p><div class="src" data-src="ntrsIlmenite,spaceMaunaKea"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested · company scale-up</span><h4>Melt it, run electricity through it</h4>
+      <ol><li>Melt crushed soil at about 1,600 °C.</li><li>Pass a current through the melt (molten regolith electrolysis).</li><li>Oxygen bubbles off; iron, silicon and aluminum collect at the other side.</li></ol>
+      <p class="result"><b>Status:</b> NASA finished a reactor test in 2025; Blue Origin's Blue Alchemist is scaling it up.</p><div class="src" data-src="aiaaMRE,nasaISRU,blueAlchemist"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>Molten salt (soil stays solid)</h4>
+      <ol><li>Put powdered soil in molten calcium-chloride salt at 950 °C; the soil doesn't melt.</li><li>Electricity pulls the oxygen out.</li><li>A mixed metal alloy is left behind.</li></ol>
+      <p class="result"><b>Result:</b> ESA got "virtually all the oxygen" out of fake Moon soil.</p><div class="src" data-src="esaOxygen"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>Concentrated sunlight + carbon</h4>
+      <ol><li>Mirrors focus sunlight to heat soil in a reactor.</li><li>Carbon pulls oxygen out as carbon monoxide.</li><li>The process then releases oxygen to collect.</li></ol>
+      <p class="result"><b>Status:</b> NASA and Sierra Space confirmed oxygen from fake Moon soil using sunlight in 2026.</p><div class="src" data-src="nasaISRU"></div></div>
+  </div>
+</section>
 
-  <!-- ================= RARE EARTHS ================= -->
-  <section class="rsec" id="ree">
-    <span class="eyebrow"><i style="background:#e88cff"></i>Rare earths &amp; thorium</span>
-    <h2>No method yet, and first, a deposit has to be found</h2>
-    <div class="methods">
-      <div class="method">
-        <span class="tag t-none">No Moon method designed</span>
-        <h3>Why it's the hardest</h3>
-        <ol>
-          <li>Rare earths sit in tiny phosphate minerals (mostly merrillite and apatite) inside KREEP rock.</li>
-          <li>Merrillite makes up at most about 3% of the rock, which researchers say is too little to mine economically "based on current understanding."</li>
-          <li>Orbit maps show only broad averages. The USGS says a few smaller deposits might be as rich as ores mined on Earth, but they have to be found first.</li>
-        </ol>
-        <p class="result"><b>What would come first:</b> close-up prospecting in the Imbrium region with landers and rovers, before anyone designs a processing method.</p>
-        <div class="src" id="s-r1"></div>
-      </div>
-    </div>
-  </section>
+<!-- ===================== IRON ===================== -->
+<section class="panel" id="iron" role="tabpanel" data-name="Iron" data-color="#ff7a45" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#ffd9c7,#ff7a45 45%,#7a2a0c)"></span>
+    <div><span class="num">04 · IRON</span><h2>Iron</h2><p>Plentiful in the dark lava plains. It comes out as a by-product when oxygen is made from rock.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>Lots of it:</strong> lava-plain soil brought back by China's Chang'e-5 has 22.5% iron oxide.</li>
+        <li><strong>Build on the Moon:</strong> Moon soil could become "construction materials for habitats and spacecraft" instead of launching heavy metal from Earth.</li>
+        <li><strong>Comes for free:</strong> the hydrogen and melt-and-electricity oxygen methods leave iron behind.</li>
+      </ul>
+      <div class="src" data-src="ce5Soil,lmISRU,ntrsIlmenite,aiaaMRE"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when now">Today</span><strong>Green steel on Earth.</strong> Boston Metal's steelmaking method grew out of NASA-funded research on getting oxygen and metal from Moon rock. It makes iron with oxygen as the byproduct instead of carbon dioxide.</li>
+        <li><span class="when future">Possible future</span><strong>Less launching:</strong> building with Moon iron means fewer heavy launches from Earth.</li>
+      </ul>
+      <div class="src" data-src="mitSteel,lmISRU"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>Raw iron or mixed metal still has to be shaped into parts, which would need factories on the Moon. <span class="src" data-src="esaOxygen,aiaaMRE"></span></div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-field">Field-tested on Earth</span><h4>Hydrogen + ilmenite</h4><ol><li>Heat ilmenite with hydrogen at 700–1,000 °C.</li><li>Iron metal is left behind, along with titanium dioxide and water.</li></ol><div class="src" data-src="ntrsIlmenite"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>Melt + electricity</h4><ol><li>Melt soil at about 1,600 °C and pass a current through it.</li><li>Iron collects at one electrode, along with silicon and aluminum.</li></ol><div class="src" data-src="aiaaMRE"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>Molten salt</h4><ol><li>Remove the oxygen at 950 °C in molten salt.</li><li>A mixed metal alloy remains.</li></ol><div class="src" data-src="esaOxygen"></div></div>
+  </div>
+</section>
 
-  <!-- ================= PGMs ================= -->
-  <section class="rsec" id="pgm">
-    <span class="eyebrow"><i style="background:#c9ced6"></i>Platinum-group metals</span>
-    <h2>Searching old impact craters</h2>
-    <div class="methods">
-      <div class="method">
-        <span class="tag t-none">Only an idea so far</span>
-        <h3>Find asteroid leftovers, then dig</h3>
-        <ol>
-          <li>Up to about 6,500 craters (1 km or wider) might hold platinum-rich pieces of the asteroids that made them.</li>
-          <li>A 2025 study says the best chance is near the edges of old "impact melt sheets," like the Sudbury nickel and platinum mines in Canada.</li>
-          <li>No spacecraft has yet carried a sensor sharp enough to spot these metals from orbit.</li>
-        </ol>
-        <p class="result"><b>Status:</b> no deposit found. The Moon's own rock has far too little platinum to ever mine.</p>
-        <div class="src" id="s-p1"></div>
-      </div>
-    </div>
-  </section>
+<!-- ===================== TITANIUM ===================== -->
+<section class="panel" id="titanium" role="tabpanel" data-name="Titanium" data-color="#9aa8ff" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#eef0ff,#9aa8ff 45%,#30387a)"></span>
+    <div><span class="num">05 · TITANIUM</span><h2>Titanium</h2><p>Held in the black mineral ilmenite. Moon lava is far richer in titanium than similar rock on Earth.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>Rich deposits:</strong> up to about 12% titanium oxide at the richest spots, far more than similar rocks on Earth.</li>
+        <li><strong>One mineral, three resources:</strong> ilmenite holds titanium and iron, gives up oxygen when heated with hydrogen, and holds helium-3 better than other minerals.</li>
+      </ul>
+      <div class="src" data-src="lrocTi,earthskyTi,ntrsIlmenite,usgsHe3Map"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when none">No direct benefit yet</span>None of the sources describe a near-term benefit to Earth from Moon titanium. Its value is mainly for building and making oxygen on the Moon.</li>
+        <li><span class="when now">Today</span><strong>Science:</strong> scientists still don't know why the Moon is so much richer in titanium than Earth. It suggests the Moon's interior had less oxygen when it formed, which helps explain how the Moon evolved.</li>
+      </ul>
+      <div class="src" data-src="earthskyTi"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>The tested methods produce titanium dioxide or mixed metal alloys, not pure titanium metal. <span class="src" data-src="ntrsIlmenite,esaOxygen"></span></div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-field">Field-tested on Earth</span><h4>Separate ilmenite, then heat with hydrogen</h4><ol><li>Sort ilmenite out of the soil.</li><li>Heat it with hydrogen; the titanium ends up as titanium dioxide, with iron and water.</li></ol><div class="src" data-src="ntrsIlmenite"></div></div>
+    <div class="method"><span class="tag t-lab">Lab-tested</span><h4>Molten salt</h4><ol><li>Strip the oxygen from soil in molten salt at 950 °C.</li><li>A mixed metal alloy is left.</li></ol><div class="src" data-src="esaOxygen"></div></div>
+  </div>
+</section>
 
-  <!-- ================= COMPARE ================= -->
-  <section class="rsec" id="compare">
-    <span class="eyebrow">Compare all</span>
-    <h2>How far each resource has gotten</h2>
-    <div class="table-scroll">
-      <table class="cmp-table">
-        <thead><tr><th>Resource</th><th>Main ideas</th><th>Furthest it has gotten</th><th>Biggest challenge</th></tr></thead>
-        <tbody>
-          <tr><td>Water ice</td><td>Dig and bake · heat in place under a tent · microwaves</td><td>Lab tests on Earth; first ice drill reached the south pole in 2025 but couldn't dig</td><td>Working at −233 °C in the dark, and cleaning the water</td></tr>
-          <tr><td>Helium-3</td><td>Dig, sort, release gas, separate (Interlune) · till the surface (Magna Petra)</td><td>Prototypes on Earth; Moon test planned 2028</td><td>Huge amounts of soil for tiny amounts of gas</td></tr>
-          <tr><td>Oxygen</td><td>Hydrogen + ilmenite · melt + electricity · molten salt · sunlight + carbon</td><td>Field test on Earth (660 kg in a year); lab reactors</td><td>Very high temperatures and lots of power</td></tr>
-          <tr><td>Iron, silicon, aluminum, titanium</td><td>By-products of the oxygen methods</td><td>Lab tests on fake Moon soil</td><td>Turning mixed metal into useful parts</td></tr>
-          <tr><td>Rare earths</td><td>None designed yet</td><td>Mapped from orbit only</td><td>Finding a rich enough deposit</td></tr>
-          <tr><td>Platinum-group metals</td><td>Search impact craters</td><td>Estimates only</td><td>No sensor yet to find them</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+<!-- ===================== ALUMINUM & SILICON ===================== -->
+<section class="panel" id="alsi" role="tabpanel" data-name="Aluminum & silicon" data-color="#5ff0c4" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#e6fff6,#5ff0c4 45%,#13654a)"></span>
+    <div><span class="num">06 · ALUMINUM &amp; SILICON</span><h2>Aluminum &amp; silicon</h2><p>Aluminum fills the bright highlands, and silicon is in almost every rock. Together they could make power systems on the Moon.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>Plenty of both:</strong> highland samples hold 24–30% alumina, and silicon is one of the seven elements that make up 98–99% of Moon rock.</li>
+        <li><strong>Make power on the Moon:</strong> silicon becomes solar cells, and aluminum becomes wire and cables.</li>
+        <li><strong>Already demonstrated:</strong> Blue Origin's NASA-backed Blue Alchemist turns fake Moon soil into silicon solar cells and aluminum wire.</li>
+      </ul>
+      <div class="src" data-src="sourcebook,wustlComp,aiaaMRE,nasaISRU"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when future">Possible future</span><strong>Cleaner processing.</strong> Blue Origin says its method separates metals and silicon "without water, toxic chemicals, or carbon emissions" (company's own claim).</li>
+        <li><span class="when future">Possible future</span><strong>Less launching:</strong> solar panels made on the Moon would not have to be launched from Earth.</li>
+      </ul>
+      <div class="src" data-src="blueAlchemist,lmISRU"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>Solar cells need very pure silicon, and the process runs at about 1,600 °C. <span class="src" data-src="aiaaMRE,blueAlchemist"></span></div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-lab">Lab-tested · company scale-up</span><h4>Melt + electricity (Blue Alchemist)</h4><ol><li>Melt crushed soil at about 1,600 °C.</li><li>A current separates metal and silicon from oxygen.</li><li>Silicon is refined for solar cells; aluminum becomes wire.</li></ol><p class="result"><b>Status:</b> passed design review; a full autonomous ground demonstration was planned for 2026.</p><div class="src" data-src="aiaaMRE,blueAlchemist"></div></div>
+  </div>
+</section>
+
+<!-- ===================== RARE EARTHS ===================== -->
+<section class="panel" id="ree" role="tabpanel" data-name="Rare earths" data-color="#e88cff" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#fbe9ff,#e88cff 45%,#6a1f80)"></span>
+    <div><span class="num">07 · RARE EARTHS &amp; THORIUM</span><h2>Rare earths</h2><p>The magnet metals behind electric cars, wind turbines and defense systems. On the Moon they sit in rock called KREEP.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>One country controls the supply.</strong> In 2024 China produced 60% of mined magnet rare earths, 91% of refined output and 94% of the magnets.</li>
+        <li><strong>Supply is getting tighter.</strong> In 2025 China announced export controls on several rare earths.</li>
+        <li><strong>Demand is growing,</strong> led by electric vehicles. They are also used in satellites and missile guidance.</li>
+      </ul>
+      <div class="src" data-src="ieaREE,crsREE"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when future">Possible future</span><strong>A second supply.</strong> The USGS says a few Moon deposits might be as rich as ores mined on Earth. That could one day be a source outside today's concentrated supply chain.</li>
+        <li><span class="when future">Possible future</span><strong>Clean energy and cars:</strong> more supply for wind-turbine and electric-motor magnets.</li>
+      </ul>
+      <div class="src" data-src="usgsREE,ieaREE"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>No rich deposit has been found, and no Moon method has been designed. The rare-earth minerals make up at most about 3% of the rock, which researchers call too little to mine economically "based on current understanding." <span class="src" data-src="mdpiREE,usgsREE"></span></div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-none">No Moon method designed</span><h4>Step one: find a deposit</h4><ol><li>Orbit maps show only broad averages over huge areas.</li><li>Landers and rovers would need to prospect the Imbrium region up close.</li><li>Only then could a processing method be designed.</li></ol><div class="src" data-src="usgsREE,mdpiREE"></div></div>
+  </div>
+</section>
+
+<!-- ===================== PGMs ===================== -->
+<section class="panel" id="pgm" role="tabpanel" data-name="Platinum metals" data-color="#c9ced6" hidden>
+  <div class="phead"><span class="orb" style="background:radial-gradient(circle at 35% 30%,#ffffff,#c9ced6 45%,#4d535c)"></span>
+    <div><span class="num">08 · PLATINUM-GROUP METALS</span><h2>Platinum-group metals</h2><p>Platinum, palladium and their relatives, possibly left in old craters by metal-rich asteroids.</p></div></div>
+  <div class="why2">
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="none" stroke="#fc3d21" stroke-width="2"/><circle cx="9" cy="9" r="3" fill="#fc3d21"/></svg>Why extract it</h3>
+      <ul>
+        <li><strong>Few sources on Earth:</strong> since 1900, about 90% of production has come from South Africa and Russia.</li>
+        <li><strong>Needed for clean tech:</strong> catalytic converters use the most, and fuel cells and the electrolyzers that make clean hydrogen need platinum and iridium.</li>
+      </ul>
+      <div class="src" data-src="usgsPGE,doePGM"></div></div>
+    <div><h3><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#1c67e3"/><path d="M3 8c3-2 5 1 7-1s3-1 5 1M4 12c2-1 4 1 6 0" stroke="#3fd0a0" stroke-width="1.6" fill="none"/></svg>How it could help Earth &amp; humanity</h3>
+      <ul>
+        <li><span class="when future">Possible future</span><strong>More supply for clean hydrogen,</strong> if a rich deposit is ever found and can be brought back.</li>
+        <li><span class="when now">Today</span><strong>Worth knowing:</strong> on Earth, recycled catalytic converters, jewelry and electronics already supply enough to close the gap between mining and use.</li>
+      </ul>
+      <div class="src" data-src="doePGM,usgsPGE"></div></div>
+  </div>
+  <div class="catch"><b>The catch</b>No deposit has been found, and the Moon's own rock has far too little to ever mine. No spacecraft has carried a sensor sharp enough to find these metals. <span class="src" data-src="pgmNature,pgmCraters"></span></div>
+  <h3 class="sub">How it could be extracted</h3>
+  <div class="methods">
+    <div class="method"><span class="tag t-none">Only an idea so far</span><h4>Find asteroid leftovers, then dig</h4><ol><li>Up to about 6,500 craters (1 km or wider) might hold platinum-rich asteroid remains.</li><li>The best chance is near the edges of old impact melt sheets, like Canada's Sudbury mines.</li><li>A new orbiting sensor would be needed to find them first.</li></ol><div class="src" data-src="pgmCraters,pgmNature"></div></div>
+  </div>
+</section>
+
+<!-- ===================== COMPARE ===================== -->
+<section class="panel" id="compare" role="tabpanel" data-name="Compare all" data-color="#1d1d1d" hidden>
+  <div class="phead"><span class="orb" style="background:conic-gradient(#7fdcff,#ffcf5a,#d9e2ea,#ff7a45,#9aa8ff,#5ff0c4,#e88cff,#c9ced6,#7fdcff)"></span>
+    <div><span class="num">COMPARE ALL</span><h2>Side by side</h2><p>Why each resource matters, and how far it has gotten.</p></div></div>
+  <div class="table-scroll">
+    <table class="cmp-table">
+      <thead><tr><th>Resource</th><th>Why it matters</th><th>Could help Earth by</th><th>Furthest it has gotten</th></tr></thead>
+      <tbody>
+        <tr><td>Water ice</td><td>Water, air and rocket fuel on the Moon</td><td>Cheaper space services (possible)</td><td>Lab tests; first ice drill reached the south pole in 2025 but couldn't dig</td></tr>
+        <tr><td>Helium-3</td><td>Earth has under 10 kg; buyers already signed</td><td>Security, lung imaging, quantum computers; maybe cleaner fusion</td><td>Prototypes on Earth; Moon test planned 2028</td></tr>
+        <tr><td>Oxygen</td><td>40–45% of soil; air and fuel anywhere</td><td>Already inspired cleaner steelmaking (Boston Metal)</td><td>Field test on Earth (660 kg in a year)</td></tr>
+        <tr><td>Iron</td><td>Building material, made alongside oxygen</td><td>Green steel spinoff; fewer launches</td><td>Lab tests on fake Moon soil</td></tr>
+        <tr><td>Titanium</td><td>Rich ilmenite also holds oxygen and helium-3</td><td>No direct benefit yet</td><td>Titanium dioxide or alloys in lab tests</td></tr>
+        <tr><td>Aluminum &amp; silicon</td><td>Wire and solar cells for Moon power</td><td>Possibly cleaner processing</td><td>Solar cells and wire from fake Moon soil</td></tr>
+        <tr><td>Rare earths</td><td>China controls most of today's supply</td><td>A second supply, if a deposit is found</td><td>Mapped from orbit only</td></tr>
+        <tr><td>Platinum metals</td><td>Clean-hydrogen tech; supply concentrated</td><td>More supply, if found</td><td>Estimates only</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<div class="pager"><button type="button" id="prev">← Previous</button><button type="button" id="next">Next →</button></div>
 </main>
 
-<footer><div class="in">Research done 19 November 2026 with Tavily; each source was opened in full to check the wording. These are proposed and tested methods, not proven Moon operations. <a href="sources.html">All sources</a>.</div></footer>
+<footer><div class="in">Research done 19 November 2026 with Tavily; each source was opened in full to check the wording. "Today" means already happening; "Possible future" means not yet proven. <a href="sources.html">All sources</a>.</div></footer>
 
 <script src="assets/data.js"></script>
 <script>
-  const put = (id, keys) => { const el = document.getElementById(id); if (el) el.innerHTML = "Sources: " + srcList(keys); };
-  put("s-banner", ["nasaPrime1"]);
-  put("s-qa", ["nasaWaterQA", "mitIce", "ntrsMicrowave", "sofia"]);
-  put("s-w1", ["spaceMaunaKea", "ntrsPropellant"]);
-  put("s-w2", ["mitIce", "nasaThermal"]);
-  put("s-w3", ["ntrsMicrowave"]);
-  put("s-w4", ["ntrsPropellant", "mitIce", "natLCROSS"]);
-  put("s-h1", ["interlunePlan", "vermeer", "ntrsHe3", "prospectMoon", "spacenewsUsgs"]);
-  put("s-h2", ["magnaFAQ", "he3Rivals"]);
-  put("s-o1", ["ntrsIlmenite", "spaceMaunaKea"]);
-  put("s-o2", ["aiaaMRE", "nasaISRU", "blueAlchemist"]);
-  put("s-o3", ["esaOxygen"]);
-  put("s-o4", ["nasaISRU"]);
-  put("s-r1", ["mdpiREE", "usgsREE"]);
-  put("s-p1", ["pgmNature", "pgmCraters"]);
+  // sources
+  document.querySelectorAll("[data-src]").forEach(el => { el.innerHTML = "Sources: " + srcList(el.dataset.src.split(",")); });
   // ice grains in the crater drawing
   const g = document.getElementById("icegr");
   for (let i = 0; i < 46; i++) {
@@ -332,6 +428,37 @@
     c.setAttribute("cx", x.toFixed(1)); c.setAttribute("cy", (base + (Math.random() - 0.5) * 18).toFixed(1)); c.setAttribute("r", (1.4 + Math.random() * 1.8).toFixed(1));
     g.appendChild(c);
   }
+  // tabs
+  const panels = [...document.querySelectorAll(".panel")];
+  const bar = document.getElementById("tabs");
+  const tabs = panels.map(p => {
+    const b = document.createElement("button");
+    b.className = "tab"; b.type = "button"; b.setAttribute("role", "tab"); b.id = "t-" + p.id;
+    b.setAttribute("aria-controls", p.id); p.setAttribute("aria-labelledby", b.id);
+    b.innerHTML = `<i style="background:${p.dataset.color}"></i>${p.dataset.name}`;
+    b.addEventListener("click", () => show(p.id, true));
+    bar.appendChild(b); return b;
+  });
+  const prev = document.getElementById("prev"), next = document.getElementById("next");
+  function show(id, scroll) {
+    const i = Math.max(0, panels.findIndex(p => p.id === id));
+    panels.forEach((p, j) => { p.hidden = j !== i; tabs[j].setAttribute("aria-selected", j === i); tabs[j].tabIndex = j === i ? 0 : -1; });
+    tabs[i].scrollIntoView({ block: "nearest", inline: "center" });
+    prev.hidden = i === 0; next.hidden = i === panels.length - 1;
+    prev.textContent = i > 0 ? "← " + panels[i - 1].dataset.name : "";
+    next.textContent = i < panels.length - 1 ? panels[i + 1].dataset.name + " →" : "";
+    history.replaceState(null, "", "#" + panels[i].id);
+    if (scroll) document.querySelector(".tabbar").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+  bar.addEventListener("keydown", e => {
+    const i = tabs.indexOf(document.activeElement); if (i < 0) return;
+    const j = e.key === "ArrowRight" ? (i + 1) % tabs.length : e.key === "ArrowLeft" ? (i - 1 + tabs.length) % tabs.length : -1;
+    if (j >= 0) { e.preventDefault(); show(panels[j].id); tabs[j].focus(); }
+  });
+  prev.addEventListener("click", () => { const i = panels.findIndex(p => !p.hidden); show(panels[i - 1].id, true); });
+  next.addEventListener("click", () => { const i = panels.findIndex(p => !p.hidden); show(panels[i + 1].id, true); });
+  const start = location.hash.slice(1);
+  show(panels.some(p => p.id === start) ? start : "water", false);
 </script>
 </body>
 </html>
