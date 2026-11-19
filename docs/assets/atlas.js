@@ -1,6 +1,6 @@
-// Moon Resource Atlas: a draggable Moon globe with resource areas and missions.
-// The Moon picture is drawn pixel by pixel on a canvas (orthographic projection),
-// and everything on top (areas, dots, labels) is drawn in SVG with d3.
+// Moon Resource Atlas, map engine v2.
+// The Moon is drawn pixel by pixel on a canvas (orthographic projection) from NASA's LROC color map,
+// with lighting and resource "glow" layers blended into the surface. Missions and labels are SVG (d3).
 (function () {
   const box = document.getElementById("globe");
   const canvas = box.querySelector("canvas");
@@ -8,62 +8,179 @@
   const svg = d3.select(box).select("svg");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const DEG = Math.PI / 180;
-  // Where longitude 0 sits across the width of the Moon picture (0 = left edge, 0.5 = middle).
-  // The NASA LROC map has longitude 0 in the middle. Checked against Copernicus crater and Mare Crisium.
-  const TEX_SHIFT = 0.5;
-  const CONTRAST = 1.25; // makes the dark lava plains (maria) easier to see
+  const TEX_SHIFT = 0.5;   // NASA LROC map has longitude 0 in the middle (checked against Copernicus and Mare Crisium)
 
   const state = {
     lon: 20, lat: 8, zoom: 1,
-    layers: new Set(["he3", "ice", "ree"]),
+    mode: "both",                     // both | res | mis
+    layers: new Set(Object.keys(RESOURCES).filter(k => RESOURCES[k].on)),
     who: new Set(Object.keys(COUNTRIES)),
     status: new Set(["landed", "crashed", "planned"]),
     selected: null,
+    shift: +(box.dataset.shift || 0),
+    size: +(box.dataset.size || 0.44),
   };
 
-  let W = 0, H = 0, Q = 1, tex = null, tw = 0, th = 0, img = null;
+  // Resource glow colors (RGB)
+  const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+  const GLOW = Object.fromEntries(Object.entries(RESOURCES).map(([k, r]) => [k, hex(r.color)]));
+  const GLOW_STRENGTH = { he3: 0.75, ice: 1.0, ree: 0.6, ti: 0.85, fe: 0.62, al: 0.55 };
 
-  // ---------- texture ----------
+  let W = 0, H = 0, Q = 1, tex = null, tw = 0, th = 0, img = null;
+  const GW = 2048, GH = 1024;         // resolution of the resource fields
+  const field = {};                   // key -> Uint8Array(GW*GH), 0..255
+
+  // ---------- texture + resource fields ----------
   const image = new Image();
   image.src = "assets/moon.jpg";
+  let fieldsReady = false;
   image.onload = () => {
     const c = document.createElement("canvas");
     tw = c.width = image.naturalWidth; th = c.height = image.naturalHeight;
     const cx = c.getContext("2d");
     cx.drawImage(image, 0, 0);
     tex = cx.getImageData(0, 0, tw, th).data;
-    draw();
+    draw();                              // show the Moon right away
+    setTimeout(buildFields, 30);         // then build the resource glows in the background
   };
 
-  function radius() { return Math.min(W, H) * 0.46 * state.zoom; }
+  const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const vec = (lon, lat) => { const l = lon * DEG, b = lat * DEG; return [Math.cos(b) * Math.cos(l), Math.cos(b) * Math.sin(l), Math.sin(b)]; };
+
+  // Fields are illustrations built from published maps, shaped by the real terrain:
+  //  helium-3: dark lava plains (maria), brightest inside the richer areas of the USGS model
+  //  water ice: craters with permanently shadowed floors near the poles
+  //  rare earths & thorium: the KREEP region around the Imbrium basin (Lunar Prospector, USGS)
+  //  titanium: lava plains scaled by surface blueness (the LROC method uses the same color effect)
+  //  iron: lava plains plus the South Pole-Aitken basin floor; aluminum: bright highlands
+  function buildFields() {
+    const N = GW * GH;
+    const L = new Float32Array(N), BR = new Float32Array(N);
+    for (let y = 0; y < GH; y++) {
+      const row = Math.floor((y + 0.5) / GH * th) * tw;
+      for (let x = 0; x < GW; x++) {
+        const ti = (row + Math.floor((x + 0.5) / GW * tw)) * 4;
+        L[y * GW + x] = 0.3 * tex[ti] + 0.59 * tex[ti + 1] + 0.11 * tex[ti + 2];
+        BR[y * GW + x] = tex[ti + 2] / (tex[ti] + 1);   // blueness; checked: Tranquillitatis 0.97 vs Serenitatis 0.90
+      }
+    }
+    const Lb = blur(L, 4), BRb = blur(BR, 5);
+    const he3C = RESOURCES.he3.areas.map(a => ({ v: vec(a.c[0], a.c[1]), s: (a.c[2] * 0.9 * DEG) ** 2 }));
+    const craters = RESOURCES.ice.spots.map(c => ({ v: vec(c.ll[0], c.ll[1]), s: ((c.d / 2 / 30.3) * 0.85 * DEG) ** 2 }));
+    const reeV = vec(-25, 18), reeS = (26 * DEG) ** 2, imbV = vec(-17, 33), spaV = vec(-169, -53);
+    for (const k of ["he3", "ice", "ree", "ti", "fe", "al"]) field[k] = new Uint8Array(N);
+    const cosL = new Float32Array(GW), sinL = new Float32Array(GW);
+    for (let x = 0; x < GW; x++) { const l = ((x + 0.5) / GW - TEX_SHIFT) * 2 * Math.PI; cosL[x] = Math.cos(l); sinL[x] = Math.sin(l); }
+    const ringCos0 = Math.cos(36 * DEG), spaCos0 = Math.cos(38 * DEG);
+    let y = 0;
+    (function chunk() {
+      const t0 = performance.now();
+      for (; y < GH && performance.now() - t0 < 24; y++) {
+        const lat = 90 - (y + 0.5) / GH * 180, alat = Math.abs(lat);
+        const cb = Math.cos(lat * DEG), sb = Math.sin(lat * DEG);
+        const notPolar = 1 - smooth(68, 76, alat), he3Lat = 1 - smooth(60, 75, alat);
+        for (let x = 0; x < GW; x++) {
+          const i = y * GW + x, lum = Lb[i];
+          const px = cb * cosL[x], py = cb * sinL[x], pz = sb;
+          const maria = smooth(128, 92, lum);
+          // helium-3
+          if (maria > 0 && he3Lat > 0) {
+            let rich = 0;
+            for (const c of he3C) { const d = 1 - (px * c.v[0] + py * c.v[1] + pz * c.v[2]); if (d < 4 * c.s) rich = Math.max(rich, Math.exp(-2 * d / c.s)); }
+            field.he3[i] = 255 * maria * (0.2 + 0.8 * rich) * he3Lat;
+          }
+          // water ice
+          if (alat > 80) {
+            let ice = 0;
+            for (const c of craters) { const d = 1 - (px * c.v[0] + py * c.v[1] + pz * c.v[2]); if (d < 4 * c.s) ice = Math.max(ice, Math.exp(-2 * d / c.s)); }
+            field.ice[i] = 255 * Math.min(1, smooth(0.12, 0.75, ice) * (0.7 + 0.3 * smooth(110, 50, L[i])));
+          }
+          // rare earths & thorium
+          const dr = 1 - (px * reeV[0] + py * reeV[1] + pz * reeV[2]);
+          if (dr < 4 * reeS) {
+            const blob = Math.exp(-2 * dr / reeS);
+            const ci = px * imbV[0] + py * imbV[1] + pz * imbV[2];
+            const ring = ci > ringCos0 ? Math.exp(-(((Math.acos(Math.min(1, ci)) / DEG) - 18) ** 2) / 72) : 0;
+            field.ree[i] = 255 * Math.min(1, 0.65 * blob + 0.6 * ring * blob ** 0.3) * (0.7 + 0.3 * smooth(80, 160, L[i]));
+          }
+          // titanium
+          if (maria > 0) field.ti[i] = 255 * maria * smooth(0.905, 0.975, BRb[i]) * notPolar;
+          // iron and aluminum
+          const cs = px * spaV[0] + py * spaV[1] + pz * spaV[2];
+          const spaIn = cs > spaCos0 ? 1 - smooth(26, 36, Math.acos(Math.min(1, cs)) / DEG) : 0;
+          field.fe[i] = 255 * Math.max(maria * (0.45 + 0.55 * smooth(105, 65, lum)), spaIn * 0.5) * notPolar;
+          field.al[i] = 255 * (1 - maria) * (0.35 + 0.65 * smooth(125, 190, lum)) * smooth(105, 135, lum) * (1 - 0.6 * spaIn) * (0.6 + 0.4 * notPolar);
+        }
+      }
+      if (y < GH) setTimeout(chunk, 0);
+      else { fieldsReady = true; draw(); }
+    })();
+  }
+  function blur(src, r) {
+    const tmp = new Float32Array(src.length), out = new Float32Array(src.length);
+    for (let y = 0; y < GH; y++) { let s = 0; for (let x = -r; x <= r; x++) s += src[y * GW + ((x + GW) % GW)];
+      for (let x = 0; x < GW; x++) { tmp[y * GW + x] = s / (2 * r + 1); s += src[y * GW + ((x + r + 1) % GW)] - src[y * GW + ((x - r + GW) % GW)]; } }
+    for (let x = 0; x < GW; x++) { let s = 0; for (let y = -r; y <= r; y++) s += tmp[Math.max(0, Math.min(GH - 1, y)) * GW + x];
+      for (let y = 0; y < GH; y++) { out[y * GW + x] = s / (2 * r + 1); s += tmp[Math.min(GH - 1, y + r + 1) * GW + x] - tmp[Math.max(0, y - r) * GW + x]; } }
+    return out;
+  }
+  function fieldAt(key, lon, lat) {
+    const f = field[key]; if (!f || !fieldsReady) return 0;
+    let u = (lon / 360 + TEX_SHIFT) % 1; if (u < 0) u += 1;
+    const y = Math.min(GH - 1, Math.max(0, Math.floor((90 - lat) / 180 * GH)));
+    return f[y * GW + Math.floor(u * GW)] / 255;
+  }
+
+  function radius() { return Math.min(W, H) * state.size * state.zoom; }
+  function centerX() { return W / 2 + state.shift * W; }
 
   // ---------- Moon picture ----------
+  // Sunlight comes from the upper left of the screen, so the Moon looks round.
+  const SUN = (() => { const v = [-0.45, 0.5, 0.74]; const n = Math.hypot(...v); return v.map(x => x / n); })();
   function paint(step) {
     if (!tex || !img) return;
     const bw = img.width, bh = img.height, out = img.data;
-    const r = radius() * Q, cx = bw / 2, cy = bh / 2;
+    const r = radius() * Q, cx = centerX() * Q, cy = bh / 2;
     const lon0 = state.lon * DEG, lat0 = state.lat * DEG;
     const sl = Math.sin(lat0), cl = Math.cos(lat0);
-    const TWO_PI = 2 * Math.PI;
+    const showRes = state.mode !== "mis" && fieldsReady;
+    const keys = showRes ? [...state.layers] : [];
+    const fl = keys.map(k => field[k]), cols = keys.map(k => GLOW[k]), str = keys.map(k => GLOW_STRENGTH[k]);
+    const dim = keys.length ? 0.82 : 1; // dim the surface a little so glows stand out
     out.fill(0);
-    for (let py = 0; py < bh; py += step) {
+    const y0 = Math.max(0, Math.floor(cy - r - 2)), y1 = Math.min(bh, Math.ceil(cy + r + 2));
+    for (let py = y0 - (y0 % step); py < y1; py += step) {
       const y = (cy - py) / r;
-      for (let px = 0; px < bw; px += step) {
+      const xr = Math.sqrt(Math.max(0, 1 - y * y)) * r;
+      const x0 = Math.max(0, Math.floor(cx - xr - 2)), x1 = Math.min(bw, Math.ceil(cx + xr + 2));
+      for (let px = x0 - (x0 % step); px < x1; px += step) {
         const x = (px - cx) / r;
         const rho2 = x * x + y * y;
         if (rho2 > 1) continue;
         const cosc = Math.sqrt(1 - rho2);
         const lat = Math.asin(Math.max(-1, Math.min(1, cosc * sl + y * cl)));
         const lon = lon0 + Math.atan2(x, cosc * cl - y * sl);
-        let u = (lon / TWO_PI + TEX_SHIFT) % 1; if (u < 0) u += 1;
-        const ti = ((Math.min(th - 1, ((Math.PI / 2 - lat) / Math.PI) * th | 0) * tw) + (u * tw | 0)) * 4;
-        const shade = 0.42 + 0.58 * Math.sqrt(cosc);
-        const R = ((tex[ti] - 120) * CONTRAST + 100) * shade, G = ((tex[ti + 1] - 120) * CONTRAST + 100) * shade, B = ((tex[ti + 2] - 120) * CONTRAST + 100) * shade;
+        let u = (lon / (2 * Math.PI) + TEX_SHIFT) % 1; if (u < 0) u += 1;
+        const vrow = Math.min(th - 1, ((Math.PI / 2 - lat) / Math.PI) * th | 0);
+        const ti = (vrow * tw + (u * tw | 0)) * 4;
+        // lighting: view-space normal is (x, y, cosc)
+        const ndl = x * SUN[0] + y * SUN[1] + cosc * SUN[2];
+        const light = (0.38 + 0.62 * Math.max(0, 0.35 + 0.65 * ndl)) * (0.72 + 0.28 * Math.sqrt(cosc)) * dim;
+        let R = ((tex[ti] - 120) * 1.22 + 108) * light, G = ((tex[ti + 1] - 120) * 1.22 + 108) * light, B = ((tex[ti + 2] - 120) * 1.22 + 110) * light;
+        if (fl.length) {
+          const gi = Math.min(GH - 1, ((Math.PI / 2 - lat) / Math.PI) * GH | 0) * GW + (u * GW | 0);
+          for (let k = 0; k < fl.length; k++) {
+            const a = fl[k][gi] / 255 * str[k];
+            if (a > 0.01) {
+              // tint by the surface brightness, so craters and ridges stay visible under the color
+              const c = cols[k], lf = 0.42 + 0.7 * Math.min(1.4, (R + G + B) / 420);
+              R += (c[0] * lf - R) * a; G += (c[1] * lf - G) * a; B += (c[2] * lf - B) * a;
+            }
+          }
+        }
         for (let dy = 0; dy < step && py + dy < bh; dy++) {
           let oi = ((py + dy) * bw + px) * 4;
-          for (let dx = 0; dx < step && px + dx < bw; dx++, oi += 4) {
-            out[oi] = R; out[oi + 1] = G; out[oi + 2] = B; out[oi + 3] = 255;
-          }
+          for (let dx = 0; dx < step && px + dx < bw; dx++, oi += 4) { out[oi] = R; out[oi + 1] = G; out[oi + 2] = B; out[oi + 3] = 255; }
         }
       }
     }
@@ -73,136 +190,166 @@
   // ---------- overlays ----------
   const proj = d3.geoOrthographic().clipAngle(90);
   const path = d3.geoPath(proj);
-  const grat = d3.geoGraticule10();
-  const gGrid = svg.append("path").attr("fill", "none").attr("stroke", "rgb(255 255 255 / 8%)");
-  const gRim = svg.append("circle").attr("fill", "none").attr("stroke", "rgb(255 255 255 / 18%)");
-  const gAreas = svg.append("g");
+  const defs = svg.append("defs");
+  const rg = defs.append("radialGradient").attr("id", "rimglow");
+  [[0, 0], [92, 0], [94, 0.2], [100, 0]].forEach(([o, a]) => rg.append("stop").attr("offset", o + "%").attr("stop-color", "#9fc3ff").attr("stop-opacity", a));
+  const gRim = svg.append("circle").attr("fill", "url(#rimglow)").style("pointer-events", "none");
+  const gGrid = svg.append("path").attr("fill", "none").attr("stroke", "rgb(255 255 255 / 6%)").style("pointer-events", "none");
+  const gRegions = svg.append("g");
   const gMarks = svg.append("g");
-  const gLabels = svg.append("g");
+  const gLabels = svg.append("g").style("pointer-events", "none");
+  const gTip = svg.append("g").style("pointer-events", "none").attr("opacity", 0);
+  gTip.append("rect").attr("rx", 6).attr("fill", "rgb(10 12 16 / 92%)").attr("stroke", "rgb(255 255 255 / 20%)");
+  gTip.append("text").attr("class", "tip1").attr("fill", "#fff").attr("font-weight", 700).attr("font-size", 13);
+  gTip.append("text").attr("class", "tip2").attr("fill", "#b7bec8").attr("font-size", 11.5);
 
-  function visible(ll) { return d3.geoDistance(ll, [state.lon, state.lat]) < Math.PI / 2 - 0.02; }
-
+  function visible(ll) { return d3.geoDistance(ll, [state.lon, state.lat]) < Math.PI / 2 - 0.03; }
   function missionShown(m) { return state.who.has(m.who) && state.status.has(m.status); }
+  const FEATURED = new Set(["a11", "a17", "ce4", "ce6", "ch3", "ce7", "bg1", "slim"]);
+  const isPolar = m => { const ll = m.ll || [m.region[0], m.region[1]]; return ll[1] < -78; };
 
   function overlays() {
-    proj.rotate([-state.lon, -state.lat]).scale(radius()).translate([W / 2, H / 2]);
-    gGrid.attr("d", path(grat));
-    gRim.attr("cx", W / 2).attr("cy", H / 2).attr("r", radius());
+    proj.rotate([-state.lon, -state.lat]).scale(radius()).translate([centerX(), H / 2]);
+    const R = radius();
+    gRim.attr("cx", centerX()).attr("cy", H / 2).attr("r", R * 1.07);
+    gGrid.attr("d", state.zoom > 1.6 ? path(d3.geoGraticule10()) : null);
 
-    // resource areas
-    const areas = [];
-    for (const key of state.layers) {
-      const res = RESOURCES[key];
-      res.areas.forEach((a, i) => areas.push({ key, res, a, id: key + i }));
-    }
-    const ap = gAreas.selectAll("path.area").data(areas, d => d.id);
-    ap.exit().remove();
-    ap.enter().append("path").attr("class", "area").style("cursor", "pointer")
-      .on("click", (e, d) => select({ type: "area", d }))
-      .merge(ap)
-      .attr("d", d => path(d3.geoCircle().center([d.a.c[0], d.a.c[1]]).radius(d.a.c[2])()))
-      .attr("fill", d => d.res.color).attr("fill-opacity", 0.2)
-      .attr("stroke", d => d.res.color).attr("stroke-width", 1.6).attr("stroke-dasharray", "5 4");
+    const showM = state.mode !== "res";
+    const cluster = showM && state.zoom < 1.75;
+    const all = showM ? MISSIONS.filter(missionShown) : [];
+    const polar = cluster ? all.filter(isPolar) : [];
+    const singles = all.filter(m => !polar.includes(m));
 
-    // ice spots
-    const spots = state.layers.has("ice") ? RESOURCES.ice.spots.filter(s => visible(s.ll)) : [];
-    const sp = gAreas.selectAll("circle.spot").data(spots, d => d.name);
-    sp.exit().remove();
-    sp.enter().append("circle").attr("class", "spot").attr("r", 3.5).attr("fill", "#7fdcff").attr("stroke", "#05080c")
-      .append("title").text(d => d.name);
-    gAreas.selectAll("circle.spot").attr("cx", d => proj(d.ll)[0]).attr("cy", d => proj(d.ll)[1]);
-
-    // mission regions (plans with no exact site)
-    const regs = MISSIONS.filter(m => m.region && missionShown(m));
-    const rp = gAreas.selectAll("path.region").data(regs, d => d.id);
+    // planned regions (no exact site): soft dashed outline
+    const regs = singles.filter(m => m.region && visible([m.region[0], m.region[1]]));
+    const rp = gRegions.selectAll("path").data(regs, d => d.id);
     rp.exit().remove();
-    rp.enter().append("path").attr("class", "region").style("cursor", "pointer")
-      .on("click", (e, d) => select({ type: "mission", d }))
+    rp.enter().append("path").style("cursor", "pointer")
+      .on("click", (e, d) => { e.stopPropagation(); select({ type: "mission", d }); })
+      .on("mouseenter", (e, d) => tip(d, proj([d.region[0], d.region[1]]))).on("mouseleave", hideTip)
       .merge(rp)
-      .attr("d", d => path(d3.geoCircle().center([d.region[0], d.region[1]]).radius(d.region[2])()))
-      .attr("fill", d => COUNTRIES[d.who].color).attr("fill-opacity", d => d === state.selected ? 0.25 : 0.07)
-      .attr("stroke", d => COUNTRIES[d.who].color).attr("stroke-width", d => d === state.selected ? 3 : 1.6)
-      .attr("stroke-dasharray", "2 4");
+      .attr("d", d => path(d3.geoCircle().center([d.region[0], d.region[1]]).radius(d.region[2] * 0.7)()))
+      .attr("fill", d => COUNTRIES[d.who].color).attr("fill-opacity", d => d === state.selected ? 0.22 : 0.06)
+      .attr("stroke", d => COUNTRIES[d.who].color).attr("stroke-opacity", 0.9).attr("stroke-width", d => d === state.selected ? 2.4 : 1.3)
+      .attr("stroke-dasharray", "3 4");
 
-    // mission dots
-    const dots = MISSIONS.filter(m => m.ll && missionShown(m) && visible(m.ll));
+    // mission markers
+    const dots = singles.filter(m => m.ll && visible(m.ll));
     const mk = gMarks.selectAll("g.m").data(dots, d => d.id);
     mk.exit().remove();
-    const enter = mk.enter().append("g").attr("class", "m").style("cursor", "pointer")
-      .on("click", (e, d) => { e.stopPropagation(); select({ type: "mission", d }); });
-    enter.append("circle").attr("class", "hit").attr("r", 13).attr("fill", "transparent");
-    enter.append("circle").attr("class", "halo").attr("r", 12).attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 2);
-    enter.each(function (d) {
+    const en = mk.enter().append("g").attr("class", "m").style("cursor", "pointer")
+      .on("click", (e, d) => { e.stopPropagation(); select({ type: "mission", d }); })
+      .on("mouseenter", (e, d) => tip(d, proj(d.ll))).on("mouseleave", hideTip);
+    en.append("circle").attr("r", 14).attr("fill", "transparent");
+    en.each(function (d) {
       const g = d3.select(this), c = COUNTRIES[d.who].color;
-      if (d.status === "landed") g.append("circle").attr("r", 6).attr("fill", c).attr("stroke", "#05080c").attr("stroke-width", 2);
-      else if (d.status === "planned") g.append("circle").attr("r", 6).attr("fill", "rgb(5 8 12 / 60%)").attr("stroke", c).attr("stroke-width", 2.6);
-      else g.append("path").attr("d", "M-5,-5L5,5M5,-5L-5,5").attr("stroke", c).attr("stroke-width", 3).attr("stroke-linecap", "round");
-      g.append("title").text(`${d.name} (${d.year})`);
+      if (d.status === "landed") {
+        g.append("circle").attr("r", 7.5).attr("fill", "rgb(0 0 0 / 45%)");
+        g.append("circle").attr("r", 5.2).attr("fill", c).attr("stroke", "#fff").attr("stroke-width", 1.6);
+      } else if (d.status === "planned") {
+        if (!reduce) g.append("circle").attr("class", "pulse").attr("r", 6).attr("fill", "none").attr("stroke", c).attr("stroke-width", 2);
+        g.append("circle").attr("r", 5.5).attr("fill", "rgb(0 0 0 / 55%)").attr("stroke", c).attr("stroke-width", 2.6);
+        g.append("circle").attr("r", 1.8).attr("fill", c);
+      } else {
+        g.append("path").attr("d", "M-4,-4L4,4M4,-4L-4,4").attr("stroke", "rgb(0 0 0 / 60%)").attr("stroke-width", 4.5).attr("stroke-linecap", "round");
+        g.append("path").attr("d", "M-4,-4L4,4M4,-4L-4,4").attr("stroke", c).attr("stroke-width", 2.2).attr("stroke-linecap", "round");
+      }
+      g.append("circle").attr("class", "sel").attr("r", 11).attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 2);
     });
-    gMarks.selectAll("g.m")
-      .attr("transform", d => { const p = proj(d.ll); return `translate(${p[0]},${p[1]})`; })
-      .select(".halo").attr("opacity", d => d === state.selected ? 1 : 0);
+    gMarks.selectAll("g.m").attr("transform", d => { const p = proj(d.ll); return `translate(${p[0]},${p[1]})`; })
+      .select(".sel").attr("opacity", d => d === state.selected ? 1 : 0);
 
-    labels(areas, dots, regs);
+    // south pole cluster badge
+    const cl = polar.length ? [{ n: polar.length, list: polar }] : [];
+    const poleLL = [0, -89.5];
+    const cb = gMarks.selectAll("g.cluster").data(cl.filter(() => visible(poleLL) || d3.geoDistance(poleLL, [state.lon, state.lat]) < Math.PI / 2 + 0.02));
+    cb.exit().remove();
+    const ce = cb.enter().append("g").attr("class", "cluster").style("cursor", "pointer")
+      .on("click", e => { e.stopPropagation(); setView("south"); });
+    ce.append("circle").attr("r", 19).attr("fill", "rgb(8 10 14 / 88%)").attr("stroke", "#fff").attr("stroke-width", 1.5);
+    ce.append("g").attr("class", "donut");
+    ce.append("text").attr("text-anchor", "middle").attr("dy", 5).attr("fill", "#fff").attr("font-weight", 800).attr("font-size", 15);
+    const cAll = gMarks.selectAll("g.cluster");
+    cAll.attr("transform", () => { let p = proj(poleLL); if (!p) p = [centerX(), H / 2 + R]; return `translate(${p[0]},${Math.min(p[1], H / 2 + R - 6)})`; });
+    cAll.select("text").text(d => d.n);
+    cAll.each(function (d) {
+      const counts = d3.rollups(d.list, v => v.length, m => m.who);
+      const arcs = d3.pie().value(v => v[1]).sort(null)(counts);
+      d3.select(this).select(".donut").selectAll("path").data(arcs).join("path")
+        .attr("d", d3.arc().innerRadius(19).outerRadius(24)).attr("fill", a => COUNTRIES[a.data[0]].color);
+    });
+
+    labels(dots, regs, cAll.size() ? polar.length : 0);
   }
 
-  // Labels with simple collision avoidance.
-  function labels(areas, dots, regs) {
+  function labels(dots, regs, clusterN) {
     const items = [];
     const z = state.zoom;
-    for (const d of areas) {
-      const ll = [d.a.c[0], d.a.c[1]];
-      if (!visible(ll)) continue;
-      const p = proj(ll);
-      items.push({ x: p[0], y: p[1], text: d.res.name, cls: "lbl area", fill: d.res.color, pri: 1, anchor: "middle", dy: 4 });
+    if (state.mode !== "mis" && fieldsReady) {
+      for (const [k, res] of Object.entries(RESOURCES)) {
+        if (!state.layers.has(k)) continue;
+        for (const a of res.areas) {
+          const ll = a.lp || [a.c[0], a.c[1]];
+          if (!visible(ll)) continue;
+          const p = proj(ll);
+          items.push({ x: p[0], y: p[1], text: a.label || res.name, fill: res.color, size: 11, upper: true, pri: 2, anchor: "middle" });
+        }
+      }
     }
     for (const d of dots) {
-      if (!(z >= 1.8 || d === state.selected || d.status === "planned")) continue;
+      if (!(d === state.selected || (FEATURED.has(d.id) && z >= 1) || z >= 2.2)) continue;
       const p = proj(d.ll);
-      items.push({ x: p[0] + 10, y: p[1] + 4, text: short(d.name), cls: "lbl", fill: "#fff", pri: d === state.selected ? 0 : 2, anchor: "start" });
+      items.push({ x: p[0] + 11, y: p[1] + 4, text: d.name.replace(/ \(.*\)$/, ""), fill: "#fff", size: 12, pri: d === state.selected ? 0 : 3, anchor: "start" });
     }
     for (const d of regs) {
-      const ll = [d.region[0], d.region[1]];
-      if (!visible(ll) || !(z >= 1.6 || d === state.selected)) continue;
-      const p = proj(ll);
-      items.push({ x: p[0], y: p[1] - 8, text: short(d.name), cls: "lbl", fill: COUNTRIES[d.who].color, pri: d === state.selected ? 0 : 3, anchor: "middle" });
+      if (!(d === state.selected || z >= 1.75)) continue;
+      const p = proj([d.region[0], d.region[1]]);
+      items.push({ x: p[0], y: p[1] + 4, text: d.name.replace(/ \(.*\)$/, ""), fill: COUNTRIES[d.who].color, size: 12, pri: d === state.selected ? 0 : 4, anchor: "middle" });
+    }
+    if (clusterN) {
+      let p = proj([0, -89.5]); if (!p) p = [centerX(), H / 2 + radius()];
+      items.push({ x: p[0] + 30, y: Math.min(p[1], H / 2 + radius() - 6) + 4, text: `South pole: ${clusterN} missions · click to zoom`, fill: "#fff", size: 12, pri: 1, anchor: "start" });
     }
     items.sort((a, b) => a.pri - b.pri);
-    const placed = [];
-    const keep = [];
+    const placed = [], keep = [];
     for (const it of items) {
-      const w = it.text.length * 6.6, h = 14;
+      const w = it.text.length * (it.upper ? 7.4 : 6.7), h = 15;
       const x0 = it.anchor === "middle" ? it.x - w / 2 : it.x;
-      const b = { x0, x1: x0 + w, y0: it.y - 11 + (it.dy || 0), y1: it.y + 3 + (it.dy || 0) };
-      if (b.x0 < 2 || b.x1 > W - 2 || b.y0 < 2 || b.y1 > H - 2) continue;
+      const b = { x0, x1: x0 + w, y0: it.y - 12, y1: it.y + 4 };
+      if (b.x0 < 4 || b.x1 > W - 4 || b.y0 < 4 || b.y1 > H - 4) continue;
       if (placed.some(o => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0)) continue;
       placed.push(b); keep.push(it);
     }
-    const t = gLabels.selectAll("text").data(keep);
-    t.exit().remove();
-    t.enter().append("text").merge(t)
-      .attr("class", d => d.cls).attr("x", d => d.x).attr("y", d => d.y + (d.dy || 0))
-      .attr("text-anchor", d => d.anchor).attr("fill", d => d.fill).text(d => d.text);
+    gLabels.selectAll("text").data(keep).join("text")
+      .attr("class", d => d.upper ? "lbl area" : "lbl").attr("x", d => d.x).attr("y", d => d.y)
+      .attr("text-anchor", d => d.anchor).attr("fill", d => d.fill).text(d => d.upper ? d.text.toUpperCase() : d.text);
   }
-  function short(n) { return n.replace(/ \(.*\)$/, ""); }
+
+  function tip(m, p) {
+    if (!p) return;
+    const st = { landed: "Landed", crashed: "Crashed", planned: "Planned" }[m.status];
+    gTip.select(".tip1").text(m.name).attr("x", 12).attr("y", 20);
+    gTip.select(".tip2").text(`${COUNTRIES[m.who].name} · ${st} · ${m.year}`).attr("x", 12).attr("y", 37);
+    const w = Math.max(gTip.select(".tip1").node().getComputedTextLength(), gTip.select(".tip2").node().getComputedTextLength()) + 24;
+    gTip.select("rect").attr("width", w).attr("height", 48);
+    let x = p[0] + 14, y = p[1] - 58;
+    if (x + w > W - 6) x = p[0] - w - 14;
+    if (y < 6) y = p[1] + 14;
+    gTip.attr("transform", `translate(${x},${y})`).attr("opacity", 1);
+  }
+  function hideTip() { gTip.attr("opacity", 0); }
 
   // ---------- drawing ----------
   let raf = 0, fastFlag = false;
   function draw(fast) {
     fastFlag = fastFlag || !!fast;
     if (raf) return;
-    raf = requestAnimationFrame(() => {
-      raf = 0;
-      paint(fastFlag ? 3 : 1);
-      fastFlag = false;
-      overlays();
-    });
+    raf = requestAnimationFrame(() => { raf = 0; paint(fastFlag ? 3 : 1); fastFlag = false; overlays(); });
   }
-
   function resize() {
     const r = box.getBoundingClientRect();
     W = Math.max(1, Math.round(r.width)); H = Math.max(1, Math.round(r.height));
-    Q = Math.min(window.devicePixelRatio || 1, 1.25);
+    Q = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.round(W * Q); canvas.height = Math.round(H * Q);
     img = ctx.createImageData(canvas.width, canvas.height);
     svg.attr("viewBox", `0 0 ${W} ${H}`);
@@ -213,7 +360,7 @@
   // ---------- interaction ----------
   let dragging = false;
   svg.call(d3.drag().clickDistance(4)
-    .on("start", () => { dragging = true; box.querySelector(".hint")?.remove(); })
+    .on("start", () => { dragging = true; hideTip(); box.querySelector(".hint")?.remove(); })
     .on("drag", e => {
       const k = 180 / Math.PI / radius();
       state.lon = wrap(state.lon - e.dx * k);
@@ -221,36 +368,49 @@
       draw(true);
     })
     .on("end", () => { dragging = false; draw(); }));
-  svg.on("click", () => { if (!dragging) select(null); });
+  svg.on("click", e => {
+    if (dragging) return;
+    const ll = proj.invert(d3.pointer(e));
+    if (ll && visible(ll) && state.mode !== "mis") {
+      let best = null, bv = 0.18;
+      for (const k of state.layers) { const v = fieldAt(k, ll[0], ll[1]); if (v > bv) { bv = v; best = k; } }
+      if (best) return select({ type: "res", key: best, ll });
+    }
+    select(null);
+  });
+  svg.on("wheel", e => {
+    if (!e.ctrlKey && !e.metaKey) return; // only zoom with ctrl/cmd or pinch, so the page still scrolls
+    e.preventDefault();
+    state.zoom = Math.max(0.8, Math.min(6, state.zoom * Math.exp(-e.deltaY * 0.01)));
+    draw(true); clearTimeout(svg._t); svg._t = setTimeout(() => draw(), 120);
+  }, { passive: false });
 
   function wrap(l) { return ((l + 540) % 360) - 180; }
-
   function fly(lon, lat, zoom) {
     if (reduce) { state.lon = lon; state.lat = lat; if (zoom) state.zoom = zoom; draw(); return; }
-    const l0 = state.lon, b0 = state.lat, z0 = state.zoom;
-    let dl = wrap(lon - l0);
-    const z1 = zoom || z0;
-    d3.select(box).transition().duration(900).ease(d3.easeCubicInOut)
-      .tween("fly", () => t => {
-        state.lon = wrap(l0 + dl * t); state.lat = b0 + (lat - b0) * t; state.zoom = z0 + (z1 - z0) * t;
-        draw(t < 1);
-      });
+    const l0 = state.lon, b0 = state.lat, z0 = state.zoom, dl = wrap(lon - l0), z1 = zoom || z0;
+    d3.select(box).transition().duration(1000).ease(d3.easeCubicInOut)
+      .tween("fly", () => t => { state.lon = wrap(l0 + dl * t); state.lat = b0 + (lat - b0) * t; state.zoom = z0 + (z1 - z0) * t; draw(t < 1); });
   }
-
-  document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => {
-    const v = VIEWS[b.dataset.view];
-    document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  const VIEWS = { near: [15, 6, 1], far: [170, 0, 1], south: [40, -87.6, 4.6], north: [-60, 87, 4] };
+  function setView(name) {
+    const v = VIEWS[name]; if (!v) return;
+    document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", x.dataset.view === name));
     fly(v[0], v[1], v[2]);
-  }));
-  const VIEWS = { near: [20, 8, 1], far: [170, 0, 1], south: [30, -82, 2], north: [0, 84, 1.8] };
-
-  box.querySelector("[data-zoom='in']").addEventListener("click", () => { state.zoom = Math.min(6, state.zoom * 1.4); draw(); });
-  box.querySelector("[data-zoom='out']").addEventListener("click", () => { state.zoom = Math.max(0.8, state.zoom / 1.4); draw(); });
+  }
+  document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+  function setMode(m) {
+    state.mode = m;
+    document.querySelectorAll("[data-mode]").forEach(x => x.setAttribute("aria-pressed", x.dataset.mode === m));
+    draw();
+  }
+  document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  box.querySelector("[data-zoom='in']")?.addEventListener("click", () => fly(state.lon, state.lat, Math.min(6, state.zoom * 1.5)));
+  box.querySelector("[data-zoom='out']")?.addEventListener("click", () => fly(state.lon, state.lat, Math.max(0.8, state.zoom / 1.5)));
 
   // ---------- side panel ----------
-  const info = document.getElementById("info");
+  const info = document.getElementById("info") || document.createElement("div");
   const defaultInfo = info.innerHTML;
-
   function select(sel) {
     state.selected = sel && sel.type === "mission" ? sel.d : null;
     if (!sel) { info.innerHTML = defaultInfo; draw(); return; }
@@ -259,72 +419,91 @@
       const st = { landed: "Landed", crashed: "Crashed", planned: "Planned" }[m.status];
       info.innerHTML = `<span class="tag" style="background:${c.color}">${c.name}</span>
         <h2>${m.name}</h2>
-        <p class="muted small">${st} · ${m.status === "planned" ? "target " : ""}${m.year}${m.approx ? " · location approximate" : ""}${m.region ? " · area, no exact site yet" : ""}</p>
+        <p class="muted">${st} · ${m.status === "planned" ? "target " : ""}${m.year}${m.approx ? " · approx. location" : ""}${m.region ? " · area, no exact site" : ""}</p>
         <p>${m.what}</p>
         <div class="src">Source: ${srcList(m.src)}</div>`;
       const ll = m.ll || [m.region[0], m.region[1]];
-      if (!visible(ll) || state.zoom < 1.4 || d3.geoDistance(ll, [state.lon, state.lat]) > 0.5) fly(ll[0], Math.max(-84, Math.min(84, ll[1])), Math.max(state.zoom, Math.abs(ll[1]) > 70 ? 2.4 : 1.5));
+      const polarZ = Math.abs(ll[1]) > 70;
+      if (!visible(ll) || d3.geoDistance(ll, [state.lon, state.lat]) > 0.45 || state.zoom < (polarZ ? 2 : 1.3))
+        fly(ll[0], Math.max(-84, Math.min(84, ll[1])), Math.max(state.zoom, polarZ ? 2.4 : 1.5));
     } else {
-      const { res, a } = sel.d;
+      const res = RESOURCES[sel.key];
+      const near = res.areas.slice().sort((a, b) => d3.geoDistance(sel.ll, [a.c[0], a.c[1]]) - d3.geoDistance(sel.ll, [b.c[0], b.c[1]]))[0];
+      const nearOK = d3.geoDistance(sel.ll, [near.c[0], near.c[1]]) < (near.c[2] + 8) * DEG;
       info.innerHTML = `<span class="tag" style="background:${res.color}">${res.name}</span>
-        <h2>${a.name}</h2>
-        <p>${a.note}</p>
-        <p class="muted small">${res.long}</p>
+        <h2>${nearOK ? near.name : res.name + " here"}</h2>
+        <p>${nearOK ? near.note : res.short}</p>
+        <p class="muted2">${res.long}</p>
         <div class="src">Source: ${srcList(res.src)}</div>`;
     }
     draw();
   }
 
-  // filter chips
+  // ---------- filters and list ----------
   function chip(container, label, color, on, toggle) {
     const b = document.createElement("button");
-    b.className = "chip"; b.type = "button";
-    b.setAttribute("aria-pressed", on);
+    b.className = "chip"; b.type = "button"; b.setAttribute("aria-pressed", on);
     b.innerHTML = `<i style="background:${color}"></i>${label}`;
     b.addEventListener("click", () => { const now = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", now); toggle(now); draw(); renderList(); });
     container.appendChild(b);
   }
   const layerBox = document.getElementById("f-layers");
-  for (const [k, r] of Object.entries(RESOURCES)) chip(layerBox, r.name, r.color, true, on => on ? state.layers.add(k) : state.layers.delete(k));
+  // Resource picker: one resource at a time, or the overview of the three headline resources.
+  const OVERVIEW = Object.keys(RESOURCES).filter(k => RESOURCES[k].on);
+  const pickBtns = [];
+  function syncPicker() { pickBtns.forEach(b => b.setAttribute("aria-pressed", [...state.layers].sort().join() === b._keys.slice().sort().join())); }
+  if (layerBox) {
+    const opts = [{ name: "Key resources", sub: "", keys: OVERVIEW, color: `conic-gradient(${OVERVIEW.map(k => RESOURCES[k].color).join(",")})`, group: null }]
+      .concat(Object.entries(RESOURCES).map(([k, r]) => ({ name: r.name, keys: [k], color: r.color, group: r.group })));
+    let g;
+    for (const o of opts) {
+      if (o.group !== g) { g = o.group; if (g) { const h = document.createElement("div"); h.className = "grp"; h.textContent = g; layerBox.appendChild(h); } }
+      const b = document.createElement("button");
+      b.className = "chip pick"; b.type = "button"; b._keys = o.keys;
+      b.innerHTML = `<i style="background:${o.color};border-radius:50%"></i>${o.name}${o.sub ? `<small>${o.sub}</small>` : ""}`;
+      b.addEventListener("click", () => { state.layers = new Set(o.keys); if (state.mode === "mis") setMode("both"); syncPicker(); ramps(); draw(); });
+      layerBox.appendChild(b); pickBtns.push(b);
+    }
+    syncPicker();
+  }
+  const rampBox = document.getElementById("ramps");
+  function ramps() {
+    if (!rampBox) return;
+    rampBox.innerHTML = [...state.layers].map(k => { const r = RESOURCES[k];
+      return `<div><b>${r.name}</b><span style="background:linear-gradient(90deg,#2b2a28,${r.color})"></span><em><i>${r.ramp[0]}</i><i>${r.ramp[1]}</i></em></div>`; }).join("");
+  }
+  ramps();
   const whoBox = document.getElementById("f-who");
-  for (const [k, c] of Object.entries(COUNTRIES)) chip(whoBox, c.name, c.color, true, on => on ? state.who.add(k) : state.who.delete(k));
+  if (whoBox) for (const [k, c] of Object.entries(COUNTRIES)) chip(whoBox, c.name, c.color, true, on => on ? state.who.add(k) : state.who.delete(k));
   const stBox = document.getElementById("f-status");
-  [["landed", "Landed"], ["crashed", "Crashed"], ["planned", "Planned"]].forEach(([k, n]) =>
-    chip(stBox, n, "#d8dee4", true, on => on ? state.status.add(k) : state.status.delete(k)));
+  if (stBox) [["landed", "Landed"], ["crashed", "Crashed"], ["planned", "Planned"]].forEach(([k, n]) => chip(stBox, n, "#d8dee4", true, on => on ? state.status.add(k) : state.status.delete(k)));
 
-  // mission list
   const list = document.getElementById("mlist");
   function renderList() {
+    if (!list) return;
     list.innerHTML = "";
-    const rows = MISSIONS.filter(missionShown).slice().sort((a, b) => a.year - b.year);
-    for (const m of rows) {
+    for (const m of MISSIONS.filter(missionShown).slice().sort((a, b) => a.year - b.year)) {
       const li = document.createElement("li");
-      li.innerHTML = `<button type="button"><span class="yr">${m.year}</span><i style="background:${COUNTRIES[m.who].color}"></i><span>${m.name}${m.status === "crashed" ? " <span class='muted'>(crashed)</span>" : ""}${m.status === "planned" ? " <span class='muted'>(planned)</span>" : ""}</span></button>`;
+      li.innerHTML = `<button type="button"><span class="yr">${m.year}</span><i style="background:${COUNTRIES[m.who].color}"></i><span>${m.name}${m.status !== "landed" ? ` <span class='muted'>(${m.status})</span>` : ""}</span></button>`;
       li.querySelector("button").addEventListener("click", () => { select({ type: "mission", d: m }); box.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" }); });
       list.appendChild(li);
-    }
-    const un = UNMAPPED.filter(m => state.who.has(m.who) && state.status.has("planned"));
-    if (un.length) {
-      const li = document.createElement("li");
-      li.innerHTML = `<p class="small muted" style="margin:0.8rem 0 0.3rem">Planned, no public site yet:</p>`;
-      list.appendChild(li);
-      for (const m of un) {
-        const l = document.createElement("li");
-        l.innerHTML = `<button type="button"><span class="yr">${m.year}</span><i style="background:${COUNTRIES[m.who].color}"></i><span>${m.name}</span></button>`;
-        l.querySelector("button").addEventListener("click", () => {
-          state.selected = null;
-          info.innerHTML = `<span class="tag" style="background:${COUNTRIES[m.who].color}">${COUNTRIES[m.who].name}</span><h2>${m.name}</h2><p class="muted small">Planned · target ${m.year} · not on the map</p><p>${m.what}</p><div class="src">Source: ${srcList(m.src)}</div>`;
-          draw();
-        });
-        list.appendChild(l);
-      }
     }
   }
   renderList();
 
   // deep links: ?m=ce7 or ?view=south
   const qs = new URLSearchParams(location.search);
-  if (qs.get("view") && VIEWS[qs.get("view")]) { const v = VIEWS[qs.get("view")]; state.lon = v[0]; state.lat = v[1]; state.zoom = v[2]; }
+  if (VIEWS[qs.get("view")]) { const v = VIEWS[qs.get("view")]; [state.lon, state.lat, state.zoom] = v; }
   const m0 = MISSIONS.find(m => m.id === qs.get("m"));
   if (m0) { const ll = m0.ll || [m0.region[0], m0.region[1]]; state.lon = ll[0]; state.lat = Math.max(-84, Math.min(84, ll[1])); state.zoom = Math.abs(ll[1]) > 70 ? 2.4 : 1.5; setTimeout(() => select({ type: "mission", d: m0 }), 0); }
+
+  window.atlas = {
+    fly, draw, state, view: setView,
+    pick: id => { const m = MISSIONS.find(x => x.id === id); if (m) select({ type: "mission", d: m }); },
+    clear: () => select(null),
+    layers: keys => { state.layers = new Set(keys); syncPicker(); ramps(); draw(); },
+    who: keys => { state.who = new Set(keys); draw(); renderList(); },
+    mode: setMode,
+    shift: f => { const s0 = state.shift; if (reduce) { state.shift = f; draw(); return; } d3.select(canvas).transition().duration(700).tween("s", () => t => { state.shift = s0 + (f - s0) * t; draw(t < 1); }); },
+  };
 })();

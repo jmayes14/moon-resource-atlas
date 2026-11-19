@@ -6,20 +6,16 @@
 <title>Sources and Method</title>
 <meta name="description" content="How the Moon Resource Atlas was researched, checked and built, and every source it uses.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <nav class="site-nav" aria-label="Main"><div class="in">
-  <b>Moon <span>Resource</span> Atlas</b>
-  <a href="index.html">Atlas</a>
-  <a href="helium3.html">Why helium-3?</a>
-  <a href="countries.html">Who's going</a>
-  <a href="companies.html">Companies</a>
-  <a href="sources.html" aria-current="page">Sources &amp; method</a>
+  <a class="brand" href="index.html"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="#d9d6cf"/><circle cx="12" cy="13" r="3.4" fill="#9d9a93"/><circle cx="21" cy="21" r="2.6" fill="#9d9a93"/><circle cx="20" cy="10" r="1.6" fill="#9d9a93"/><path d="M2 17a15 15 0 0 0 30 0" fill="none" stroke="#fc3d21" stroke-width="2.2"/></svg><b>MOON RESOURCE ATLAS<small>Critical minerals · supply security</small></b></a>
+  <nav><a href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="countries.html">Missions</a><a href="companies.html">Companies</a><a href="sources.html" aria-current="page">Sources</a></nav>
 </div></nav>
 
-<main style="max-width:56rem">
+<main style="max-width:60rem">
   <span class="eyebrow">Sources &amp; method</span>
   <h1>How this was made</h1>
   <p class="lede">The research question: <strong>Why is the Moon becoming a strategic prize, where are its resources, and who is racing to reach them?</strong></p>
@@ -33,11 +29,23 @@
 
   <h2>3. Building the map</h2>
   <ul>
-    <li>The Moon picture is NASA's Lunar Reconnaissance Orbiter color map, from NASA's Scientific Visualization Studio. It is drawn as a globe in the browser.</li>
-    <li>Landing sites use published coordinates (NASA for Apollo; mission records for the others). Sites marked "approximate" are the named area, not an exact spot.</li>
-    <li>Planned missions without an exact site are drawn as dashed areas, or listed without a dot.</li>
-    <li>Resource areas are simple circles traced from published maps (USGS helium-3 model, NASA ice maps, Lunar Prospector thorium data). They show where resources are most likely, not exact borders.</li>
+    <li><strong>The Moon picture</strong> is NASA's Lunar Reconnaissance Orbiter color map (NASA Scientific Visualization Studio). NASA's color map has almost no detail near the poles, so terrain shading was added from NASA's LOLA laser-altimeter elevation map. A test confirmed the two maps line up: low ground matches the dark lava plains. The script is in <code>tools/bake_relief.py</code>.</li>
+    <li><strong>Resource glows</strong> are illustrations built from published maps and shaped by the real terrain:
+      <ul>
+        <li><strong>Helium-3:</strong> dark lava plains, brightest in the richer areas of the USGS model.</li>
+        <li><strong>Water ice:</strong> drawn on polar craters known to have permanently shadowed floors.</li>
+        <li><strong>Rare earths:</strong> the thorium-rich ring around the Imbrium basin.</li>
+        <li><strong>Titanium:</strong> follows how blue the surface looks, the same color effect NASA's LRO camera uses. A check showed the titanium-rich Sea of Tranquility measuring bluer (0.97) than the titanium-poor Sea of Serenity (0.90).</li>
+        <li><strong>Iron:</strong> the lava plains and the South Pole–Aitken basin floor.</li>
+        <li><strong>Aluminum:</strong> the bright highlands.</li>
+      </ul>
+      They show where each resource is most likely, not exact amounts.</li>
+    <li><strong>Landing sites</strong> use published coordinates: NASA for Apollo, mission records for the others. Sites marked "approximate" are the named area, not an exact spot. Planned missions without an exact site are drawn as dashed areas or listed without a dot.</li>
+    <li><strong>Photos</strong> come from NASA's image library: Artemis II, Apollo 17, and the LRO south pole mosaic. They are public domain and credited where shown.</li>
   </ul>
+
+  <h2>3b. The resource fact sheet</h2>
+  <p>Every fact on the home page's fact sheet comes from a primary source: NASA, USGS, ESA, the LRO camera team, the Lunar Sourcebook, or a peer-reviewed study. Each source page was opened in full with Tavily's extract tool to check the exact wording and numbers. Where a page did not support a claim, the claim was removed or reworded. For example, the 24–30% alumina figure is described as coming from one set of Apollo highland samples, which is what the source says.</p>
 
   <h2>4. Rules for fairness</h2>
   <ul>

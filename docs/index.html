@@ -4,93 +4,306 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Moon Resource Atlas</title>
-<meta name="description" content="An interactive Moon globe showing where helium-3, water ice and rare earths are, and which countries plan to go there.">
+<meta name="description" content="Where the Moon's helium-3, water ice, metals and rare earths are, who plans to land there, and the companies racing to mine them.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/site.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --black: #000; --ink: #1d1d1d; --gray: #58595b; --light: #f6f6f6; --rule: #d1d1d1; --red: #fc3d21; --blue: #1c67e3; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 17px/1.6 Inter, system-ui, sans-serif; color: var(--ink); background: #fff; }
+  a { color: inherit; }
+  .mono { font: 500 .78rem "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+  .wrap { max-width: 82rem; margin: 0 auto; padding: 0 2rem; }
+
+  /* header */
+  header { background: var(--black); color: #fff; position: sticky; top: 0; z-index: 50; }
+  header .wrap { display: flex; align-items: center; gap: 2.2rem; height: 4.2rem; }
+  .brand { display: flex; align-items: center; gap: .7rem; text-decoration: none; margin-right: auto; }
+  .brand svg { flex: none; }
+  .brand b { font-weight: 800; font-size: 1.02rem; letter-spacing: .01em; line-height: 1.05; }
+  .brand b small { display: block; font: 500 .62rem "DM Mono"; letter-spacing: .14em; color: #a6a6a6; }
+  header nav { display: flex; gap: 1.8rem; }
+  header nav a { text-decoration: none; font-weight: 700; font-size: .93rem; }
+  header nav a.on { box-shadow: 0 3px 0 var(--red); }
+
+  /* hero */
+  .hero { position: relative; background: #000 url(assets/img/earthset.jpg) 0% 58% / max(135%, 1300px) auto no-repeat; color: #fff; min-height: clamp(560px, 88vh, 820px); display: flex; align-items: flex-end; }
+  .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(0 0 0 / 82%) 0%, rgb(0 0 0 / 40%) 45%, rgb(0 0 0 / 0%) 70%), linear-gradient(0deg, rgb(0 0 0 / 70%) 0%, transparent 40%); }
+  .hero .wrap { position: relative; width: 100%; padding-bottom: 4.5rem; }
+  .hero .mono { color: #fff; opacity: .85; }
+  .hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.6rem); font-weight: 900; line-height: .98; letter-spacing: -.035em; margin: .8rem 0 1.2rem; max-width: 52rem; }
+  .hero p { font-size: 1.25rem; max-width: 36rem; color: #e6e6e6; margin: 0 0 2rem; }
+  .cta { display: inline-flex; align-items: center; gap: .9rem; font-weight: 700; text-decoration: none; font-size: 1.05rem; }
+  .cta i { width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--red); display: grid; place-items: center; font-style: normal; color: #fff; font-size: 1.2rem; transition: transform .2s; }
+  .cta:hover i { transform: translateX(4px); }
+  .credit { position: absolute; right: 2rem; bottom: 1.2rem; font: 400 .7rem "DM Mono"; color: #bdbdbd; }
+
+  /* section heads */
+  section { padding: 5rem 0; }
+  .head { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 2.4rem; flex-wrap: wrap; }
+  .head h2 { font-size: clamp(2rem, 3.6vw, 3rem); font-weight: 900; letter-spacing: -.03em; line-height: 1; margin: .5rem 0 0; }
+  .head .mono { color: var(--gray); }
+  .head p { max-width: 30rem; margin: 0; color: var(--gray); }
+  .dark { background: var(--black); color: #fff; } .dark .head .mono, .dark .head p { color: #a6a6a6; }
+  .gray { background: var(--light); }
+
+  /* numbers */
+  .nums { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--ink); }
+  .nums div { padding: 1.4rem 1.4rem 0 0; border-right: 1px solid var(--rule); }
+  .nums div + div { padding-left: 1.4rem; } .nums div:last-child { border: 0; }
+  .nums b { display: block; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 900; letter-spacing: -.03em; line-height: 1; }
+  .nums span { display: block; margin-top: .6rem; font-size: .95rem; color: var(--gray); }
+  .nums .mono { margin-top: .8rem; color: var(--gray); font-size: .66rem; }
+
+  /* explorer */
+  .explorer { display: grid; grid-template-columns: 17rem 1fr 20rem; border: 1px solid #333; min-height: 640px; }
+  .explorer aside { padding: 1.4rem; background: #111; }
+  .explorer aside + * { border-left: 1px solid #333; }
+  .explorer h3 { font: 500 .7rem "DM Mono"; letter-spacing: .12em; text-transform: uppercase; color: #8c8c8c; margin: 0 0 .8rem; }
+  .viewer { position: relative; border-right: 1px solid #333; overflow: hidden;
+    background: radial-gradient(circle at 50% 50%, #0b1220 0, #000 62%),
+      #000; }
+  .viewer::before { content: ""; position: absolute; inset: 0; opacity: .7; pointer-events: none;
+    background-image: radial-gradient(1px 1px at 8% 12%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 92% 18%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 16% 84%, #cfd8ff 50%, transparent 51%), radial-gradient(1.4px 1.4px at 86% 76%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 4% 48%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 96% 52%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 30% 4%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 70% 96%, #fff 50%, transparent 51%);
+    background-size: 340px 340px; }
+  .modes { position: absolute; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 4; display: flex; background: rgb(17 17 17 / 92%); border: 1px solid #444; }
+  .modes button { background: none; border: 0; color: #bdbdbd; font: 500 .72rem "DM Mono"; letter-spacing: .06em; text-transform: uppercase; padding: .55rem .9rem; cursor: pointer; }
+  .modes button[aria-pressed="true"] { background: var(--red); color: #fff; }
+  .ramp { margin: -.6rem 0 1.4rem; }
+  .chip.pick::after { content: ""; width: .55rem; height: .55rem; border-radius: 50%; border: 1.5px solid #6b6b6b; }
+  .chip.pick[aria-pressed="true"] { color: #fff; } .chip.pick[aria-pressed="true"]::after { background: var(--red); border-color: var(--red); }
+  .chip.pick[aria-pressed="false"] i { background-clip: padding-box; opacity: .55; outline: none; }
+  .chip.pick small { display: block; font: 400 .66rem "DM Mono"; color: #8c8c8c; margin-left: .4rem; }
+  .grp { font: 500 .62rem "DM Mono"; letter-spacing: .12em; text-transform: uppercase; color: #6b6b6b; margin: .9rem 0 .2rem; }
+  .grp:first-child { margin-top: 0; }
+  .every { border-top: 1px solid #262626; padding-top: 1rem; margin-bottom: 1.4rem; font-size: .82rem; color: #bdbdbd; }
+  .every b { color: #fff; font-size: .85rem; } .every p { margin: .5rem 0; } .every strong { color: #fff; }
+  .every .src { font-size: .7rem; color: #8c8c8c; } .every .src a { color: #a6a6a6; }
+  .ramp div { display: grid; grid-template-columns: 1fr; gap: .25rem; margin: .7rem 0; font-size: .74rem; color: #a6a6a6; }
+  .ramp b { color: #fff; font-size: .8rem; font-weight: 600; }
+  .ramp span { height: .5rem; border-radius: 2px; }
+  .ramp em { font-style: normal; display: flex; justify-content: space-between; font: 400 .62rem "DM Mono"; color: #8c8c8c; text-transform: uppercase; }
+  @keyframes pulse { from { r: 6; opacity: .9; } to { r: 16; opacity: 0; } }
+  .pulse { animation: pulse 2.2s ease-out infinite; }
+  #info .muted2 { color: #a6a6a6; font-size: .84rem; }
+  #globe { position: absolute; inset: 0; } #globe canvas, #globe svg { position: absolute; inset: 0; width: 100%; height: 100%; } #globe svg { cursor: grab; }
+  .viewer .bar { position: absolute; left: 1rem; top: 1rem; z-index: 4; display: flex; gap: .4rem; }
+  .viewer .bar button, .zoom button { background: rgb(17 17 17 / 90%); color: #fff; border: 1px solid #444; font: 500 .72rem "DM Mono"; letter-spacing: .06em; text-transform: uppercase; padding: .45rem .75rem; cursor: pointer; }
+  .viewer .bar button[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+  .zoom { position: absolute; right: 1rem; top: 1rem; z-index: 4; display: flex; flex-direction: column; gap: .3rem; }
+  .zoom button { width: 2.2rem; height: 2.2rem; padding: 0; font-size: 1rem; }
+  .chips { display: flex; flex-direction: column; gap: 0; margin-bottom: 1.6rem; }
+  .chip { display: flex; align-items: center; gap: .7rem; background: none; border: 0; border-bottom: 1px solid #262626; color: #fff; font: 500 .9rem Inter; padding: .55rem 0; cursor: pointer; text-align: left; }
+  .chip i { width: .8rem; height: .8rem; border-radius: 2px; display: inline-block; }
+  .chip::after { content: "✓"; margin-left: auto; color: var(--red); font-weight: 700; }
+  .chip[aria-pressed="false"] { color: #6b6b6b; } .chip[aria-pressed="false"]::after { content: ""; } .chip[aria-pressed="false"] i { background: transparent !important; outline: 1px solid #6b6b6b; }
+  #info .tag { display: inline-block; font: 500 .66rem "DM Mono"; letter-spacing: .1em; text-transform: uppercase; padding: .2rem .5rem; color: #000; }
+  #info h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: .7rem 0 .4rem; }
+  #info p { font-size: .92rem; color: #d4d4d4; margin: 0 0 .7rem; }
+  #info .muted { color: #8c8c8c !important; font: 500 .7rem "DM Mono"; letter-spacing: .05em; text-transform: uppercase; }
+  #info .src { font-size: .74rem; color: #8c8c8c; } #info .src a { color: #bdbdbd; }
+  .via { font: 500 .6rem "DM Mono"; color: #8c8c8c; text-transform: uppercase; }
+  .lgd { font-size: .82rem; color: #bdbdbd; display: flex; gap: .6rem; align-items: center; margin: .35rem 0; }
+  .lbl { font: 600 12px Inter; fill: #fff; paint-order: stroke; stroke: rgb(0 0 0 / 85%); stroke-width: 3.5px; pointer-events: none; }
+  .lbl.area { font: 500 11.5px "DM Mono"; letter-spacing: .12em; stroke-width: 4px; }
+
+  /* cards */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+  .card { text-decoration: none; display: block; }
+  .card .img { aspect-ratio: 4 / 3; background: #000 center / cover no-repeat; overflow: hidden; }
+  .card .mono { display: block; margin: 1.1rem 0 .5rem; color: var(--gray); }
+  .card h3 { font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; margin: 0 0 .6rem; }
+  .card p { color: var(--gray); margin: 0 0 1rem; font-size: 1rem; }
+  .card .more { display: inline-flex; align-items: center; gap: .6rem; font-weight: 700; font-size: .95rem; }
+  .card .more i { width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; font-style: normal; font-size: .85rem; }
+  .card:hover h3 { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  .card .cap { font: 400 .66rem "DM Mono"; color: #8c8c8c; margin-top: .4rem; }
+
+  /* missions list */
+  .mrow { display: grid; grid-template-columns: 8rem 1fr 13rem 14rem; gap: 1.5rem; align-items: center; padding: 1.3rem 0; border-top: 1px solid var(--rule); }
+  .mrow:last-child { border-bottom: 1px solid var(--rule); }
+  .mrow .date { font: 500 1.4rem "DM Mono"; }
+  .mrow b { font-size: 1.2rem; font-weight: 800; letter-spacing: -.01em; }
+  .mrow .sub { color: var(--gray); font-size: .92rem; }
+  .mrow .ctry { display: flex; align-items: center; gap: .5rem; font-weight: 600; font-size: .95rem; }
+  .mrow .ctry i { width: .7rem; height: .7rem; border-radius: 50%; display: inline-block; }
+  .pill { justify-self: start; font: 500 .68rem "DM Mono"; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--ink); padding: .25rem .6rem; }
+
+  /* split feature */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .split .photo { aspect-ratio: 1 / 1; background: url(assets/img/schmitt.jpg) center / cover; }
+  .split h2 { font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.02; margin: .6rem 0 1rem; }
+  .split p { color: #cfcfcf; }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); margin: 1.8rem 0; border-top: 1px solid #333; }
+  .flow div { padding: .9rem .8rem 0 0; } .flow div + div { padding-left: .8rem; border-left: 1px solid #333; }
+  .flow .mono { color: var(--red); font-size: .62rem; } .flow b { display: block; font-size: .95rem; margin-top: .3rem; } .flow span { font-size: .8rem; color: #a6a6a6; }
+
+
+  /* fact sheet */
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--ink); }
+  .fact { padding: 1.6rem 1.6rem 1.8rem 0; border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; }
+  .fact:not(:nth-child(3n+1)) { padding-left: 1.6rem; border-left: 1px solid var(--rule); }
+  .fact .sw { width: 2.2rem; height: .35rem; margin-bottom: 1rem; }
+  .fact h3 { font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; margin: 0 0 .8rem; }
+  .fact .num { font-size: 2.6rem; font-weight: 900; letter-spacing: -.035em; line-height: 1; }
+  .fact .note { color: var(--gray); font-size: .9rem; margin: .4rem 0 1rem; }
+  .fact ul { margin: 0 0 1rem; padding: 0; list-style: none; }
+  .fact li { font-size: .94rem; padding: .55rem 0; border-top: 1px dashed var(--rule); }
+  .fact li a { font: 500 .62rem "DM Mono"; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); text-decoration: none; white-space: nowrap; margin-left: .3rem; border: 1px solid var(--rule); padding: .05rem .35rem; }
+  .fact li a:hover { border-color: var(--ink); color: var(--ink); }
+  .fact .go { margin-top: auto; align-self: flex-start; display: inline-flex; gap: .55rem; align-items: center; background: none; border: 0; font: 700 .9rem Inter; cursor: pointer; padding: 0; color: var(--ink); }
+  .fact .go i { width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--red); color: #fff; display: grid; place-items: center; font-style: normal; font-size: .8rem; }
+  .verified { font: 500 .68rem "DM Mono"; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-top: 1.2rem; }
+  @media (max-width: 960px) { .facts { grid-template-columns: 1fr 1fr; } .fact:not(:nth-child(3n+1)) { padding-left: 0; border-left: 0; } .fact:nth-child(2n) { padding-left: 1.4rem; border-left: 1px solid var(--rule); } }
+  @media (max-width: 600px) { .facts { grid-template-columns: 1fr; } .fact:nth-child(2n) { padding-left: 0; border-left: 0; } }
+  footer { background: #000; color: #a6a6a6; padding: 3.5rem 0; font-size: .85rem; border-top: 1px solid #222; }
+  footer .wrap { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 2rem; }
+  footer b { color: #fff; } footer a { color: #d4d4d4; text-decoration: none; display: block; margin: .3rem 0; }
+
+  @media (max-width: 960px) {
+    header nav { display: none; }
+    .nums, .cards, .split, .flow { grid-template-columns: 1fr 1fr; }
+    .explorer { grid-template-columns: 1fr; } .viewer { aspect-ratio: 1 / 1; }
+    .mrow { grid-template-columns: 1fr; gap: .3rem; }
+    footer .wrap { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) { .wrap { padding: 0 16px; } .nums, .cards, .split, .flow { grid-template-columns: 1fr; } .nums div, .nums div + div { padding: 1.2rem 0; border-right: 0; border-bottom: 1px solid var(--rule); } }
+</style>
 </head>
 <body>
-<nav class="site-nav" aria-label="Main"><div class="in">
-  <b>Moon <span>Resource</span> Atlas</b>
-  <a href="index.html" aria-current="page">Atlas</a>
-  <a href="helium3.html">Why helium-3?</a>
-  <a href="countries.html">Who's going</a>
-  <a href="companies.html">Companies</a>
-  <a href="sources.html">Sources &amp; method</a>
-</div></nav>
+<header><div class="wrap">
+  <a class="brand" href="index.html">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="#d9d6cf"/><circle cx="12" cy="13" r="3.4" fill="#9d9a93"/><circle cx="21" cy="21" r="2.6" fill="#9d9a93"/><circle cx="20" cy="10" r="1.6" fill="#9d9a93"/><path d="M2 17a15 15 0 0 0 30 0" fill="none" stroke="#fc3d21" stroke-width="2.2"/></svg>
+    <b>MOON RESOURCE ATLAS<small>Critical minerals · supply security</small></b>
+  </a>
+  <nav><a class="on" href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="countries.html">Missions</a><a href="companies.html">Companies</a><a href="sources.html">Sources</a></nav>
+</div></header>
 
-<main>
-  <span class="eyebrow">Critical minerals &amp; strategic supply security</span>
-  <h1>The race for the Moon's resources</h1>
-  <p class="lede">The Moon holds things Earth is short on: helium-3, water ice, and rare earth elements. Drag the Moon to explore where they are, and which countries and companies plan to land there.</p>
+<section class="hero"><div class="wrap">
+  <span class="mono">Feature · Critical minerals &amp; strategic supply</span>
+  <h1>The Race for the Moon's Resources</h1>
+  <p>Helium-3, water ice and rare earth elements are turning the Moon into the next front in the contest for critical minerals. See where they are, and who is going after them.</p>
+  <a class="cta" href="#explore"><i>→</i>Explore the Moon</a>
+  <span class="credit">Earth sets behind the Moon's far side · Artemis II crew, 6 April 2026 · Photo: NASA</span>
+</div></section>
 
-  <div class="atlas">
-    <div id="globe" class="globe-box" aria-label="Interactive Moon globe. Drag to turn it. Use the list beside it to jump to a mission.">
-      <canvas></canvas>
-      <svg role="img" aria-label="Resource areas and landing sites"></svg>
-      <div class="globe-tools" role="group" aria-label="Jump to a view">
-        <button type="button" data-view="near" aria-pressed="true">Near side</button>
-        <button type="button" data-view="far" aria-pressed="false">Far side</button>
-        <button type="button" data-view="south" aria-pressed="false">South pole</button>
-        <button type="button" data-view="north" aria-pressed="false">North pole</button>
-      </div>
-      <div class="zoom"><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" aria-label="Zoom out">−</button></div>
-      <div class="hint">Drag to spin · click a dot or area</div>
+<section><div class="wrap">
+  <div class="head"><div><span class="mono">By the numbers</span><h2>Why the Moon, why now</h2></div><p>Countries and companies are moving fast. These four numbers explain the rush.</p></div>
+  <div class="nums">
+    <div><b>&lt;10 kg</b><span>Helium-3 reserves on all of Earth</span><span class="mono">Nature, 2024</span></div>
+    <div><b>$20M</b><span>Price of one kilogram of helium-3</span><span class="mono">Interlune / GeekWire</span></div>
+    <div><b>78 vs 13</b><span>Countries in the U.S.-led and China-led Moon groups</span><span class="mono">NASA · Secure World</span></div>
+    <div><b>2028</b><span>Next crewed landing, near the south pole (Artemis IV)</span><span class="mono">NASA, Oct 2026</span></div>
+  </div>
+</div></section>
+
+<section class="dark" id="explore"><div class="wrap">
+  <div class="head"><div><span class="mono">Interactive</span><h2>Explore the Moon</h2></div><p>Drag to rotate. Click a landing site or resource area for details and sources.</p></div>
+  <div class="explorer">
+    <aside>
+      <h3>Show resource</h3><div class="chips" id="f-layers"></div>
+      <div class="ramp" id="ramps"></div>
+      <div class="every"><b>Everywhere in Moon soil</b>
+        <p><strong>Oxygen</strong> is 40–45% of the soil by weight, locked in minerals. <strong>Silicon</strong> is in almost every rock. Both can be split out with electricity to make air, rocket fuel and solar panels.</p>
+        <p><strong>Platinum-group metals</strong> may sit in old asteroid impact craters, possibly thousands of them, but no deposit has been found yet.</p>
+        <div class="src" id="every-src"></div></div>
+      <h3>Country</h3><div class="chips" id="f-who"></div>
+    </aside>
+    <div class="viewer">
+      <div id="globe" data-size="0.42"><canvas></canvas><svg></svg></div>
+      <div class="bar"><button data-view="near" aria-pressed="true">Near side</button><button data-view="far">Far side</button><button data-view="south">South pole</button><button data-view="north">North pole</button></div>
+      <div class="zoom"><button data-zoom="in" aria-label="Zoom in">+</button><button data-zoom="out" aria-label="Zoom out">−</button></div>
+      <div class="modes" role="group" aria-label="What to show"><button data-mode="both" aria-pressed="true">Everything</button><button data-mode="res" aria-pressed="false">Resources</button><button data-mode="mis" aria-pressed="false">Missions</button></div>
     </div>
-
-    <aside class="side">
-      <div class="card info" id="info" aria-live="polite">
-        <span class="eyebrow">How to read the map</span>
-        <h2>Click anything to learn more</h2>
-        <div class="legend-row"><svg width="22" height="16"><circle cx="11" cy="8" r="6" fill="#4ea1ff" stroke="#05080c" stroke-width="2"/></svg>Landed</div>
-        <div class="legend-row"><svg width="22" height="16"><path d="M6,3L16,13M16,3L6,13" stroke="#4ea1ff" stroke-width="3" stroke-linecap="round"/></svg>Crashed</div>
-        <div class="legend-row"><svg width="22" height="16"><circle cx="11" cy="8" r="6" fill="#05080c" stroke="#4ea1ff" stroke-width="2.6"/></svg>Planned</div>
-        <div class="legend-row"><svg width="22" height="16"><circle cx="11" cy="8" r="6.5" fill="#4ea1ff" fill-opacity=".1" stroke="#4ea1ff" stroke-width="1.6" stroke-dasharray="2 3"/></svg>Planned area, no exact site yet</div>
-        <div class="legend-row"><svg width="22" height="16"><rect x="2" y="2" width="18" height="12" rx="6" fill="#ffcf5a" fill-opacity=".25" stroke="#ffcf5a" stroke-dasharray="4 3"/></svg>Resource area (color = resource)</div>
-        <p class="small muted" style="margin-top:.6rem">Dot color shows the country. Resource areas are simplified from published maps.</p>
-      </div>
-
-      <div class="card">
-        <h3>Resources</h3>
-        <div class="chips" id="f-layers"></div>
-        <h3 style="margin-top:1rem">Countries</h3>
-        <div class="chips" id="f-who"></div>
-        <h3 style="margin-top:1rem">Status</h3>
-        <div class="chips" id="f-status"></div>
-      </div>
+    <aside id="info">
+      <span class="tag" style="background:#fff">Map key</span>
+      <h2>Click anything on the Moon</h2>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#4ea1ff" stroke="#fff" stroke-width="1.6"/></svg>Landed</div>
+      <div class="lgd"><svg width="18" height="14"><path d="M4,2L14,12M14,2L4,12" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Crashed</div>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#000" stroke="#4ea1ff" stroke-width="2.4"/><circle cx="9" cy="7" r="1.7" fill="#4ea1ff"/></svg>Planned (pulses)</div>
+      <div class="lgd"><svg width="18" height="18"><circle cx="9" cy="9" r="6.5" fill="#000" stroke="#fff"/><text x="9" y="12" font-size="8" fill="#fff" text-anchor="middle" font-weight="800">9</text></svg>Group of missions: click to zoom</div>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="6" fill="none" stroke="#fff" stroke-width="1.4" stroke-dasharray="2 2.5"/></svg>Planned area, no exact site</div>
+      <p style="margin-top:1rem">Dot colors show the country. Glowing color on the surface shows where each resource is most likely, drawn from USGS and NASA maps. Hover a dot for its name; click the glow for details.</p>
     </aside>
   </div>
+</div></section>
 
-  <h2>Why these three resources matter</h2>
-  <div class="grid">
-    <div class="tile" style="border-top:4px solid var(--he3)"><div class="big" style="color:var(--he3)">Helium-3</div>
-      <p>Cools quantum computers and powers neutron detectors. It is a possible future fusion fuel. Earth has less than 10 kg in reserves. The Moon has far more, because the Sun has been dusting it with helium-3 for billions of years.</p>
-      <p><a href="helium3.html">See how the Sun put it there →</a></p>
-      <div class="src">${0}</div></div>
-    <div class="tile" style="border-top:4px solid var(--ice)"><div class="big" style="color:var(--ice)">Water ice</div>
-      <p>Drinking water, air to breathe, and rocket fuel. Fuel made on the Moon means not hauling it from Earth. The ice sits in dark craters at the poles, so the south pole has become the most wanted place on the Moon.</p>
-      <div class="src"></div></div>
-    <div class="tile" style="border-top:4px solid var(--ree)"><div class="big" style="color:var(--ree)">Rare earths</div>
-      <p>Needed for magnets in electric cars, wind turbines and weapons. China supplies most of the world's refined rare earths today. Moon rock called KREEP is rich in them, but no one knows yet whether mining it could ever pay off.</p>
-      <div class="src"></div></div>
+<section><div class="wrap">
+  <div class="head"><div><span class="mono">The resources</span><h2>What's worth going for</h2></div></div>
+  <div class="cards">
+    <a class="card" href="helium3.html"><div class="img" style="background-image:url(assets/img/schmitt.jpg)"></div><div class="cap">Harrison Schmitt, Apollo 17, 1972 · NASA</div>
+      <span class="mono">Helium-3</span><h3>A rare gas the Sun dusted onto the Moon</h3><p>Earth's magnetic field blocks the solar wind. The Moon has none, so helium-3 has built up in its soil for billions of years.</p><span class="more"><i>→</i>How it got there</span></a>
+    <a class="card" href="index.html?view=south#explore"><div class="img" style="background-image:url(assets/img/southpole.jpg)"></div><div class="cap">Lunar south pole mosaic · NASA/LRO/ASU</div>
+      <span class="mono">Water ice</span><h3>Ice in craters that never see the Sun</h3><p>Drinking water, air and rocket fuel, frozen at the south pole. It's why nearly every country is aiming there.</p><span class="more"><i>→</i>See the south pole</span></a>
+    <a class="card" href="#facts"><div class="img" style="background-image:url(assets/img/volcanic.jpg)"></div><div class="cap">Volcanic plains seen by Artemis II, 2026 · NASA</div>
+      <span class="mono">Rare earths</span><h3>Magnet metals in old lava plains</h3><p>Rock called KREEP, rich in rare earth elements, rings the Imbrium basin. On Earth, China refines most of the supply.</p><span class="more"><i>→</i>See the facts</span></a>
   </div>
+</div></section>
 
-  <h2>Every mission on the map</h2>
-  <p class="muted">Click a name to find it on the Moon. The list follows the filters above.</p>
-  <div class="card"><ul class="mlist" id="mlist"></ul></div>
-</main>
+<section id="facts"><div class="wrap">
+  <div class="head"><div><span class="mono">Resource fact sheet</span><h2>What's on the Moon, by the numbers</h2></div><p>Direct facts from NASA, the U.S. Geological Survey, ESA, the LRO camera team and peer-reviewed studies. Each fact links to where it comes from.</p></div>
+  <div class="facts" id="factgrid"></div>
+  <p class="verified">Each source page was opened and checked with Tavily on 19 November 2026.</p>
+</div></section>
 
-<footer><div class="in">Moon picture: NASA Scientific Visualization Studio (LRO camera). Research done 19 November 2026 with Tavily and TradeVerifyd. <a href="sources.html">All sources</a>.</div></footer>
+<section class="gray"><div class="wrap">
+  <div class="head"><div><span class="mono">Upcoming</span><h2>Missions headed for the Moon</h2></div><p>Target dates. Most Moon missions slip, and several have this year.</p></div>
+  <div id="mrows"></div>
+</div></section>
+
+<section class="dark"><div class="wrap split">
+  <div class="photo" role="img" aria-label="Apollo 17 geologist Harrison Schmitt beside a huge boulder"></div>
+  <div>
+    <span class="mono" style="color:#a6a6a6">Companies &amp; supply chains</span>
+    <h2>The first Moon-mining supply chain is already forming</h2>
+    <p>Harrison Schmitt, the only geologist to walk on the Moon, cofounded Interlune, which plans to harvest helium-3 in the early 2030s. Buyers have signed up before a single gram has been mined.</p>
+    <div class="flow">
+      <div><span class="mono">01 · Earth</span><b>Factories</b><span>Germany, India, China, U.S.</span></div>
+      <div><span class="mono">02 · Ride</span><b>Landers</b><span>Blue Origin, Firefly, Voyager</span></div>
+      <div><span class="mono">03 · Moon</span><b>Miners</b><span>Interlune, Magna Petra</span></div>
+      <div><span class="mono">04 · Earth</span><b>Buyers</b><span>Bluefors, Maybell, U.S. DOE</span></div>
+    </div>
+    <a class="cta" href="companies.html"><i>→</i>See the companies</a>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div><b>Moon Resource Atlas</b><p>An independent student research project. Not affiliated with NASA. Photos courtesy of NASA, used under its public media guidelines. Research done 19 November 2026 with Tavily and TradeVerifyd.</p></div>
+  <div><b>Explore</b><a href="index.html#explore">Moon map</a><a href="index.html#facts">Resource fact sheet</a><a href="helium3.html">Why helium-3?</a><a href="countries.html">Missions</a></div>
+  <div><b>About</b><a href="companies.html">Companies</a><a href="sources.html">Sources &amp; method</a><a href="https://github.com/jmayes14/moon-resource-atlas">GitHub</a></div>
+</div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="assets/data.js"></script>
-<script>
-  // fill the tile sources
-  const tiles = document.querySelectorAll(".tile .src");
-  tiles[0].innerHTML = "Source: " + srcList(["natureHe3"]);
-  tiles[1].innerHTML = "Source: " + srcList(["nasaWater"]);
-  tiles[2].innerHTML = "Source: " + srcList(["usgsREE"]);
-</script>
 <script src="assets/atlas.js"></script>
+<script>
+  document.getElementById("every-src").innerHTML = "Sources: " + srcList(["esaOxygen", "nasaISRU", "pgmNature", "pgmCraters"]);
+
+  // fact sheet
+  const colorOf = k => (RESOURCES[k] && RESOURCES[k].color) || ({ oxy: "#d9d9d9", sun: "#fff3b0", pgm: "#c9ced6" })[k];
+  document.getElementById("factgrid").innerHTML = FACTS.map(f => `<div class="fact">
+    <span class="sw" style="background:${colorOf(f.key)};outline:1px solid rgb(0 0 0 / 12%)"></span>
+    <h3>${f.title}</h3>
+    <div class="num">${f.big}</div><p class="note">${f.bigNote}</p>
+    <ul>${f.facts.map(x => `<li>${x.t}<a href="${SOURCES[x.s].url}" target="_blank" rel="noopener" title="${SOURCES[x.s].title}">${SOURCES[x.s].pub.split(/[,(]/)[0].trim()}</a></li>`).join("")}</ul>
+    ${RESOURCES[f.key] ? `<button class="go" data-k="${f.key}"><i>→</i>See it on the map</button>` : ""}
+  </div>`).join("");
+  document.querySelectorAll(".fact .go").forEach(b => b.addEventListener("click", () => {
+    atlas.layers([b.dataset.k]);
+    if (b.dataset.k === "ice") atlas.view("south");
+    document.getElementById("explore").scrollIntoView({ behavior: "smooth" });
+  }));
+  const plans = MISSIONS.filter(m => m.status === "planned" && !["base", "ilrs"].includes(m.id)).concat(UNMAPPED).sort((a, b) => a.year - b.year).slice(0, 8);
+  const firstSentence = t => { const m = t.match(/^.*?[a-z0-9)'"]\.(?=\s|$)/); return m ? m[0] : t; };
+  const where = m => m.region ? "South pole region" : m.ll ? (m.ll[1] < -75 ? "South pole" : m.ll[1] > 75 ? "North pole" : "Near side") : "Site not public";
+  document.getElementById("mrows").innerHTML = plans.map(m => `<div class="mrow">
+    <span class="date">${m.year}</span>
+    <div><b>${m.name}</b><div class="sub">${firstSentence(m.what)}</div></div>
+    <span class="ctry"><i style="background:${COUNTRIES[m.who].color};outline:1px solid rgb(0 0 0 / 20%)"></i>${COUNTRIES[m.who].name}</span>
+    <span class="pill">${where(m)}</span></div>`).join("");
+</script>
 </body>
 </html>

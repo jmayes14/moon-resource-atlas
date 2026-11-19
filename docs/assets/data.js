@@ -17,6 +17,28 @@ const SOURCES = {
   nasaWater:    { title: "Moon Water and Ices", pub: "NASA Science", url: "https://science.nasa.gov/moon/moon-water-and-ices", via: "Tavily" },
   usgsREE:      { title: "Rare Earth Elements on the Moon (Fact Sheet 2025-3049)", pub: "U.S. Geological Survey", url: "https://pubs.usgs.gov/fs/2025/3049/fs20253049.pdf", via: "Tavily" },
 
+  // Metals and other raw materials
+  lrocTi:       { title: "Ilmenite Seen with Ultraviolet Light (LROC titanium map)", pub: "Lunar Reconnaissance Orbiter Camera team, Arizona State University", url: "https://lroc.im-ldi.com/images/986", via: "Tavily" },
+  earthskyTi:   { title: "Moon map reveals titanium treasure troves (NASA LRO release)", pub: "EarthSky", url: "https://earthsky.org/space/moon-map-reveals-titanium-treasure-troves", via: "Tavily" },
+  wikiGeology:  { title: "Geology of the Moon (surface chemical composition table)", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Geology_of_the_Moon", via: "Tavily" },
+  esaOxygen:    { title: "Oxygen and metal from lunar regolith", pub: "European Space Agency, 2019", url: "https://www.esa.int/media/oxygen-and-metal-from-lunar-regolith", via: "Tavily" },
+  spaWiki:      { title: "South Pole–Aitken basin", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/South_Pole%E2%80%93Aitken_basin", via: "Tavily" },
+  spaNature:    { title: "Southward impact excavated magma ocean at the lunar South Pole–Aitken basin", pub: "Nature, 2025", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC12507655", via: "Tavily" },
+  blueAlchemist:{ title: "Blue Alchemist Hits Major Milestone Toward Permanent and Sustainable Lunar Infrastructure", pub: "Blue Origin (company's own claim)", url: "https://www.blueorigin.com/news/blue-alchemist-hits-major-milestone-toward-permanent-sustainable-lunar-infrastructure", via: "Tavily" },
+  nasaISRU:     { title: "Lunar Surface Technology (oxygen-from-regolith projects)", pub: "NASA", url: "https://www.nasa.gov/lunar-surface-technology", via: "Tavily" },
+  pgmNature:    { title: "Precious metal enrichment during impacts on the Moon", pub: "Communications Earth & Environment (Nature), 2025", url: "https://www.nature.com/articles/s43247-025-03046-x", via: "Tavily" },
+  pgmCraters:   { title: "On ore-bearing asteroid remnants in lunar craters", pub: "Planetary and Space Science, 2025 (arXiv)", url: "https://arxiv.org/html/2508.03025v1", via: "Tavily" },
+
+  // Primary sources for the resource fact sheet (checked in full with Tavily extract, 19 Nov 2026)
+  nasaMiniSAR:  { title: "NASA Radar Finds Ice Deposits at Moon's North Pole", pub: "NASA Science (Mini-SAR on Chandrayaan-1), 2010", url: "https://science.nasa.gov/missions/mini-rf/nasa-radar-finds-ice-deposits-at-moons-north-pole", via: "Tavily" },
+  aaasLCROSS:   { title: "LCROSS Impact Ejects Minerals and Frozen Water from Crater on the Moon", pub: "AAAS / Science, Oct 2010", url: "https://www.aaas.org/news/science-lcross-impact-ejects-minerals-and-frozen-water-crater-moon", via: "Tavily" },
+  natLCROSS:    { title: "Exogenic origin for the volatiles sampled by the LCROSS impact", pub: "Nature Communications, 2022", url: "https://www.nature.com/articles/s41467-022-28289-6", via: "Tavily" },
+  ntrsWater:    { title: "Robust Exploration and Commercial Missions to the Moon Using Lunar Polar Ice (NASA TM-2018-219937)", pub: "NASA Technical Reports Server, 2018", url: "https://ntrs.nasa.gov/api/citations/20180008495/downloads/20180008495.pdf", via: "Tavily" },
+  wustlComp:    { title: "The chemical composition of lunar soil", pub: "Washington University in St. Louis (Randy Korotev)", url: "https://sites.wustl.edu/meteoritesite/items/the-chemical-composition-of-lunar-soil", via: "Tavily" },
+  sourcebook:   { title: "Lunar Sourcebook: A User's Guide to the Moon, Chapter 6", pub: "Lunar and Planetary Institute", url: "https://www.lpi.usra.edu/publications/books/lunar_sourcebook/pdf/Chapter06.pdf", via: "Tavily" },
+  ce5Soil:      { title: "Characteristics of the lunar samples returned by the Chang'E-5 mission", pub: "National Science Review, 2022", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8974359", via: "Tavily" },
+  nasaShackleton:{ title: "Shackleton Crater's Illuminated Rim & Shadowed Interior", pub: "NASA Science", url: "https://science.nasa.gov/resource/shackleton-craters-illuminated-rim-shadowed-interior", via: "Tavily" },
+
   // Helium-3 market
   geekwireIL:   { title: "Interlune reveals partners and customers for lunar helium-3", pub: "GeekWire, May 2025", url: "https://www.geekwire.com/2025/interlune-moon-mining-vermeer-maybell-quantum-doe", via: "Tavily" },
   bluefors:     { title: "Bluefors Enters Deal to Secure Lunar Helium-3 Supply From Interlune", pub: "The Quantum Insider, Sept 2025", url: "https://thequantuminsider.com/2025/09/17/bluefors-enters-deal-to-secure-lunar-helium-3-supply-from-interlune", via: "Tavily" },
@@ -91,43 +113,142 @@ const COUNTRIES = {
 // They are simplified outlines of published maps, not exact borders.
 const RESOURCES = {
   he3: {
-    name: "Helium-3", color: "#ffcf5a",
+    name: "Helium-3", color: "#ffcf5a", group: "Energy & life support", on: true, ramp: ["less", "more (est.)"],
     short: "Best guesses for the richest soil, based on a U.S. Geological Survey model.",
     long: "Helium-3 is spread thinly across the whole Moon. The U.S. Geological Survey model finds the most in dark lava plains rich in titanium on the near side, and in the lava plains on the far side, which get more solar wind.",
     src: ["usgsHe3Map", "natureHe3"],
     areas: [
-      { name: "Sea of Tranquility (Mare Tranquillitatis)", c: [31, 8.5, 11], note: "Apollo 11 soil from here averaged 11.8 parts per billion of helium-3." },
-      { name: "Ocean of Storms, western part (Oceanus Procellarum)", c: [-57, 15, 14], note: "Large, titanium-rich lava plains." },
-      { name: "Sea of Moscow (Mare Moscoviense), far side", c: [148, 27, 4.5], note: "Far-side lava plains get more solar wind." },
+      { name: "Sea of Tranquility (Mare Tranquillitatis)", label: "Helium-3 · richest", c: [31, 8.5, 11], note: "Apollo 11 soil from here averaged 11.8 parts per billion of helium-3." },
+      { name: "Ocean of Storms, western part (Oceanus Procellarum)", label: "Helium-3", c: [-57, 15, 14], note: "Large, titanium-rich lava plains." },
+      { name: "Sea of Moscow (Mare Moscoviense), far side", label: "Helium-3", c: [148, 27, 4.5], note: "Far-side lava plains get more solar wind." },
     ],
   },
   ice: {
-    name: "Water ice", color: "#7fdcff",
+    name: "Water ice", color: "#7fdcff", group: "Energy & life support", on: true, ramp: ["sunlit", "always dark, coldest"],
     short: "Craters at the poles where sunlight never reaches.",
-    long: "Some craters near the poles never see sunlight and stay colder than about -200 °C. Water ice has collected there. Ice means drinking water, oxygen to breathe, and rocket fuel. That is why almost every country is aiming for the south pole.",
-    src: ["nasaWater"],
+    long: "Some craters near the poles never see sunlight. Cabeus crater's floor stays around 39–47 kelvin (about −230 °C). When NASA crashed LCROSS into it, about 5.6% of the soil it kicked up was water ice. Radar found more than 40 icy craters at the north pole alone, holding at least 600 million tonnes. Ice means drinking water, oxygen to breathe, and rocket fuel.",
+    src: ["nasaWater", "aaasLCROSS", "nasaMiniSAR", "natLCROSS"],
     areas: [
-      { name: "South pole cold traps", c: [0, -90, 5.5], note: "Most of the ice is in craters here. Shackleton, Cabeus, Haworth, Shoemaker and Faustini are among them." },
-      { name: "North pole cold traps", c: [0, 90, 5], note: "Ice here is thinner and more spread out than at the south pole." },
+      { name: "South pole cold traps", label: "Water ice", lp: [20, -83], c: [0, -90, 5.5], note: "Most of the ice is in craters here. Shackleton, Cabeus, Haworth, Shoemaker and Faustini are among them." },
+      { name: "North pole cold traps", label: "Water ice", lp: [0, 83.5], c: [0, 90, 5], note: "Ice here is thinner and more spread out than at the south pole." },
     ],
+    // Craters with permanently shadowed floors (approximate centers; d = diameter in km). The ice glow is drawn on these.
     spots: [
-      { name: "Shackleton crater", ll: [129.8, -89.7] },
-      { name: "Cabeus crater (NASA LCROSS found ice here in 2009)", ll: [-42.1, -85.3] },
-      { name: "Haworth crater", ll: [-5, -87.4] },
-      { name: "Shoemaker crater", ll: [44.9, -88.1] },
-      { name: "Faustini crater", ll: [77, -87.3] },
+      { name: "Shackleton crater", ll: [129.8, -89.7], d: 21 },
+      { name: "Cabeus crater (NASA LCROSS found ice here in 2009)", ll: [-42.1, -85.3], d: 98 },
+      { name: "Haworth crater", ll: [-5, -87.4], d: 51 },
+      { name: "Shoemaker crater", ll: [44.9, -88.1], d: 51 },
+      { name: "Faustini crater", ll: [77, -87.3], d: 39 },
+      { name: "de Gerlache crater", ll: [-87.1, -88.5], d: 32 },
+      { name: "Sverdrup crater", ll: [-152, -88.3], d: 33 },
+      { name: "Nobile crater", ll: [53.5, -85.2], d: 73 },
+      { name: "Amundsen crater", ll: [85.6, -84.4], d: 103 },
+      { name: "Hermite crater", ll: [-89.9, 86], d: 104 },
+      { name: "Rozhdestvenskiy crater", ll: [-155.4, 85.2], d: 177 },
+      { name: "Whipple crater", ll: [118, 89.1], d: 15 },
     ],
   },
   ree: {
-    name: "Rare earths", color: "#e88cff",
+    name: "Rare earths & thorium", color: "#e88cff", group: "Metals & minerals", on: true, ramp: ["less", "more thorium"],
     short: "Rock called KREEP, mostly in a ring around the Sea of Showers.",
     long: "Rare earth elements are needed for magnets, phones and wind turbines. China supplies most of the world's refined rare earths. On the Moon, a rock type called KREEP holds them. Orbiting satellites found it mostly in a ring around the Imbrium basin on the near side.",
     src: ["usgsREE"],
     areas: [
-      { name: "Imbrium basin ring (Procellarum KREEP Terrane)", c: [-22, 28, 26], note: "The full rare-earth region covers about 16% of the Moon, more than twice the size of Greenland." },
+      { name: "Imbrium basin ring (Procellarum KREEP Terrane)", label: "Rare earths", lp: [-30, 30], c: [-22, 28, 26], note: "The full rare-earth region covers about 16% of the Moon, more than twice the size of Greenland." },
+    ],
+  },
+  ti: {
+    name: "Titanium", color: "#9aa8ff", group: "Metals & minerals", on: false, ramp: ["under 1.5%", "up to ~12% titanium oxide"],
+    short: "Titanium-rich lava plains, found from the color of the surface.",
+    long: "Titanium sits in the black mineral ilmenite, which makes lava plains look slightly bluer. NASA's Lunar Reconnaissance Orbiter camera used that to map it: from about 1% to a little over 10% in the lava plains, with the highest spots near 12% titanium oxide. That is much more than similar rocks on Earth. Ilmenite is also what holds helium-3 and can be split to make oxygen.",
+    src: ["lrocTi", "earthskyTi"],
+    areas: [
+      { name: "Sea of Tranquility (Mare Tranquillitatis)", label: "Titanium · highest", c: [31, 8.5, 11], note: "Among the most titanium-rich plains on the Moon. Its blue tint against the Sea of Serenity next door shows the difference." },
+      { name: "Ocean of Storms, western part (Oceanus Procellarum)", label: "Titanium", c: [-52, 10, 13], note: "Large titanium-rich lava plains on the western near side." },
+    ],
+  },
+  fe: {
+    name: "Iron", color: "#ff7a45", group: "Metals & minerals", on: false, ramp: ["2–6%", "up to ~22% iron oxide"],
+    short: "Iron-rich lava plains, plus the floor of the giant South Pole–Aitken basin.",
+    long: "Lava-plain basalt is rich in iron. Soil brought back by China's Chang'e-5 from the Ocean of Storms has 22.5% iron oxide, higher than most Apollo and Luna samples (below 22%). Some highland samples have only 2–6%. The floor of the South Pole–Aitken basin on the far side, the Moon's largest crater, is also richer in iron than the highlands around it. Iron could be used to build habitats and tools.",
+    src: ["ce5Soil", "sourcebook", "spaNature"],
+    areas: [
+      { name: "Near-side lava plains (maria)", label: "Iron", lp: [-12, 22], c: [-15, 18, 38], note: "About 14% iron oxide, in the dark basalt that fills the near-side plains." },
+      { name: "South Pole–Aitken basin floor (far side)", label: "Iron · South Pole–Aitken", lp: [-169, -50], c: [-169, -53, 30], note: "The Moon's biggest and oldest basin. Its floor has more iron, titanium and thorium than the surrounding highlands, possibly from deep crust or mantle rock." },
+    ],
+  },
+  al: {
+    name: "Aluminum", color: "#5ff0c4", group: "Metals & minerals", on: false, ramp: ["~11%", "24–30% alumina"],
+    short: "The bright highlands, made of aluminum-rich rock called anorthosite.",
+    long: "The bright highlands that cover most of the Moon are made of anorthosite, rich in aluminum: one set of Apollo highland samples holds 24–30% alumina. Lava-plain soil has much less; Chang'e-5 soil has 10.8%. Companies are testing machines that pull aluminum, iron, silicon and oxygen out of Moon soil to make wire, solar panels and air.",
+    src: ["sourcebook", "ce5Soil", "blueAlchemist"],
+    areas: [
+      { name: "Southern near-side highlands", label: "Aluminum", lp: [5, -38], c: [5, -38, 25], note: "Bright, heavily cratered highlands rich in aluminum-bearing plagioclase." },
+      { name: "Far-side highlands", label: "Aluminum", lp: [175, 25], c: [175, 25, 35], note: "The far side is mostly highlands, so most of it is aluminum-rich." },
     ],
   },
 };
+
+// Resource fact sheet: direct facts, each from a primary source checked with Tavily extract.
+const FACTS = [
+  { key: "ice", title: "Water ice", big: "600M t", bigNote: "of ice, at least, in 40+ craters at the north pole alone",
+    facts: [
+      { t: "NASA's LCROSS crashed into Cabeus crater in 2009. About 5.6% (±2.9%) of the soil it threw up was water ice, and about 155 kg of water was seen in the plume.", s: "aaasLCROSS" },
+      { t: "The plume also held the first carbon-, nitrogen- and sulfur-bearing ices ever found in the shadowed craters, likely delivered by comets.", s: "natLCROSS" },
+      { t: "Cabeus is one of the coldest places known: its floor stays between 38.7 and 46.7 kelvin (about −230 °C).", s: "natLCROSS" },
+      { t: "Lunar Prospector's data suggested about 135–240 million tonnes of ice near the south pole and about 62 million near the north, and up to about 2 billion tonnes in all if every bit of hydrogen it saw were ice.", s: "ntrsWater" },
+    ] },
+  { key: "he3", title: "Helium-3", big: "<10 kg", bigNote: "all the helium-3 reserves on Earth (5 parts per trillion)",
+    facts: [
+      { t: "Careful estimates put helium-3 in Moon soil at 3.7 parts per billion in the highlands and 7.8 in the lava plains.", s: "natureHe3" },
+      { t: "Neil Armstrong's Apollo 11 bulk soil sample averaged 11.8 ppb, ranging from 9.2 to 17.9 ppb.", s: "ntrsHe3" },
+      { t: "Apollo soils ranged from 2.4 to 26 ppb. Getting 1 kg means processing 100,000 to 1 million tonnes of soil.", s: "spacenewsUsgs" },
+      { t: "Uses today: cooling, neutron detection, medical imaging; in the future, possibly fusion power.", s: "natureHe3" },
+    ] },
+  { key: "ree", title: "Rare earths & thorium", big: "1,000×", bigNote: "the Solar System average: possible rare-earth level in a few deposits, similar to ores mined on Earth",
+    facts: [
+      { t: "Rare earths on the Moon are concentrated in rock called KREEP (potassium, rare earth elements, phosphorus).", s: "usgsREE" },
+      { t: "Satellites track KREEP through thorium, which behaves like rare earths and gives off radiation that can be mapped from orbit.", s: "usgsREE" },
+      { t: "The thorium-rich region rings the Imbrium basin and covers about 2 million square miles, 16% of the Moon, more than twice the size of Greenland.", s: "usgsREE" },
+      { t: "Apollo samples suggest some spots hold twelve times the thorium seen from orbit.", s: "usgsREE" },
+    ] },
+  { key: "ti", title: "Titanium", big: "~12%", bigNote: "titanium oxide at the richest spots, from NASA's LRO camera",
+    facts: [
+      { t: "In the lava plains, titanium ranges from about 1% (similar to Earth) to a little more than 10%.", s: "earthskyTi" },
+      { t: "The Moon has much more titanium than similar rocks on Earth, and scientists still don't fully know why.", s: "earthskyTi" },
+      { t: "Lava-plain basalts are grouped by titanium: high (over 9% titanium oxide), low (1.5–9%) and very low (under 1.5%).", s: "sourcebook" },
+      { t: "It sits in ilmenite (FeTiO₃), an iron-titanium mineral. Ilmenite reflects a little more ultraviolet light than other minerals, which is how NASA mapped it.", s: "lrocTi" },
+    ] },
+  { key: "fe", title: "Iron", big: "22.5%", bigNote: "iron oxide in lava-plain soil returned by China's Chang'e-5",
+    facts: [
+      { t: "Chang'e-5 soil is richer in iron than most Apollo and Luna lava-plain samples, which are below 22%.", s: "ce5Soil" },
+      { t: "Lava-plain basalts have more iron and titanium than highland rocks.", s: "sourcebook" },
+      { t: "The floor of the giant South Pole–Aitken basin on the far side is also rich in iron and thorium.", s: "spaNature" },
+    ] },
+  { key: "al", title: "Aluminum", big: "24–30%", bigNote: "alumina in a set of Apollo highland samples, from aluminum-rich plagioclase",
+    facts: [
+      { t: "One set of Apollo highland samples described in the Lunar Sourcebook holds 24–30% alumina and only 2–6% iron oxide.", s: "sourcebook" },
+      { t: "Lava-plain soil has much less: Chang'e-5 soil has 10.8% alumina.", s: "ce5Soil" },
+      { t: "Blue Origin's Blue Alchemist, a NASA-backed project, turns Moon-soil simulant into aluminum wire, silicon solar cells, iron and oxygen.", s: "nasaISRU" },
+    ] },
+  { key: "oxy", title: "Oxygen & silicon", big: "40–45%", bigNote: "of Moon soil by weight is oxygen, its most abundant element",
+    facts: [
+      { t: "Seven elements make up 98–99% of lunar rock and soil: oxygen, silicon, aluminum, calcium, iron, magnesium and titanium.", s: "wustlComp" },
+      { t: "ESA pulled essentially all the oxygen out of simulated Moon soil at 950 °C, leaving metal alloys behind.", s: "esaOxygen" },
+      { t: "NASA and partners are testing ways to pull oxygen out of Moon soil; in 2026 a solar-powered reactor test confirmed oxygen production from simulated soil.", s: "nasaISRU" },
+    ] },
+  { key: "sun", title: "Sunlight", big: ">90%", bigNote: "of the year, three points on Shackleton crater's rim are sunlit together",
+    facts: [
+      { t: "The Moon tilts only 1.5°, so at the south pole the Sun skims the horizon all year. Crater floors stay dark; high rims stay lit.", s: "nasaShackleton" },
+      { t: "Steady sunlight next to dark, icy craters is why the south pole is the top choice for a base.", s: "nasaShackleton" },
+    ] },
+  { key: "pgm", title: "Platinum-group metals", big: "≤6,500", bigNote: "craters 1 km or wider that might hold platinum-rich asteroid remains (upper estimate)",
+    facts: [
+      { t: "The Moon's own rocks have platinum-group metals far too thin to ever mine.", s: "pgmNature" },
+      { t: "The best chance is in old impact melt sheets, but no specific deposit has been found yet.", s: "pgmNature" },
+      { t: "For craters 5 km or wider, the estimate drops to about 400.", s: "pgmCraters" },
+    ] },
+];
 
 // Missions. status: landed | crashed | planned. ll = [lon, lat]. approx = location is approximate.
 // region = draw a dashed area instead of a dot (for plans with no exact site yet).

@@ -6,17 +6,13 @@
 <title>Who's Going</title>
 <meta name="description" content="Which countries plan to land on the Moon, when, and where, and the two groups competing to set the rules.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 <nav class="site-nav" aria-label="Main"><div class="in">
-  <b>Moon <span>Resource</span> Atlas</b>
-  <a href="index.html">Atlas</a>
-  <a href="helium3.html">Why helium-3?</a>
-  <a href="countries.html" aria-current="page">Who's going</a>
-  <a href="companies.html">Companies</a>
-  <a href="sources.html">Sources &amp; method</a>
+  <a class="brand" href="index.html"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="#d9d6cf"/><circle cx="12" cy="13" r="3.4" fill="#9d9a93"/><circle cx="21" cy="21" r="2.6" fill="#9d9a93"/><circle cx="20" cy="10" r="1.6" fill="#9d9a93"/><path d="M2 17a15 15 0 0 0 30 0" fill="none" stroke="#fc3d21" stroke-width="2.2"/></svg><b>MOON RESOURCE ATLAS<small>Critical minerals · supply security</small></b></a>
+  <nav><a href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="countries.html" aria-current="page">Missions</a><a href="companies.html">Companies</a><a href="sources.html">Sources</a></nav>
 </div></nav>
 
 <main>
@@ -45,7 +41,7 @@
 
   <h2>Who plans to land, and when</h2>
   <p class="muted">Each dot is one planned mission. Hover or tap a dot for its name. Dates are targets and often slip.</p>
-  <div class="card" style="padding:1rem .5rem">
+  <div class="card dark" style="padding:1rem .5rem">
     <svg id="timeline" class="chain" role="img" aria-label="Timeline of planned Moon missions by country, 2026 to 2036"></svg>
   </div>
 
@@ -54,7 +50,7 @@
 
   <div class="note" style="margin-top:2rem">
     <strong>Why the south pole?</strong> It has ice in craters that never see sunlight, and nearby ridges that get sunlight almost all the time for solar power. Good landing spots there are few. The United States, China, India and Russia all plan to land within a few hundred kilometers of each other.
-    <a href="index.html?view=south">See it on the Moon →</a>
+    <a class="btn" href="index.html?view=south#explore">See it on the Moon</a>
   </div>
 </main>
 
