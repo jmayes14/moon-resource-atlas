@@ -2,7 +2,7 @@
 
 An interactive site about **critical minerals and strategic supply security on the Moon**: where helium-3, water ice and rare earths are, which countries plan to land there, and which companies could form the first Moon-mining supply chain.
 
-**Live site:** https://jmayes14.github.io/fusion-materials-map/ is the separate lithium project. This one is at https://jmayes14.github.io/moon-resource-atlas/
+**Live site:** https://jmayes14.github.io/moon-resource-atlas/
 
 ## Pages
 
