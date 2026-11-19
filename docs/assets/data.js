@@ -66,6 +66,28 @@ const SOURCES = {
   niaBreakeven: { title: "Cost Breakeven Analysis of Cis-lunar ISRU for Propellant", pub: "NASA-sponsored study (National Institute of Aerospace), 2019", url: "http://bigidea.nianet.org/wp-content/uploads/2019/10/Cost_Breakeven_Analysis_of_Cis-Lunar_ISRU-FINAL.pdf", via: "Tavily" },
   lmISRU:       { title: "A Water-Based Lunar Architecture", pub: "Lockheed Martin (company's own view)", url: "https://www.lockheedmartin.com/en-us/capabilities/space/human-space-exploration/water-based-lunar-architecture.html", via: "Tavily" },
 
+  // Landing history (checked with Tavily, 19 Nov 2026)
+  wikiMoonLanding:{ title: "Moon landing (tables of soft landings and failures)", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Moon_landing", via: "Tavily" },
+  lpiSurveyor:  { title: "The Surveyor Program", pub: "Lunar and Planetary Institute", url: "https://www.lpi.usra.edu/lunar/missions/surveyor", via: "Tavily" },
+  wikiSurveyor: { title: "Surveyor program", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Surveyor_program", via: "Tavily" },
+  nasaApollo:   { title: "Apollo Missions (Apollo 50th)", pub: "NASA", url: "https://www.nasa.gov/specials/apollo50th/missions.html", via: "Tavily" },
+  nasaApolloProg:{ title: "The Apollo Program", pub: "NASA", url: "https://www.nasa.gov/the-apollo-program", via: "Tavily" },
+  luna15Wiki:   { title: "Luna 15", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Luna_15", via: "Tavily" },
+  luna23Reg:    { title: "Luna 23: Lunar Landing", pub: "For All Moonkind Moon Registry (citing NASA)", url: "https://moonregistry.forallmoonkind.org/luna-23", via: "Tavily" },
+  luna25Payload:{ title: "Russia Blames Onboard Controls for Luna-25 Crash", pub: "Payload", url: "https://payloadspace.com/russia-blames-onboard-controls-for-luna-25-crash", via: "Tavily" },
+  im1SpaceNews: { title: "IM-2 lunar lander on its side after touchdown (includes IM-1 cause)", pub: "SpaceNews, 2025", url: "https://spacenews.com/im-2-lunar-lander-touches-down-status-unclear", via: "Tavily" },
+  im2Wiki:      { title: "IM-2", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/IM-2", via: "Tavily" },
+  bg1NASA:      { title: "NASA Science Continues After Firefly's First Moon Mission Concludes", pub: "NASA, 2025", url: "https://www.nasa.gov/news-release/nasa-science-continues-after-fireflys-first-moon-mission-concludes", via: "Tavily" },
+  ce4Planetary: { title: "Chang'e-4 and Yutu-2: China's mission to the Moon's farside", pub: "The Planetary Society", url: "https://www.planetary.org/space-missions/change-4", via: "Tavily" },
+  ce6NSR:       { title: "Nature of the lunar far-side samples returned by the Chang'E-6 mission", pub: "National Science Review, 2024", url: "https://academic.oup.com/nsr/article/11/11/nwae328/7758366", via: "Tavily" },
+  ch3Wiki:      { title: "Chandrayaan-3", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Chandrayaan-3", via: "Tavily" },
+  ch2Wiki:      { title: "Chandrayaan-2 (failure analysis)", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Chandrayaan-2", via: "Tavily" },
+  slimSpace:    { title: "Japan's upside-down SLIM moon lander wakes up on lunar surface", pub: "Space.com, 2024", url: "https://www.space.com/japan-slim-moon-lander-awake-after-hibernation", via: "Tavily" },
+  hakuto1SPO:   { title: "Japanese Lunar Lander Hakuto-R M1 Failed Due to Software Error", pub: "SpacePolicyOnline, 2023", url: "https://spacepolicyonline.com/news/japanese-lunar-lander-hakuto-r-m1-failed-due-to-software-error", via: "Tavily" },
+  resilienceSpace:{ title: "Private Japanese moon lander crashed due to laser errors, ispace says", pub: "Space.com, 2025", url: "https://www.space.com/space-exploration/launches-spacecraft/private-japanese-moon-lander-crashed-due-to-laser-errors-ispace-says", via: "Tavily" },
+  beresheetWiki:{ title: "Beresheet", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Beresheet", via: "Tavily" },
+  spaceMoonRush:{ title: "Moon rush: These private spacecraft will attempt lunar landings in 2026", pub: "Space.com", url: "https://www.space.com/astronomy/moon/moon-rush-these-private-spacecraft-will-attempt-lunar-landings-in-2026", via: "Tavily" },
+
   // Helium-3 market
   geekwireIL:   { title: "Interlune reveals partners and customers for lunar helium-3", pub: "GeekWire, May 2025", url: "https://www.geekwire.com/2025/interlune-moon-mining-vermeer-maybell-quantum-doe", via: "Tavily" },
   bluefors:     { title: "Bluefors Enters Deal to Secure Lunar Helium-3 Supply From Interlune", pub: "The Quantum Insider, Sept 2025", url: "https://thequantuminsider.com/2025/09/17/bluefors-enters-deal-to-secure-lunar-helium-3-supply-from-interlune", via: "Tavily" },
@@ -131,8 +153,9 @@ const COUNTRIES = {
   cn: { name: "China",         color: "#ff4d5e", bloc: "ilrs" },
   in: { name: "India",         color: "#ff9a3c", bloc: "artemis" },
   jp: { name: "Japan",         color: "#f4f1ea", bloc: "artemis" },
-  ru: { name: "Russia / USSR", color: "#a77bff", bloc: "ilrs" },
+  ru: { name: "USSR / Russia", color: "#a77bff", bloc: "ilrs" },
   kr: { name: "South Korea",   color: "#33d39a", bloc: "artemis" },
+  il: { name: "Israel",        color: "#f2a7c3", bloc: "artemis" },
   ot: { name: "Other",         color: "#b9c2c9", bloc: "" },
 };
 
@@ -277,63 +300,136 @@ const FACTS = [
     ] },
 ];
 
-// Missions. status: landed | crashed | planned. ll = [lon, lat]. approx = location is approximate.
-// region = draw a dashed area instead of a dot (for plans with no exact site yet).
+// Missions. status: landed | partial (landed but tipped over or damaged) | crashed | planned.
+// ll = [lon, lat]; approx = location approximate; region = planned area with no exact site.
+// purpose = what it was meant for; result = what happened; why = why it failed (failed or partial only).
 const MISSIONS = [
-  // Past: United States
-  { id: "a11", name: "Apollo 11", who: "us", year: 1969, status: "landed", ll: [23.47, 0.67], what: "First people on the Moon. Its soil samples were later found to contain helium-3.", src: ["nssdcApollo", "ntrsHe3"] },
-  { id: "a12", name: "Apollo 12", who: "us", year: 1969, status: "landed", ll: [-23.42, -3.01], what: "Crewed landing in the Ocean of Storms.", src: ["nssdcApollo"] },
-  { id: "a14", name: "Apollo 14", who: "us", year: 1971, status: "landed", ll: [-17.47, -3.65], what: "Crewed landing in the Fra Mauro highlands.", src: ["nssdcApollo"] },
-  { id: "a15", name: "Apollo 15", who: "us", year: 1971, status: "landed", ll: [3.63, 26.13], what: "Crewed landing at Hadley Rille, with the first Moon car.", src: ["nssdcApollo"] },
-  { id: "a16", name: "Apollo 16", who: "us", year: 1972, status: "landed", ll: [15.50, -8.97], what: "Crewed landing in the Descartes highlands.", src: ["nssdcApollo"] },
-  { id: "a17", name: "Apollo 17", who: "us", year: 1972, status: "landed", ll: [30.77, 20.19], what: "Last crewed landing. Geologist Harrison Schmitt, now a cofounder of the helium-3 company Interlune, collected soil here.", src: ["nssdcApollo"] },
-  { id: "im1", name: "IM-1 Odysseus (Intuitive Machines)", who: "us", year: 2024, status: "landed", approx: true, ll: [1.4, -80.1], what: "First U.S. landing since 1972. It tipped over on landing.", src: ["wikiObjects"] },
-  { id: "bg1", name: "Blue Ghost 1 (Firefly)", who: "us", year: 2025, status: "landed", ll: [61.81, 18.56], what: "First fully successful private landing, in the Sea of Crises.", src: ["wikiObjects"] },
-  { id: "im2", name: "IM-2 Athena (Intuitive Machines)", who: "us", year: 2025, status: "landed", ll: [29.20, -84.79], what: "Landed near Mons Mouton at the south pole but fell over.", src: ["wikiObjects"] },
+  // ---------- USSR / Russia ----------
+  { id: "l9", name: "Luna 9", who: "ru", org: "Soviet space program", year: 1966, status: "landed", ll: [-64.37, 7.08], site: "Ocean of Storms",
+    purpose: "Prove a spacecraft could land softly on the Moon.", result: "The first soft landing on the Moon. It sent back the first photos taken from the surface.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l13", name: "Luna 13", who: "ru", org: "Soviet space program", year: 1966, status: "landed", ll: [-62.05, 18.87], site: "Ocean of Storms",
+    purpose: "Land again and photograph the surface around the lander.", result: "The second Soviet soft landing; it returned many photos.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l16", name: "Luna 16", who: "ru", org: "Soviet space program", year: 1970, status: "landed", ll: [56.3, -0.68], site: "Sea of Fertility",
+    purpose: "Have a robot scoop Moon soil and fly it back to Earth.", result: "Brought 0.10 kg of soil home, with no astronauts needed.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l17", name: "Luna 17 · Lunokhod 1", who: "ru", org: "Soviet space program", year: 1970, status: "landed", ll: [-35.0, 38.28], site: "Sea of Rains",
+    purpose: "Drive a remote-controlled rover across the Moon.", result: "The Lunokhod 1 rover traveled 10.5 km.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l20", name: "Luna 20", who: "ru", org: "Soviet space program", year: 1972, status: "landed", ll: [56.5, 3.57], site: "Near the Sea of Fertility",
+    purpose: "Robotic sample return from a new area.", result: "Brought 0.05 kg of soil home.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l21", name: "Luna 21 · Lunokhod 2", who: "ru", org: "Soviet space program", year: 1973, status: "landed", ll: [30.45, 25.85], site: "Le Monnier crater",
+    purpose: "Send a second, longer-range rover.", result: "Lunokhod 2 drove 37 km across the surface.", src: ["wikiMoonLanding"] },
+  { id: "l23", name: "Luna 23", who: "ru", org: "Soviet space program", year: 1974, status: "partial", ll: [62.2, 12.75], site: "Sea of Crises",
+    purpose: "Drill 2.5 m down and bring a deep soil sample to Earth.", result: "It landed, but no sample came back.", why: "The drill was damaged during landing, so it could not collect a sample.", src: ["luna23Reg", "wikiObjects"] },
+  { id: "l24", name: "Luna 24", who: "ru", org: "Soviet space program", year: 1976, status: "landed", ll: [62.2, 12.75], site: "Sea of Crises",
+    purpose: "Finish Luna 23's job: drill a deep sample and return it.", result: "Brought 0.17 kg of soil home. No country landed on the Moon again for 37 years.", src: ["wikiMoonLanding", "luna23Reg"] },
+  { id: "l5", name: "Luna 5", who: "ru", org: "Soviet space program", year: 1965, status: "crashed", ll: [-23, 8], site: "Ocean of Storms (approx.)", approx: true,
+    purpose: "Early attempt at the first soft landing.", result: "Hit the Moon instead of landing.", why: "Records list it only as a crash during the landing attempt; it was one of several Soviet tries before Luna 9 succeeded.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l7", name: "Luna 7", who: "ru", org: "Soviet space program", year: 1965, status: "crashed", ll: [-47.8, 9.8], site: "Ocean of Storms",
+    purpose: "Attempt the first soft landing.", result: "Hit the Moon instead of landing.", why: "Records list it as a crash during the landing attempt.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l8", name: "Luna 8", who: "ru", org: "Soviet space program", year: 1965, status: "crashed", ll: [-63.3, 9.1], site: "Ocean of Storms",
+    purpose: "Attempt the first soft landing.", result: "Crashed during the landing attempt.", why: "Records list it as a crash during the landing attempt. Luna 9 succeeded two months later.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l15", name: "Luna 15", who: "ru", org: "Soviet space program", year: 1969, status: "crashed", ll: [60, 17], site: "Sea of Crises",
+    purpose: "Bring Moon soil to Earth before Apollo 11's astronauts got home.", result: "Crashed hours before Apollo 11 left the Moon.", why: "After 52 orbits, it came down too fast and probably hit the side of a mountain about 4 minutes into its descent.", src: ["luna15Wiki"] },
+  { id: "l18", name: "Luna 18", who: "ru", org: "Soviet space program", year: 1971, status: "crashed", ll: [56.5, 3.57], site: "Sea of Fertility",
+    purpose: "Robotic sample return.", result: "Crashed on landing.", why: "Records list it as a crash on impact; Luna 20 later landed nearby.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "l25", name: "Luna 25", who: "ru", org: "Roscosmos", year: 2023, status: "crashed", ll: [61.36, -57.87], site: "On the way to the south pole",
+    purpose: "Russia's first Moon landing in 47 years, aiming for the south pole to study ice.", result: "Crashed before it could land.", why: "A faulty signal kept the engine burning for 127 seconds instead of 84, sending it into the Moon.", src: ["luna25Payload", "wikiObjects"] },
 
-  // Past: USSR / Russia
-  { id: "l16", name: "Luna 16", who: "ru", year: 1970, status: "landed", ll: [56.3, -0.68], what: "First robot to bring Moon soil back to Earth.", src: ["wikiObjects"] },
-  { id: "l25", name: "Luna 25", who: "ru", year: 2023, status: "crashed", ll: [61.36, -57.87], what: "Russia's first Moon mission in 47 years. It crashed on the way to the south pole.", src: ["wikiObjects", "diaSpace"] },
+  // ---------- United States ----------
+  { id: "s1", name: "Surveyor 1", who: "us", org: "NASA", year: 1966, status: "landed", ll: [-43.34, -2.47], site: "Ocean of Storms",
+    purpose: "Test soft landing and check the ground was safe for Apollo astronauts.", result: "The first U.S. Moon landing; returned 11,000 pictures.", src: ["wikiMoonLanding", "lpiSurveyor"] },
+  { id: "s3", name: "Surveyor 3", who: "us", org: "NASA", year: 1967, status: "landed", ll: [-23.42, -3.02], site: "Ocean of Storms",
+    purpose: "Test the soil for Apollo with a robot arm.", result: "Dug a trench 17.5 cm deep. Apollo 12 astronauts later visited it and took parts home.", src: ["wikiMoonLanding", "wikiSurveyor"] },
+  { id: "s5", name: "Surveyor 5", who: "us", org: "NASA", year: 1967, status: "landed", ll: [23.2, 1.46], site: "Sea of Tranquility",
+    purpose: "Scout a possible Apollo site and measure what the soil is made of.", result: "19,000 photos and the first chemical test of Moon soil on the surface.", src: ["wikiMoonLanding", "lpiSurveyor"] },
+  { id: "s6", name: "Surveyor 6", who: "us", org: "NASA", year: 1967, status: "landed", ll: [-1.43, 0.47], site: "Central Bay (Sinus Medii)",
+    purpose: "Scout another Apollo site.", result: "30,000 photos. It also restarted its engines and hopped to a second spot 2.5 m away.", src: ["wikiMoonLanding"] },
+  { id: "s7", name: "Surveyor 7", who: "us", org: "NASA", year: 1968, status: "landed", ll: [-11.51, -40.98], site: "Near Tycho crater (highlands)",
+    purpose: "The last Surveyor, sent to the highlands for science rather than Apollo scouting.", result: "Landed safely in rough highland terrain.", src: ["lpiSurveyor", "wikiObjects"] },
+  { id: "a11", name: "Apollo 11", who: "us", org: "NASA (crewed)", year: 1969, status: "landed", ll: [23.47, 0.67], site: "Sea of Tranquility",
+    purpose: "Land people on the Moon and return them safely to Earth.", result: "Neil Armstrong and Buzz Aldrin became the first people on the Moon. Their soil was later found to hold helium-3.", src: ["nssdcApollo", "ntrsHe3"] },
+  { id: "a12", name: "Apollo 12", who: "us", org: "NASA (crewed)", year: 1969, status: "landed", ll: [-23.42, -3.01], site: "Ocean of Storms",
+    purpose: "Make a pinpoint landing next to the Surveyor 3 robot.", result: "Landed close enough to walk to Surveyor 3 and bring parts back, and set up a seismometer.", src: ["nasaApollo", "nssdcApollo"] },
+  { id: "a14", name: "Apollo 14", who: "us", org: "NASA (crewed)", year: 1971, status: "landed", ll: [-17.47, -3.65], site: "Fra Mauro highlands",
+    purpose: "Explore the Fra Mauro highlands.", result: "Alan Shepard and Edgar Mitchell explored the region on foot.", src: ["nasaApolloProg", "nssdcApollo"] },
+  { id: "a15", name: "Apollo 15", who: "us", org: "NASA (crewed)", year: 1971, status: "landed", ll: [3.63, 26.13], site: "Hadley Rille",
+    purpose: "Longer stay, with a car to cover more ground.", result: "The first time the Lunar Roving Vehicle was driven on the Moon.", src: ["nasaApolloProg", "nssdcApollo"] },
+  { id: "a16", name: "Apollo 16", who: "us", org: "NASA (crewed)", year: 1972, status: "landed", ll: [15.5, -8.97], site: "Descartes highlands",
+    purpose: "Study the bright highland rock.", result: "John Young and Charles Duke explored the Descartes highlands.", src: ["nasaApolloProg", "nssdcApollo"] },
+  { id: "a17", name: "Apollo 17", who: "us", org: "NASA (crewed)", year: 1972, status: "landed", ll: [30.77, 20.19], site: "Taurus-Littrow valley",
+    purpose: "Final Apollo landing, with the first scientist-astronaut, geologist Harrison Schmitt.", result: "The last time people walked on the Moon. Schmitt later cofounded the helium-3 company Interlune.", src: ["nssdcApollo", "nasaApolloProg"] },
+  { id: "im1", name: "IM-1 Odysseus", who: "us", org: "Intuitive Machines (for NASA)", year: 2024, status: "partial", approx: true, ll: [1.4, -80.1], site: "Near Malapert A, south pole region",
+    purpose: "First U.S. landing since 1972, carrying NASA instruments under its commercial delivery program.", result: "Landed and worked for about a week, but on its side.", why: "A safety switch on its laser rangefinders was never turned off before launch. It came in too fast, broke a leg and tipped over.", src: ["im1SpaceNews", "wikiObjects"] },
+  { id: "bg1", name: "Blue Ghost 1", who: "us", org: "Firefly Aerospace (for NASA)", year: 2025, status: "landed", ll: [61.81, 18.56], site: "Sea of Crises, near Mons Latreille",
+    purpose: "Deliver 10 NASA science and technology instruments.", result: "The first fully successful private Moon landing. It worked for about 14 days and filmed an eclipse and a sunset from the Moon.", src: ["bg1NASA", "wikiObjects"] },
+  { id: "im2", name: "IM-2 Athena", who: "us", org: "Intuitive Machines (for NASA)", year: 2025, status: "partial", ll: [29.2, -84.79], site: "Mons Mouton, south pole",
+    purpose: "Carry NASA's PRIME-1 drill to look for ice at the south pole.", result: "Landed about 400 m from target but on its side; it lasted about 10 hours, not 10 days.", why: "Its altimeter failed during landing, so it hit a plateau, tipped over and slid into a crater.", src: ["im2Wiki", "nasaPrime1"] },
+  { id: "sv2", name: "Surveyor 2", who: "us", org: "NASA", year: 1966, status: "crashed", ll: [-12, 5.5], site: "Near Copernicus crater",
+    purpose: "Second U.S. landing test for Apollo.", result: "Crashed at high speed.", why: "An engine failed during a course correction on the way, sending it into a tumble it could not recover from.", src: ["wikiMoonLanding", "wikiSurveyor"] },
+  { id: "sv4", name: "Surveyor 4", who: "us", org: "NASA", year: 1967, status: "crashed", ll: [-1.33, 0.4], site: "Central Bay (Sinus Medii)",
+    purpose: "Land with a robot arm to test soil.", result: "Contact was lost 2.5 minutes before touchdown.", why: "Its solid-fuel braking rocket may have exploded near the end of its burn.", src: ["wikiSurveyor", "lpiSurveyor"] },
 
-  // Past: China
-  { id: "ce4", name: "Chang'e-4", who: "cn", year: 2019, status: "landed", ll: [177.59, -45.46], what: "First landing ever on the far side.", src: ["wikiObjects"] },
-  { id: "ce5", name: "Chang'e-5", who: "cn", year: 2020, status: "landed", approx: true, ll: [-51.9, 43.1], what: "Brought back 1.7 kg of soil. Chinese scientists measured helium-3 in it.", src: ["cnsaHe3"] },
-  { id: "ce6", name: "Chang'e-6", who: "cn", year: 2024, status: "landed", ll: [-153.99, -41.64], what: "First soil ever brought back from the far side.", src: ["wikiObjects"] },
+  // ---------- China ----------
+  { id: "ce3", name: "Chang'e-3", who: "cn", org: "CNSA", year: 2013, status: "landed", ll: [-19.51, 44.12], site: "Sea of Rains",
+    purpose: "China's first landing on another world, with a rover.", result: "The first Moon landing by any country since 1976. The Yutu rover drove 114 m before getting stuck.", src: ["wikiMoonLanding", "wikiObjects"] },
+  { id: "ce4", name: "Chang'e-4", who: "cn", org: "CNSA", year: 2019, status: "landed", ll: [177.59, -45.44], site: "Von Kármán crater, far side",
+    purpose: "Land on the far side and study rock that may come from deep inside the Moon.", result: "The first landing ever on the far side, using a relay satellite to talk to Earth. Its Yutu-2 rover explored Von Kármán crater.", src: ["ce4Planetary", "wikiObjects"] },
+  { id: "ce5", name: "Chang'e-5", who: "cn", org: "CNSA", year: 2020, status: "landed", approx: true, ll: [-51.92, 43.06], site: "Ocean of Storms (near Mons Rümker)",
+    purpose: "Bring back soil from a young lava plain.", result: "Brought 1,731 g home, the first Moon samples in 44 years. Scientists measured helium-3 in them.", src: ["cnsaHe3", "wikiObjects"] },
+  { id: "ce6", name: "Chang'e-6", who: "cn", org: "CNSA", year: 2024, status: "landed", ll: [-153.99, -41.64], site: "Apollo basin, far side",
+    purpose: "Bring back the first samples from the far side.", result: "Returned 1,935.3 g from the South Pole–Aitken basin, the Moon's largest and oldest basin.", src: ["ce6NSR", "wikiObjects"] },
 
-  // Past: India, Japan, others
-  { id: "ch3", name: "Chandrayaan-3", who: "in", year: 2023, status: "landed", ll: [32.32, -69.37], what: "First landing near the south pole, at 'Shiv Shakti point'.", src: ["wikiObjects"] },
-  { id: "slim", name: "SLIM", who: "jp", year: 2024, status: "landed", ll: [25.25, -13.32], what: "Japan's first landing. A pinpoint-landing test.", src: ["wikiObjects"] },
-  { id: "hk1", name: "Hakuto-R 1 (ispace)", who: "jp", year: 2023, status: "crashed", ll: [44.09, 47.58], what: "Private Japanese lander. It crashed, along with the UAE's Rashid rover.", src: ["wikiObjects"] },
-  { id: "hk2", name: "Resilience (ispace)", who: "jp", year: 2025, status: "crashed", ll: [-4.59, 60.44], what: "Carried a small rover with a scoop to test collecting Moon soil. It crashed.", src: ["wikiObjects"] },
-  { id: "ber", name: "Beresheet", who: "ot", year: 2019, status: "crashed", ll: [19.35, 32.60], what: "Israel's private lander. It crashed in the Sea of Serenity.", src: ["wikiObjects"] },
+  // ---------- India ----------
+  { id: "ch3", name: "Chandrayaan-3", who: "in", org: "ISRO", year: 2023, status: "landed", ll: [32.32, -69.37], site: "Shiv Shakti point, south polar region",
+    purpose: "Land near the south pole and test the soil with a rover.", result: "The first landing near the south pole. The Pragyan rover confirmed sulfur in the soil there.", src: ["ch3Wiki", "wikiObjects"] },
+  { id: "ch2", name: "Chandrayaan-2 Vikram", who: "in", org: "ISRO", year: 2019, status: "crashed", ll: [22.78, -70.88], site: "South polar region",
+    purpose: "India's first landing, near the south pole.", result: "Hard landing about 500 m from its target.", why: "Its engines pushed harder than planned, errors added up, and software limits stopped it from turning fast enough to recover.", src: ["ch2Wiki", "wikiObjects"] },
 
-  // Planned: United States
-  { id: "art4", name: "Artemis IV crewed landing", who: "us", year: 2028, status: "planned", region: [0, -87, 4], what: "NASA's next astronaut landing, near the south pole. Artemis III became a 2027 test flight in orbit around Earth.", src: ["spoArtemis", "bbcArtemis"] },
-  { id: "base", name: "NASA Moon Base", who: "us", year: 2032, status: "planned", region: [0, -88, 6], what: "Phase 1 (to 2029): robot scouts. Phase 2 (2029-2032): power, communications and transport. Phase 3 (from 2032): homes for a lasting human presence near the south pole.", src: ["nasaMoonBase"] },
-  { id: "gr1", name: "Griffin-1 (Voyager / Astrobotic)", who: "us", year: 2027, status: "planned", approx: true, ll: [45, -85.3], what: "Largest private lander yet, aiming for the Nobile crater area. Carries the FLIP rover with Interlune's helium-3 camera. Now targeting January 2027.", src: ["griffin", "griffinSite", "crescentMoon"] },
-  { id: "im3", name: "IM-3 (Intuitive Machines)", who: "us", year: 2027, status: "planned", approx: true, ll: [-59, 7.5], what: "Will study the Reiner Gamma 'lunar swirl', a spot with its own small magnetic field.", src: ["clps2026"] },
+  // ---------- Japan ----------
+  { id: "slim", name: "SLIM", who: "jp", org: "JAXA", year: 2024, status: "landed", ll: [25.25, -13.32], site: "Near Shioli crater",
+    purpose: "Prove a pinpoint landing within 100 m of a target.", result: "Landed within its 100 m goal, making Japan the fifth country to land. An engine failed during descent, so it ended up upside down, but it still worked and a tiny rover it carried photographed it.", src: ["slimSpace", "wikiObjects"] },
+  { id: "hk1", name: "Hakuto-R Mission 1", who: "jp", org: "ispace (private)", year: 2023, status: "crashed", ll: [44.09, 47.58], site: "Atlas crater",
+    purpose: "First private Japanese landing, carrying the UAE's Rashid rover.", result: "Ran out of fuel and fell to the surface.", why: "After passing a crater rim, its software wrongly decided the correct altitude reading was an error and ignored it. It hovered too high until the fuel ran out.", src: ["hakuto1SPO", "wikiObjects"] },
+  { id: "hk2", name: "Resilience (Hakuto-R 2)", who: "jp", org: "ispace (private)", year: 2025, status: "crashed", ll: [-4.59, 60.44], site: "Sea of Cold (Mare Frigoris)",
+    purpose: "Land and test scooping up Moon soil with a small rover.", result: "Hard landing; lost.", why: "Its laser rangefinder was slow to get valid distance readings, so it could not slow down enough.", src: ["resilienceSpace", "wikiObjects"] },
 
-  // Planned: China
-  { id: "ce7", name: "Chang'e-7", who: "cn", year: 2027, status: "planned", ll: [123.4, -88.8], what: "Lander, rover and a hopping robot to search for ice near Shackleton crater. Delayed from August 2026 to 2027.", src: ["ce7Delay", "ce7Site"] },
-  { id: "ce8", name: "Chang'e-8", who: "cn", year: 2029, status: "planned", approx: true, ll: [31, -84.6], what: "Tests making bricks and other things from Moon soil, on a plateau near Mons Mouton. Its date may move to 2030 or 2031.", src: ["sciamMoonBase", "ce8Change"] },
-  { id: "ilrs", name: "International Lunar Research Station (China + Russia)", who: "cn", year: 2035, status: "planned", region: [120, -88, 5], what: "Basic base at the south pole by about 2035. Russia plans a nuclear power plant for it. China also plans to land astronauts before 2030 (site not chosen).", src: ["asiaTimes", "neiRussia"] },
+  // ---------- Israel ----------
+  { id: "ber", name: "Beresheet", who: "il", org: "SpaceIL & Israel Aerospace Industries", year: 2019, status: "crashed", ll: [19.35, 32.6], site: "Sea of Serenity",
+    purpose: "A low-cost private lander, built partly to inspire students in science.", result: "Crashed in the Sea of Serenity.", why: "A gyroscope failed during braking. The main engine shut off and restarted too late; at 150 m it was still going over 500 km/h.", src: ["beresheetWiki"] },
 
-  // Planned: India, Russia, Korea
-  { id: "ch4", name: "Chandrayaan-4", who: "in", year: 2028, status: "planned", approx: true, ll: [31.5, -84.4], what: "India's first sample return. Site MM-4 near Mons Mouton was chosen for landing.", src: ["hinduCh4"] },
-  { id: "l27a", name: "Luna-27A", who: "ru", year: 2029, status: "planned", region: [60, -86, 4], what: "Russian lander to the south pole. An orbiter (Luna-26) goes first in 2028 to scout sites.", src: ["neiRussia", "elpaisRussia"] },
-  { id: "l27b", name: "Luna-27B", who: "ru", year: 2030, status: "planned", region: [0, 86, 4], what: "Russian lander to the north pole.", src: ["neiRussia"] },
-  { id: "kr", name: "Korean lunar lander", who: "kr", year: 2032, status: "planned", approx: true, ll: [27.2, 45.1], what: "South Korea's first landing. Six candidate sites, including Lacus Mortis (shown), Endymion, Gärtner, Clavius, Pingré and Maginus.", src: ["koreaSites"] },
+  // ---------- Planned ----------
+  { id: "art4", name: "Artemis IV crewed landing", who: "us", org: "NASA (crewed)", year: 2028, status: "planned", region: [0, -87, 4], site: "South pole region",
+    purpose: "NASA's next astronaut landing, near the south pole.", result: "Artemis III became a 2027 test flight in orbit around Earth, so this is now the first landing.", src: ["spoArtemis", "bbcArtemis"] },
+  { id: "base", name: "NASA Moon Base", who: "us", org: "NASA", year: 2032, status: "planned", region: [0, -88, 6], site: "South pole region",
+    purpose: "A lasting human presence near the south pole.", result: "Phase 1 (to 2029): robot scouts. Phase 2 (2029–2032): power, communications, transport. Phase 3 (from 2032): homes.", src: ["nasaMoonBase"] },
+  { id: "gr1", name: "Griffin-1", who: "us", org: "Voyager / Astrobotic (for NASA)", year: 2027, status: "planned", approx: true, ll: [45, -85.3], site: "Nobile crater area, south pole",
+    purpose: "Largest private lander yet; carries the FLIP rover with Interlune's helium-3 camera.", result: "Now targeting January 2027.", src: ["griffin", "griffinSite", "crescentMoon"] },
+  { id: "im3", name: "IM-3", who: "us", org: "Intuitive Machines (for NASA)", year: 2027, status: "planned", approx: true, ll: [-59, 7.5], site: "Reiner Gamma",
+    purpose: "Study a 'lunar swirl', a spot with its own small magnetic field.", result: "Planned for 2027.", src: ["clps2026"] },
+  { id: "ce7", name: "Chang'e-7", who: "cn", org: "CNSA", year: 2027, status: "planned", ll: [123.4, -88.8], site: "Near Shackleton crater, south pole",
+    purpose: "Lander, rover and hopping robot to search for ice.", result: "Delayed from August 2026 to 2027.", src: ["ce7Delay", "ce7Site"] },
+  { id: "ce8", name: "Chang'e-8", who: "cn", org: "CNSA", year: 2029, status: "planned", approx: true, ll: [31, -84.6], site: "Near Mons Mouton",
+    purpose: "Test making bricks and other materials from Moon soil.", result: "Date may move to 2030 or 2031.", src: ["sciamMoonBase", "ce8Change"] },
+  { id: "ilrs", name: "International Lunar Research Station", who: "cn", org: "China + Russia", year: 2035, status: "planned", region: [120, -88, 5], site: "South pole region",
+    purpose: "A shared base, with a basic version by about 2035.", result: "Russia plans a nuclear power plant for it.", src: ["asiaTimes", "neiRussia"] },
+  { id: "ch4", name: "Chandrayaan-4", who: "in", org: "ISRO", year: 2028, status: "planned", approx: true, ll: [31.5, -84.4], site: "Site MM-4 near Mons Mouton",
+    purpose: "India's first sample return.", result: "Planned for 2028.", src: ["hinduCh4"] },
+  { id: "l27a", name: "Luna-27A", who: "ru", org: "Roscosmos", year: 2029, status: "planned", region: [60, -86, 4], site: "South pole region",
+    purpose: "Russian lander to the south pole, after the Luna-26 orbiter scouts sites in 2028.", result: "Planned for 2029.", src: ["neiRussia", "elpaisRussia"] },
+  { id: "l27b", name: "Luna-27B", who: "ru", org: "Roscosmos", year: 2030, status: "planned", region: [0, 86, 4], site: "North pole region",
+    purpose: "Russian lander to the north pole.", result: "Planned for 2030.", src: ["neiRussia"] },
+  { id: "kr", name: "Korean lunar lander", who: "kr", org: "KASA", year: 2032, status: "planned", approx: true, ll: [27.2, 45.1], site: "Lacus Mortis (one of six candidates)",
+    purpose: "South Korea's first landing.", result: "Six candidate sites announced in March 2026.", src: ["koreaSites"] },
 ];
 
-// Plans with no public landing site yet (listed, not mapped).
+// Plans and failures with no landing site (listed, not mapped).
 const UNMAPPED = [
-  { name: "Blue Ghost Mission 2 (Firefly, with ESA and the UAE)", who: "us", year: 2027, what: "First U.S. landing on the far side. Exact site not public.", src: ["bg2"] },
-  { name: "Interlune Prospect Moon", who: "us", year: 2028, what: "Tests helium-3 extraction near the equator. Site kept secret for competitive reasons.", src: ["prospectMoon", "spacenewsUsgs"] },
-  { name: "Chinese crewed landing", who: "cn", year: 2030, what: "Two astronauts, three days on the surface. Likely a low-risk near-side site; not yet chosen.", src: ["sciamMoonBase", "asiaTimes"] },
-  { name: "LUPEX / Chandrayaan-5 (India + Japan)", who: "in", year: 2028, what: "Joint water-ice rover mission to the south pole.", src: ["hinduCh4"] },
+  { name: "Blue Ghost Mission 2", who: "us", org: "Firefly (with ESA and the UAE)", year: 2027, status: "planned", purpose: "First U.S. landing on the far side.", result: "Exact site not public.", src: ["bg2"] },
+  { name: "Interlune Prospect Moon", who: "us", org: "Interlune", year: 2028, status: "planned", purpose: "Test helium-3 extraction near the equator.", result: "Site kept secret for competitive reasons.", src: ["prospectMoon", "spacenewsUsgs"] },
+  { name: "Chinese crewed landing", who: "cn", org: "CMSA", year: 2030, status: "planned", purpose: "Two astronauts, three days on the surface.", result: "Likely a low-risk near-side site; not yet chosen.", src: ["sciamMoonBase", "asiaTimes"] },
+  { name: "LUPEX / Chandrayaan-5", who: "in", org: "ISRO + JAXA", year: 2028, status: "planned", purpose: "Joint ice-hunting rover mission to the south pole.", result: "Site not public.", src: ["hinduCh4"] },
+  { name: "Peregrine Mission One", who: "us", org: "Astrobotic (for NASA)", year: 2024, status: "crashed", purpose: "Deliver NASA instruments; would have been the first U.S. landing since 1972.", result: "Never reached the Moon; fell back to Earth over the Pacific.", why: "A faulty valve caused a propulsion problem soon after launch.", src: ["spaceMoonRush"] },
 ];
 
-// Company front-runners for Moon mining and its supply chain.
 const COMPANIES = [
   { name: "Interlune", country: "United States", role: "dig", stage: "Mining helium-3",
     what: "Plans to scoop and heat Moon soil to collect helium-3. Has signed buyers: Bluefors (up to 10,000 liters a year, 2028-2037), Maybell Quantum, and the U.S. Department of Energy (3 liters by April 2029).",

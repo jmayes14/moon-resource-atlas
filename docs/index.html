@@ -181,6 +181,57 @@
   .brand b { font-family: Orbitron, Inter, sans-serif; letter-spacing: .05em; }
   header nav a { font-family: Orbitron, Inter, sans-serif; font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; }
   #info h2 { font-family: Orbitron, Inter, sans-serif; font-size: 1.2rem; letter-spacing: 0; }
+
+  /* missions panel */
+  .explorer { grid-template-columns: 16rem 1fr 23rem; }
+  #mpanel { padding: 0; background: #0d0d0d; display: flex; flex-direction: column; max-height: 760px; }
+  .mp-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #333; position: sticky; top: 0; background: #0d0d0d; z-index: 2; }
+  .mp-tabs button { background: none; border: 0; border-bottom: 3px solid transparent; color: #a6a6a6; font: 700 .7rem Orbitron, sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 1rem .4rem .8rem; cursor: pointer; }
+  .mp-tabs button b { display: inline-block; margin-left: .25rem; font: 500 .66rem "DM Mono"; color: #8c8c8c; }
+  .mp-tabs button[aria-selected="true"] { color: #fff; border-bottom-color: var(--red); }
+  .mp-body { padding: 1.1rem 1.2rem 1.4rem; overflow-y: auto; }
+  .mp-intro { font-size: .88rem; color: #cfcfcf; margin: 0 0 .9rem; } .mp-intro strong { color: #fff; }
+  .mp-firsts { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0 0 1rem; }
+  .mp-firsts span { font: 500 .66rem "DM Mono"; text-transform: uppercase; letter-spacing: .04em; border: 1px solid #333; padding: .25rem .45rem; color: #d4d4d4; display: inline-flex; gap: .35rem; align-items: center; }
+  .mp-firsts i, .mp-group h4 i, .mlist2 i { width: .55rem; height: .55rem; border-radius: 50%; display: inline-block; }
+  .mp-firsts b { color: #fff; }
+  .mp-group h4 { display: flex; align-items: center; gap: .5rem; font: 700 .72rem Orbitron, sans-serif; letter-spacing: .06em; text-transform: uppercase; margin: 1rem 0 .3rem; color: #fff; }
+  .mp-group h4 span { margin-left: auto; font: 500 .66rem "DM Mono"; color: #8c8c8c; }
+  .mp-group ul { list-style: none; margin: 0; padding: 0; }
+  .mp-group li button { width: 100%; display: grid; grid-template-columns: 2.6rem .7rem 1fr auto; gap: .5rem; align-items: center; text-align: left; background: none; border: 0; border-bottom: 1px solid #222; color: #e6e6e6; font: 500 .86rem Inter; padding: .5rem .2rem; cursor: pointer; }
+  .mp-group li button:hover, .mp-group li button[aria-current="true"] { background: #1a1a1a; color: #fff; }
+  .mp-group li .yr { font: 500 .72rem "DM Mono"; color: #8c8c8c; }
+  .mp-group li i { width: .55rem; height: .55rem; border-radius: 50%; }
+  .mp-group li em { font-style: normal; font: 500 .6rem "DM Mono"; text-transform: uppercase; color: #ffb07a; margin-left: .3rem; }
+  .mp-group li .go { color: #666; font-size: 1.1rem; }
+  .mp-sub { font: 500 .68rem "DM Mono"; letter-spacing: .08em; text-transform: uppercase; color: #ffb07a; margin: 1.6rem 0 0; border-top: 1px solid #333; padding-top: 1rem; }
+  .mp-detail h2 { font: 800 1.4rem Orbitron, sans-serif; margin: .7rem 0 .3rem; line-height: 1.2; }
+  .mp-detail h4 { font: 500 .66rem "DM Mono"; letter-spacing: .1em; text-transform: uppercase; color: #8c8c8c; margin: 1rem 0 .3rem; }
+  .mp-detail p { font-size: .92rem; color: #e0e0e0; margin: 0; }
+  .mp-detail .mp-meta { font: 500 .7rem "DM Mono"; color: #a6a6a6; text-transform: uppercase; letter-spacing: .04em; line-height: 1.6; }
+  .mp-back { background: none; border: 0; color: #a6a6a6; font: 500 .7rem "DM Mono"; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; padding: 0; }
+  .mp-back:hover { color: #fff; }
+  .mp-tags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; }
+  .mp-tags .tag { font: 500 .62rem "DM Mono"; letter-spacing: .08em; text-transform: uppercase; padding: .2rem .5rem; color: #000; }
+  .st { font: 500 .62rem "DM Mono"; letter-spacing: .06em; text-transform: uppercase; padding: .2rem .5rem; }
+  .st-ok { background: #3fd0a0; color: #062a1d; } .st-warn { background: #ffb07a; color: #3a1a00; } .st-bad { background: var(--red); color: #fff; } .st-plan { background: #333; color: #fff; }
+  .mp-why { border-left: 3px solid var(--red); padding: .1rem 0 .2rem .8rem; margin-top: 1rem; } .mp-why h4 { color: #ff8a73; margin-top: .2rem; }
+  .mp-note { margin-top: 1rem !important; font: 500 .66rem "DM Mono" !important; text-transform: uppercase; letter-spacing: .05em; color: #8c8c8c !important; }
+  .mp-detail .src { font-size: .72rem; color: #8c8c8c; margin-top: 1rem; } .mp-detail .src a { color: #bdbdbd; }
+  /* landing-site option */
+  .toggle { display: flex; align-items: center; gap: .6rem; background: none; border: 1px solid #333; color: #fff; font: 600 .85rem Inter; padding: .55rem .7rem; width: 100%; cursor: pointer; text-align: left; }
+  .toggle .sw { width: 2rem; height: 1.1rem; border-radius: 999px; background: #333; position: relative; flex: none; transition: background .2s; }
+  .toggle .sw::after { content: ""; position: absolute; left: .15rem; top: .15rem; width: .8rem; height: .8rem; border-radius: 50%; background: #bdbdbd; transition: left .2s; }
+  .toggle[aria-pressed="true"] .sw { background: var(--red); } .toggle[aria-pressed="true"] .sw::after { left: 1.05rem; background: #fff; }
+  .opt-note { font-size: .76rem; color: #8c8c8c; margin: .5rem 0 .8rem; }
+  /* resource card over the map */
+  #info.float { position: absolute; left: 1rem; bottom: 4rem; width: min(21rem, calc(100% - 2rem)); z-index: 5; background: rgb(13 13 13 / 94%); border: 1px solid #444; padding: 1rem 1.1rem; }
+  #info.float[hidden] { display: none; }
+  #info.float .x { position: absolute; right: .5rem; top: .3rem; background: none; border: 0; color: #a6a6a6; font-size: 1.3rem; cursor: pointer; }
+  #info.float h2 { font-size: 1.05rem; margin: .5rem 0 .3rem; }
+  @keyframes pulse2 { from { r: 10; opacity: 1; } to { r: 26; opacity: 0; } }
+  .pulse-sel { animation: pulse2 1.6s ease-out infinite; }
+  @media (max-width: 960px) { #mpanel { max-height: none; } .explorer { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -211,7 +262,7 @@
 </div></section>
 
 <section class="dark" id="explore"><div class="wrap">
-  <div class="head"><div><span class="mono">Interactive</span><h2>Explore the Moon</h2></div><p>Drag to rotate. Click a landing site or resource area for details and sources.</p></div>
+  <div class="head"><div><span class="mono">Interactive</span><h2>Explore the Moon</h2></div><p>Drag to rotate. Pick a mission on the right to see where it landed and what it was for, or click the colored glow for resource details.</p></div>
   <div class="explorer">
     <aside>
       <h3>Show resource</h3><div class="chips" id="f-layers"></div>
@@ -220,24 +271,23 @@
         <p><strong>Oxygen</strong> is 40–45% of the soil by weight, locked in minerals. <strong>Silicon</strong> is in almost every rock. Both can be split out with electricity to make air, rocket fuel and solar panels.</p>
         <p><strong>Platinum-group metals</strong> may sit in old asteroid impact craters, possibly thousands of them, but no deposit has been found yet.</p>
         <div class="src" id="every-src"></div></div>
-      <h3>Country</h3><div class="chips" id="f-who"></div>
+      <h3>Landing sites</h3>
+      <button type="button" class="toggle" id="showall" aria-pressed="false"><span class="sw"></span>Show all landing sites</button>
+      <p class="opt-note">Off by default. Pick a mission in the panel on the right to see where it landed.</p>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#4ea1ff" stroke="#fff" stroke-width="1.6"/></svg>Landed</div>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#4ea1ff" stroke="#fff" stroke-width="1.6" stroke-dasharray="2.2 1.8"/></svg>Landed, tipped over or damaged</div>
+      <div class="lgd"><svg width="18" height="14"><path d="M4,2L14,12M14,2L4,12" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Failed landing (crash)</div>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#000" stroke="#4ea1ff" stroke-width="2.4"/><circle cx="9" cy="7" r="1.7" fill="#4ea1ff"/></svg>Planned</div>
+      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="6" fill="none" stroke="#fff" stroke-width="1.4" stroke-dasharray="2 2.5"/></svg>Planned area, no exact site</div>
     </aside>
     <div class="viewer">
       <div id="globe" data-size="0.42"><canvas></canvas><svg></svg></div>
       <div class="bar"><button data-view="near" aria-pressed="true">Near side</button><button data-view="far">Far side</button><button data-view="south">South pole</button><button data-view="north">North pole</button></div>
       <div class="zoom"><button data-zoom="in" aria-label="Zoom in">+</button><button data-zoom="out" aria-label="Zoom out">−</button></div>
+      <div id="info" class="float" hidden></div>
       <div class="modes" role="group" aria-label="What to show"><button data-mode="both" aria-pressed="true">Everything</button><button data-mode="res" aria-pressed="false">Resources</button><button data-mode="mis" aria-pressed="false">Missions</button></div>
     </div>
-    <aside id="info">
-      <span class="tag" style="background:#fff">Map key</span>
-      <h2>Click anything on the Moon</h2>
-      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#4ea1ff" stroke="#fff" stroke-width="1.6"/></svg>Landed</div>
-      <div class="lgd"><svg width="18" height="14"><path d="M4,2L14,12M14,2L4,12" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Crashed</div>
-      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="5" fill="#000" stroke="#4ea1ff" stroke-width="2.4"/><circle cx="9" cy="7" r="1.7" fill="#4ea1ff"/></svg>Planned (pulses)</div>
-      <div class="lgd"><svg width="18" height="18"><circle cx="9" cy="9" r="6.5" fill="#000" stroke="#fff"/><text x="9" y="12" font-size="8" fill="#fff" text-anchor="middle" font-weight="800">9</text></svg>Group of missions: click to zoom</div>
-      <div class="lgd"><svg width="18" height="14"><circle cx="9" cy="7" r="6" fill="none" stroke="#fff" stroke-width="1.4" stroke-dasharray="2 2.5"/></svg>Planned area, no exact site</div>
-      <p style="margin-top:1rem">Dot colors show the country. Glowing color on the surface shows where each resource is most likely, drawn from USGS and NASA maps. Hover a dot for its name; click the glow for details.</p>
-    </aside>
+    <aside id="mpanel" aria-label="Moon missions" aria-live="polite"></aside>
   </div>
 </div></section>
 
@@ -307,12 +357,12 @@
     if (b.dataset.k === "ice") atlas.view("south");
     document.getElementById("explore").scrollIntoView({ behavior: "smooth" });
   }));
-  const plans = MISSIONS.filter(m => m.status === "planned" && !["base", "ilrs"].includes(m.id)).concat(UNMAPPED).sort((a, b) => a.year - b.year).slice(0, 8);
+  const plans = MISSIONS.filter(m => m.status === "planned" && !["base", "ilrs"].includes(m.id)).concat(UNMAPPED.filter(m => m.status === "planned")).sort((a, b) => a.year - b.year).slice(0, 8);
   const firstSentence = t => { const m = t.match(/^.*?[a-z0-9)'"]\.(?=\s|$)/); return m ? m[0] : t; };
   const where = m => m.region ? "South pole region" : m.ll ? (m.ll[1] < -75 ? "South pole" : m.ll[1] > 75 ? "North pole" : "Near side") : "Site not public";
   document.getElementById("mrows").innerHTML = plans.map(m => `<div class="mrow">
     <span class="date">${m.year}</span>
-    <div><b>${m.name}</b><div class="sub">${firstSentence(m.what)}</div></div>
+    <div><b>${m.name}</b><div class="sub">${m.purpose}</div></div>
     <span class="ctry"><i style="background:${COUNTRIES[m.who].color};outline:1px solid rgb(0 0 0 / 20%)"></i>${COUNTRIES[m.who].name}</span>
     <span class="pill">${where(m)}</span></div>`).join("");
 </script>

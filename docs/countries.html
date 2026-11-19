@@ -65,7 +65,7 @@
 
   // ---- timeline ----
   const order = ["us", "cn", "in", "ru", "jp", "kr"];
-  const plans = MISSIONS.filter(m => m.status === "planned").concat(UNMAPPED.map(m => ({ ...m, status: "planned", unmapped: true })));
+  const plans = MISSIONS.filter(m => m.status === "planned").concat(UNMAPPED.filter(m => m.status === "planned").map(m => ({ ...m, unmapped: true })));
   const W = 1000, rowH = 54, topY = 30, left = 130, right = 20;
   const H = topY + order.length * rowH + 30;
   const x = d3.scaleLinear().domain([2026, 2036]).range([left, W - right]);
@@ -111,8 +111,8 @@
     div.className = "card country"; div.style.setProperty("--c", c.color);
     div.innerHTML = `<h3><span>${c.name}</span><span class="small muted">${c.bloc === "artemis" ? "Artemis Accords" : "ILRS (China-led)"}</span></h3>
       <p class="small">${notes[k]}</p>
-      <strong class="small">Next</strong><ul>${next.map(m => `<li>${m.year}: ${m.name}${m.ll || m.region ? ` <a href="index.html?m=${m.id}" class="small">map</a>` : ""}</li>`).join("") || "<li>No new landing announced</li>"}</ul>
-      <strong class="small">Past</strong><ul>${past.map(m => `<li>${m.year}: ${m.name}${m.status === "crashed" ? " (crashed)" : ""}</li>`).join("")}</ul>
+      <strong class="small">Next</strong><ul>${next.map(m => `<li>${m.year}: ${m.name}${m.ll || m.region ? ` <a href="index.html?m=${m.id}#explore" class="small">map</a>` : ""}</li>`).join("") || "<li>No new landing announced</li>"}</ul>
+      <strong class="small">Past</strong><ul>${past.map(m => `<li>${m.year}: ${m.name}${m.status === "crashed" ? " (crashed)" : m.status === "partial" ? " (tipped over/damaged)" : ""} <a href="index.html?m=${m.id}#explore" class="small">map</a></li>`).join("")}</ul>
       <div class="src">Sources: ${srcList(noteSrc[k])}</div>`;
     cards.appendChild(div);
   }

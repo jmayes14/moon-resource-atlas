@@ -20,7 +20,7 @@ An interactive site about **critical minerals and strategic supply security on t
 - `docs/assets/atlas.js` draws the Moon pixel by pixel on a canvas (orthographic projection), with d3 SVG markers and labels on top. Deep links: `?m=ce7`, `?view=south`.
 - Surface: NASA LROC color map with terrain shading baked in from NASA LOLA elevation (`tools/bake_relief.py`), so the poles show real craters.
 - Resource layers (one at a time, or "Key resources"): helium-3, water ice, rare earths & thorium, titanium, iron, aluminum. Each is built in the browser from published maps and shaped by the terrain; titanium follows the surface's blueness (checked: Tranquillitatis 0.97 vs Serenitatis 0.90). They show where a resource is most likely, not exact amounts.
-- Missions: landed, crashed, planned (pulsing); the crowded south pole groups into one badge until you zoom in.
+- Missions: no dots by default. A Missions panel (Landed / Failed / Planned, grouped by country) lists every landing attempt by the USSR/Russia, United States, China, India, Japan and Israel, plus private landers. Picking one turns the Moon to the site, marks it with a pulsing ring, and shows its purpose, what happened, and for failures, why. A "Show all landing sites" switch shows every site at once.
 - Facts live only in `docs/assets/data.js` (SOURCES, COUNTRIES, RESOURCES, FACTS, MISSIONS, UNMAPPED, COMPANIES).
 - Photos: NASA image library (Artemis II art002e021278 and art002e012228, Apollo 17 AS17-140-21497, LRO PIA13523), public domain.
 

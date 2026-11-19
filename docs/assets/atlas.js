@@ -15,7 +15,8 @@
     mode: "both",                     // both | res | mis
     layers: new Set(Object.keys(RESOURCES).filter(k => RESOURCES[k].on)),
     who: new Set(Object.keys(COUNTRIES)),
-    status: new Set(["landed", "crashed", "planned"]),
+    status: new Set(["landed", "partial", "crashed", "planned"]),
+    showAll: false,                   // landing sites are hidden until a mission is picked (or "show all" is on)
     selected: null,
     shift: +(box.dataset.shift || 0),
     size: +(box.dataset.size || 0.44),
@@ -205,6 +206,7 @@
 
   function visible(ll) { return d3.geoDistance(ll, [state.lon, state.lat]) < Math.PI / 2 - 0.03; }
   function missionShown(m) { return state.who.has(m.who) && state.status.has(m.status); }
+  const STATUS = { landed: "Landed", partial: "Landed, but tipped over or damaged", crashed: "Failed landing", planned: "Planned" };
   const FEATURED = new Set(["a11", "a17", "ce4", "ce6", "ch3", "ce7", "bg1", "slim"]);
   const isPolar = m => { const ll = m.ll || [m.region[0], m.region[1]]; return ll[1] < -78; };
 
@@ -215,9 +217,10 @@
     gGrid.attr("d", state.zoom > 1.6 ? path(d3.geoGraticule10()) : null);
 
     const showM = state.mode !== "res";
-    const cluster = showM && state.zoom < 1.75;
-    const all = showM ? MISSIONS.filter(missionShown) : [];
-    const polar = cluster ? all.filter(isPolar) : [];
+    let all = showM && state.showAll ? MISSIONS.filter(missionShown) : [];
+    if (state.selected && !all.includes(state.selected)) all = all.concat([state.selected]);
+    const cluster = showM && state.showAll && state.zoom < 1.75;
+    const polar = cluster ? all.filter(m => isPolar(m) && m !== state.selected) : [];
     const singles = all.filter(m => !polar.includes(m));
 
     // planned regions (no exact site): soft dashed outline
@@ -243,9 +246,9 @@
     en.append("circle").attr("r", 14).attr("fill", "transparent");
     en.each(function (d) {
       const g = d3.select(this), c = COUNTRIES[d.who].color;
-      if (d.status === "landed") {
+      if (d.status === "landed" || d.status === "partial") {
         g.append("circle").attr("r", 7.5).attr("fill", "rgb(0 0 0 / 45%)");
-        g.append("circle").attr("r", 5.2).attr("fill", c).attr("stroke", "#fff").attr("stroke-width", 1.6);
+        g.append("circle").attr("r", 5.2).attr("fill", c).attr("stroke", "#fff").attr("stroke-width", 1.6).attr("stroke-dasharray", d.status === "partial" ? "2.2 1.8" : null);
       } else if (d.status === "planned") {
         if (!reduce) g.append("circle").attr("class", "pulse").attr("r", 6).attr("fill", "none").attr("stroke", c).attr("stroke-width", 2);
         g.append("circle").attr("r", 5.5).attr("fill", "rgb(0 0 0 / 55%)").attr("stroke", c).attr("stroke-width", 2.6);
@@ -255,9 +258,10 @@
         g.append("path").attr("d", "M-4,-4L4,4M4,-4L-4,4").attr("stroke", c).attr("stroke-width", 2.2).attr("stroke-linecap", "round");
       }
       g.append("circle").attr("class", "sel").attr("r", 11).attr("fill", "none").attr("stroke", "#fff").attr("stroke-width", 2);
+      if (!reduce) g.append("circle").attr("class", "selpulse").attr("r", 11).attr("fill", "none").attr("stroke", c).attr("stroke-width", 2.5);
     });
     gMarks.selectAll("g.m").attr("transform", d => { const p = proj(d.ll); return `translate(${p[0]},${p[1]})`; })
-      .select(".sel").attr("opacity", d => d === state.selected ? 1 : 0);
+      .call(sel => { sel.select(".sel").attr("opacity", d => d === state.selected ? 1 : 0); sel.select(".selpulse").attr("opacity", d => d === state.selected ? 1 : 0).classed("pulse-sel", d => d === state.selected); });
 
     // south pole cluster badge
     const cl = polar.length ? [{ n: polar.length, list: polar }] : [];
@@ -297,7 +301,7 @@
       }
     }
     for (const d of dots) {
-      if (!(d === state.selected || (FEATURED.has(d.id) && z >= 1) || z >= 2.2)) continue;
+      if (!(d === state.selected || (state.showAll && FEATURED.has(d.id) && z >= 1) || z >= 2.2)) continue;
       const p = proj(d.ll);
       items.push({ x: p[0] + 11, y: p[1] + 4, text: d.name.replace(/ \(.*\)$/, ""), fill: "#fff", size: 12, pri: d === state.selected ? 0 : 3, anchor: "start" });
     }
@@ -327,7 +331,7 @@
 
   function tip(m, p) {
     if (!p) return;
-    const st = { landed: "Landed", crashed: "Crashed", planned: "Planned" }[m.status];
+    const st = STATUS[m.status];
     gTip.select(".tip1").text(m.name).attr("x", 12).attr("y", 20);
     gTip.select(".tip2").text(`${COUNTRIES[m.who].name} · ${st} · ${m.year}`).attr("x", 12).attr("y", 37);
     const w = Math.max(gTip.select(".tip1").node().getComputedTextLength(), gTip.select(".tip2").node().getComputedTextLength()) + 24;
@@ -408,36 +412,107 @@
   box.querySelector("[data-zoom='in']")?.addEventListener("click", () => fly(state.lon, state.lat, Math.min(6, state.zoom * 1.5)));
   box.querySelector("[data-zoom='out']")?.addEventListener("click", () => fly(state.lon, state.lat, Math.max(0.8, state.zoom / 1.5)));
 
-  // ---------- side panel ----------
+  // ---------- side panels ----------
+  // Resource details appear in a small card over the map (#info); missions use the Missions panel (#mpanel).
   const info = document.getElementById("info") || document.createElement("div");
-  const defaultInfo = info.innerHTML;
+  const mp = document.getElementById("mpanel");
+  const ORDER = ["ru", "us", "cn", "in", "jp", "il", "kr", "ot"];
+  const GROUP = m => m.status === "planned" ? "planned" : m.status === "crashed" ? "failed" : "landed";
+  const EXTRA = UNMAPPED.map((m, i) => ({ ...m, id: "u" + i, nosite: true }));
+  const ALL = MISSIONS.concat(EXTRA);
+  let mpTab = "landed";
+
+  function locate(m) {
+    const ll = m.ll || (m.region && [m.region[0], m.region[1]]);
+    if (!ll) return;
+    const polarZ = Math.abs(ll[1]) > 70;
+    if (!visible(ll) || d3.geoDistance(ll, [state.lon, state.lat]) > 0.3 || state.zoom < (polarZ ? 2 : 1.4))
+      fly(ll[0], Math.max(-84, Math.min(84, ll[1])), Math.max(state.zoom, polarZ ? 2.6 : 1.7));
+  }
+
   function select(sel) {
-    state.selected = sel && sel.type === "mission" ? sel.d : null;
-    if (!sel) { info.innerHTML = defaultInfo; draw(); return; }
+    if (!sel) { state.selected = null; info.hidden = true; if (mp) mpList(); draw(); return; }
     if (sel.type === "mission") {
-      const m = sel.d, c = COUNTRIES[m.who];
-      const st = { landed: "Landed", crashed: "Crashed", planned: "Planned" }[m.status];
-      info.innerHTML = `<span class="tag" style="background:${c.color}">${c.name}</span>
-        <h2>${m.name}</h2>
-        <p class="muted">${st} · ${m.status === "planned" ? "target " : ""}${m.year}${m.approx ? " · approx. location" : ""}${m.region ? " · area, no exact site" : ""}</p>
-        <p>${m.what}</p>
-        <div class="src">Source: ${srcList(m.src)}</div>`;
-      const ll = m.ll || [m.region[0], m.region[1]];
-      const polarZ = Math.abs(ll[1]) > 70;
-      if (!visible(ll) || d3.geoDistance(ll, [state.lon, state.lat]) > 0.45 || state.zoom < (polarZ ? 2 : 1.3))
-        fly(ll[0], Math.max(-84, Math.min(84, ll[1])), Math.max(state.zoom, polarZ ? 2.4 : 1.5));
+      const m = sel.d;
+      state.selected = m.nosite ? null : m;
+      info.hidden = true;
+      if (mp) mpDetail(m); else {
+        info.hidden = false;
+        info.innerHTML = `<h2>${m.name}</h2><p>${m.purpose}</p><div class="src">Source: ${srcList(m.src)}</div>`;
+      }
+      if (!m.nosite) locate(m);
     } else {
       const res = RESOURCES[sel.key];
       const near = res.areas.slice().sort((a, b) => d3.geoDistance(sel.ll, [a.c[0], a.c[1]]) - d3.geoDistance(sel.ll, [b.c[0], b.c[1]]))[0];
       const nearOK = d3.geoDistance(sel.ll, [near.c[0], near.c[1]]) < (near.c[2] + 8) * DEG;
-      info.innerHTML = `<span class="tag" style="background:${res.color}">${res.name}</span>
+      info.hidden = false;
+      info.innerHTML = `<button class="x" type="button" aria-label="Close">×</button><span class="tag" style="background:${res.color}">${res.name}</span>
         <h2>${nearOK ? near.name : res.name + " here"}</h2>
         <p>${nearOK ? near.note : res.short}</p>
-        <p class="muted2">${res.long}</p>
         <div class="src">Source: ${srcList(res.src)}</div>`;
+      info.querySelector(".x").addEventListener("click", e => { e.stopPropagation(); info.hidden = true; });
     }
     draw();
   }
+
+  function rowHTML(m) {
+    const c = COUNTRIES[m.who];
+    const note = m.status === "partial" ? "tipped/damaged" : m.nosite ? "no site" : "";
+    return `<li><button type="button" data-id="${m.id}"${state.selected === m ? ' aria-current="true"' : ""}><span class="yr">${m.year}</span><i style="background:${c.color}"></i><span class="nm">${m.name}${note ? ` <em>${note}</em>` : ""}</span><span class="go">›</span></button></li>`;
+  }
+  function byCountry(list) {
+    return ORDER.map(k => [k, list.filter(m => m.who === k).sort((a, b) => a.year - b.year)]).filter(([, l]) => l.length)
+      .map(([k, l]) => `<div class="mp-group"><h4><i style="background:${COUNTRIES[k].color}"></i>${COUNTRIES[k].name}<span>${l.length}</span></h4><ul>${l.map(rowHTML).join("")}</ul></div>`).join("");
+  }
+  function mpTabs() {
+    const n = g => ALL.filter(m => GROUP(m) === g || (g === "failed" && m.status === "partial")).length;
+    return `<div class="mp-tabs" role="tablist">${[["landed", "Landed"], ["failed", "Failed"], ["planned", "Planned"]].map(([g, t]) =>
+      `<button type="button" role="tab" data-tab="${g}" aria-selected="${mpTab === g}">${t} <b>${n(g)}</b></button>`).join("")}</div>`;
+  }
+  function mpList() {
+    if (!mp) return;
+    let body = "";
+    if (mpTab === "landed") {
+      const landed = ALL.filter(m => m.status === "landed");
+      const firsts = ORDER.map(k => [k, landed.filter(m => m.who === k).map(m => m.year)]).filter(([, y]) => y.length).map(([k, y]) => [k, Math.min(...y)]);
+      body = `<p class="mp-intro"><strong>${firsts.length} countries have landed on the Moon.</strong> Pick a mission to see where it touched down and what it was for.</p>
+        <div class="mp-firsts">${firsts.map(([k, y]) => `<span><i style="background:${COUNTRIES[k].color}"></i>${COUNTRIES[k].name} <b>${y}</b></span>`).join("")}</div>
+        ${byCountry(ALL.filter(m => GROUP(m) === "landed"))}`;
+    } else if (mpTab === "failed") {
+      body = `<p class="mp-intro"><strong>Landing on the Moon is hard.</strong> These missions crashed or never arrived. Pick one to see why.</p>
+        ${byCountry(ALL.filter(m => m.status === "crashed"))}
+        <p class="mp-sub">Landed, but tipped over or damaged</p>${byCountry(ALL.filter(m => m.status === "partial"))}`;
+    } else {
+      body = `<p class="mp-intro"><strong>Coming next.</strong> Target dates; most Moon missions slip.</p>${byCountry(ALL.filter(m => m.status === "planned"))}`;
+    }
+    mp.innerHTML = mpTabs() + `<div class="mp-body">${body}</div>`;
+    wireMP();
+  }
+  function mpDetail(m) {
+    if (!mp) return;
+    mpTab = m.status === "partial" ? mpTab === "failed" ? "failed" : "landed" : GROUP(m);
+    const c = COUNTRIES[m.who];
+    const cls = { landed: "ok", partial: "warn", crashed: "bad", planned: "plan" }[m.status];
+    mp.innerHTML = mpTabs() + `<div class="mp-body mp-detail">
+      <button type="button" class="mp-back">← All ${mpTab === "failed" ? "failed" : mpTab} missions</button>
+      <div class="mp-tags"><span class="tag" style="background:${c.color}">${c.name}</span><span class="st st-${cls}">${STATUS[m.status]}</span></div>
+      <h2>${m.name}</h2>
+      <p class="mp-meta">${m.status === "planned" ? "Target " : ""}${m.year} · ${m.org}${m.site ? ` · ${m.site}` : ""}${m.approx ? " (approx.)" : ""}</p>
+      <h4>Purpose</h4><p>${m.purpose}</p>
+      <h4>${m.status === "planned" ? "Status" : "What happened"}</h4><p>${m.result}</p>
+      ${m.why ? `<div class="mp-why"><h4>${m.status === "partial" ? "What went wrong" : "Why it failed"}</h4><p>${m.why}</p></div>` : ""}
+      ${m.nosite ? `<p class="mp-note">${m.status === "crashed" ? "It never reached the Moon, so there is no site on the map." : "No public landing site yet, so it is not on the map."}</p>` : `<p class="mp-note">Shown on the Moon with a pulsing ring.</p>`}
+      <div class="src">Sources: ${srcList(m.src)}</div></div>`;
+    wireMP();
+  }
+  function wireMP() {
+    mp.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => { mpTab = b.dataset.tab; mpList(); }));
+    mp.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const m = ALL.find(x => x.id === b.dataset.id); select({ type: "mission", d: m }); if (matchMedia("(max-width: 960px)").matches) box.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }); }));
+    mp.querySelector(".mp-back")?.addEventListener("click", () => { state.selected = null; draw(); mpList(); });
+  }
+  if (mp) mpList();
+  const allBtn = document.getElementById("showall");
+  allBtn?.addEventListener("click", () => { state.showAll = !state.showAll; allBtn.setAttribute("aria-pressed", state.showAll); draw(); });
 
   // ---------- filters and list ----------
   function chip(container, label, color, on, toggle) {
@@ -503,6 +578,7 @@
     clear: () => select(null),
     layers: keys => { state.layers = new Set(keys); syncPicker(); ramps(); draw(); },
     who: keys => { state.who = new Set(keys); draw(); renderList(); },
+    showAll: on => { state.showAll = !!on; draw(); },
     mode: setMode,
     shift: f => { const s0 = state.shift; if (reduce) { state.shift = f; draw(); return; } d3.select(canvas).transition().duration(700).tween("s", () => t => { state.shift = s0 + (f - s0) * t; draw(t < 1); }); },
   };
