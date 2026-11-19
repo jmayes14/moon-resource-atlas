@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Earth–Moon Supply Chain</title>
+<meta name="description" content="An interactive map of how cargo, fuel and Moon resources could move between Earth and the Moon, with the five Lagrange points and the main proposed routes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .sc-hero { background: radial-gradient(ellipse at 70% 0%, #14233a 0%, #05070c 60%); color: #fff; }
+  .sc-hero .in { max-width: 82rem; margin: 0 auto; padding: 3.5rem 2rem 2.2rem; }
+  .sc-hero .eyebrow { color: #9fb3c8; }
+  .sc-hero .lede { color: #c3ccd6; }
+  .stage { background: #04060b; color: #fff; }
+  .stage .in { max-width: 90rem; margin: 0 auto; padding: 0 2rem 2.5rem; display: grid; grid-template-columns: 1fr minmax(19rem, 24rem); gap: 1.5rem; }
+  .scen { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0 0 1rem; grid-column: 1 / -1; }
+  .scen button { font: 700 .66rem Orbitron, Inter, sans-serif; letter-spacing: .07em; text-transform: uppercase; background: #0f1724; color: #c9d4e0; border: 1px solid #2a3a50; padding: .6rem .8rem; cursor: pointer; }
+  .scen button:hover { border-color: #6b87a8; color: #fff; }
+  .scen button[aria-pressed="true"] { background: #fc3d21; border-color: #fc3d21; color: #fff; }
+  .scen .st { display: block; font: 500 .58rem "DM Mono", monospace; letter-spacing: .04em; text-transform: none; opacity: .8; margin-top: .15rem; }
+  .scene { position: relative; min-width: 0; }
+  #map { width: 100%; height: auto; display: block; background: #04060b; }
+  #map .obj { cursor: pointer; outline: none; }
+  #map .obj .hit { fill: transparent; }
+  #map .obj:hover .ring, #map .obj:focus-visible .ring { stroke: #fff; stroke-width: 2; }
+  #map .obj.sel .ring { stroke: #fc3d21; stroke-width: 2.5; }
+  #map .obj.dim { opacity: .28; }
+  #map .lbl { font: 600 11px Inter, sans-serif; fill: #dbe4ee; pointer-events: none; }
+  #map .lbl.sm { font: 500 9.5px "DM Mono", monospace; fill: #8ea2b8; }
+  #map .lp { font: 800 13px Orbitron, sans-serif; fill: #ffcf5a; }
+  #map .route { fill: none; stroke-width: 2; stroke-dasharray: 5 6; opacity: .9; }
+  #map .cargo { pointer-events: none; }
+  .legend { display: flex; flex-wrap: wrap; gap: 1rem; font: 500 .7rem "DM Mono", monospace; color: #8ea2b8; margin-top: .6rem; }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px dashed; vertical-align: middle; margin-right: .35rem; }
+  .card2 { background: #0b111b; border: 1px solid #23324a; padding: 1.2rem 1.3rem; font-size: .93rem; line-height: 1.55; align-self: start; position: sticky; top: 5rem; max-height: calc(100vh - 6rem); overflow-y: auto; }
+  .card2 h3 { font-family: Orbitron, Inter, sans-serif; font-size: 1.05rem; letter-spacing: .02em; margin: .2rem 0 .6rem; color: #fff; }
+  .card2 .k { font: 500 .66rem "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: #8ea2b8; margin: .9rem 0 .2rem; }
+  .card2 p, .card2 li { color: #d3dbe4; }
+  .card2 ul { padding-left: 1.1rem; margin: .2rem 0; }
+  .card2 .src, .card2 .src a { color: #8ea2b8; }
+  .card2 .via { border-color: #33465f; color: #8ea2b8; }
+  .card2 .via-tradeverifyd { border-color: #6b4f93; color: #c9b3e8; }
+  .tag { display: inline-block; font: 500 .6rem "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; padding: .15rem .45rem; margin-right: .3rem; }
+  .t-now { background: #8fe3c4; color: #04130d; } .t-test { background: #9cc8ff; color: #04101f; }
+  .t-plan { background: #ffd978; color: #1d1600; } .t-idea { background: #e88cff; color: #1c0420; } .t-paused { background: #59606b; color: #fff; }
+  .chainrow { display: flex; flex-wrap: wrap; gap: 0; margin: .4rem 0 0; padding: 0; list-style: none; counter-reset: c; grid-column: 1 / -1; border-top: 1px solid #2a3a50; }
+  .chainrow li { flex: 1 1 10rem; padding: .8rem 1rem .9rem 0; font-size: .86rem; color: #c3ccd6; border-bottom: 1px solid #1c2738; }
+  .chainrow li::before { counter-increment: c; content: counter(c, decimal-leading-zero); display: block; font: 700 .72rem Orbitron, sans-serif; color: #fc3d21; margin-bottom: .3rem; }
+  .chainrow li b { color: #fff; }
+  .scensum { grid-column: 1 / -1; color: #c3ccd6; font-size: .95rem; margin: 0; }
+  .scensum b { color: #fff; }
+  .scensum .src, .scensum .src a { color: #8ea2b8; }
+  .lgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); border-top: 1px solid var(--ink); }
+  .lgrid > div { padding: 1.2rem 1.2rem 1.3rem 0; border-bottom: 1px solid var(--rule); }
+  .lgrid .lpname { font: 800 1.6rem Orbitron, sans-serif; }
+  .lgrid .lpname small { font: 500 .66rem "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); margin-left: .4rem; }
+  .lgrid p { font-size: .93rem; margin: .4rem 0 0; }
+  .stab { font: 500 .62rem "DM Mono", monospace; text-transform: uppercase; letter-spacing: .06em; padding: .1rem .4rem; border: 1px solid var(--rule); }
+  .calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+  .calc label { font: 500 .72rem "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--gray); display: block; margin: 1rem 0 .3rem; }
+  .calc select, .calc input[type=range] { width: 100%; font: inherit; }
+  .bars { margin-top: .4rem; }
+  .bar { margin: .9rem 0; }
+  .bar .t { display: flex; justify-content: space-between; gap: 1rem; font-size: .9rem; font-weight: 600; }
+  .bar .t span:last-child { font-family: Orbitron, sans-serif; font-weight: 700; white-space: nowrap; }
+  .bar .track { height: 14px; background: var(--light); margin-top: .3rem; }
+  .bar .fill { height: 100%; background: #2a6fdb; transition: width .4s; }
+  .bar.moon .fill { background: #fc3d21; }
+  .bignum { font: 800 clamp(2rem, 4vw, 3rem) Orbitron, sans-serif; line-height: 1.05; }
+  .debate { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--ink); }
+  .debate > div { padding: 1.3rem 1.3rem 1.3rem 0; border-bottom: 1px solid var(--rule); }
+  .debate > div + div { padding-left: 1.3rem; border-left: 1px solid var(--rule); }
+  .debate .bignum { color: var(--ink); }
+  @media (max-width: 1000px) { .stage .in { grid-template-columns: 1fr; } .card2 { position: static; max-height: none; } }
+  @media (max-width: 700px) {
+    .sc-hero .in, .stage .in { padding-left: 16px; padding-right: 16px; }
+    .scene { overflow-x: auto; } #map { min-width: 720px; }
+    .calc, .debate { grid-template-columns: 1fr; } .debate > div + div { padding-left: 0; border-left: 0; }
+  }
+</style>
+</head>
+<body>
+<nav class="site-nav" aria-label="Main"><div class="in">
+  <a class="brand" href="index.html"><svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="#d9d6cf"/><circle cx="12" cy="13" r="3.4" fill="#9d9a93"/><circle cx="21" cy="21" r="2.6" fill="#9d9a93"/><circle cx="20" cy="10" r="1.6" fill="#9d9a93"/><path d="M2 17a15 15 0 0 0 30 0" fill="none" stroke="#fc3d21" stroke-width="2.2"/></svg><b>MOON RESOURCE ATLAS<small>Critical minerals · supply security</small></b></a>
+  <nav><a href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="extraction.html">Extraction</a><a href="supplychain.html" aria-current="page">Supply chain</a><a href="countries.html">Missions</a><a href="companies.html">Companies</a><a href="sources.html">Sources</a></nav>
+</div></nav>
+
+<header class="sc-hero"><div class="in">
+  <span class="eyebrow">Earth → Moon → Earth</span>
+  <h1>The Earth–Moon supply chain</h1>
+  <p class="lede">Everything on the Moon today was launched from Earth. Proposed supply chains would change that, with fuel stops in space, parking spots at Lagrange points, and Moon resources sent back home. Pick a route, then click any object to see what it does.</p>
+</div></header>
+
+<section class="stage" aria-label="Interactive supply chain map"><div class="in">
+  <div class="scen" role="group" aria-label="Choose a supply chain route" id="scen"></div>
+  <div class="scene">
+    <svg id="map" viewBox="0 0 1200 620" role="img" aria-labelledby="mapdesc">
+      <desc id="mapdesc">Diagram, not to scale: Earth on the left with a ring for low Earth orbit, the Moon on the right, and the five Earth–Moon Lagrange points. Dashed routes with moving dots show cargo for the chosen route. A zoomed box shows a base at the Moon's south pole.</desc>
+    </svg>
+    <div class="legend" id="legend"></div>
+  </div>
+  <aside class="card2" id="card" aria-live="polite"></aside>
+  <p class="scensum" id="scensum"></p>
+  <ol class="chainrow" id="chain"></ol>
+</div></section>
+
+<main>
+  <span class="eyebrow">Parking spots in space</span>
+  <h2>The five Lagrange points</h2>
+  <p class="lede">Where Earth's and the Moon's pull balance out, a spacecraft can travel around Earth in step with the Moon. There are five of these spots, named L1 to L5 after the mathematician Joseph-Louis Lagrange.</p>
+  <div class="lgrid" id="lgrid"></div>
+  <p class="src" id="s-lp"></p>
+
+  <span class="eyebrow" style="display:block;margin-top:4rem">Why a fuel stop matters</span>
+  <h2>Escaping Earth costs far more than escaping the Moon</h2>
+  <p class="lede">Rocket scientists measure the effort of a trip as "delta-v": the total change in speed a rocket must make. The more delta-v, the more of the rocket has to be fuel.</p>
+  <div class="calc">
+    <div>
+      <label for="dest">Deliver 1 tonne of fuel to…</label>
+      <select id="dest">
+        <option value="l1">Earth–Moon L1 (a possible depot)</option>
+        <option value="llo">Low lunar orbit</option>
+        <option value="leo">Low Earth orbit</option>
+      </select>
+      <label for="eng">Engine</label>
+      <select id="eng">
+        <option value="450">Hydrogen + oxygen (about 450 s; can be made from Moon ice)</option>
+        <option value="360">Methane + oxygen (about 360 s)</option>
+      </select>
+      <div class="bars" id="bars"></div>
+      <p class="src" id="s-dv"></p>
+    </div>
+    <div>
+      <div class="note">
+        <p class="eyebrow" style="margin:0 0 .4rem">Rocket weight at the start, per tonne arriving</p>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap">
+          <div><div class="bignum" id="mEarth">–</div><div class="small muted">tonnes leaving Earth's surface</div></div>
+          <div><div class="bignum" id="mMoon" style="color:var(--red)">–</div><div class="small muted">tonnes leaving the Moon's surface</div></div>
+        </div>
+        <p class="small" style="margin:.8rem 0 0" id="calcnote"></p>
+      </div>
+      <p class="small muted" style="margin-top:1rem"><strong>Illustrative only.</strong> This uses the ideal rocket equation and ignores the weight of tanks, engines and rocket stages, and assumes one engine type for the whole trip. Real rockets need much more. It shows why the idea is attractive, not what it would cost.</p>
+    </div>
+  </div>
+
+  <h2>Would Moon fuel actually be cheaper?</h2>
+  <p class="lede">Studies disagree. The answer depends on how heavy and efficient Moon factories turn out to be, and how cheap launches from Earth become.</p>
+  <div class="debate">
+    <div><p class="eyebrow">For: industry-led study, 2018</p><div class="bignum">3×+</div><p>Refueling with Moon propellant could cut the cost of getting from Earth to the Moon's surface by more than three times.</p><p class="src" id="s-for"></p></div>
+    <div><p class="eyebrow">Against: NASA-sponsored study, 2019</p><div class="bignum" style="color:var(--red)">+97%</div><p>Under its assumptions, Moon-made propellant would cost 97% more than launching it from Earth. Extraction systems would need to be 2–3 times more efficient to break even.</p><p class="src" id="s-against"></p></div>
+  </div>
+  <p class="note" style="margin-top:1.6rem">No supply chain beyond Earth exists yet. Fuel has never been moved between two large spacecraft in orbit, and nothing has been mined on the Moon. Every route on this page past "launch everything from Earth" is a proposal, a test or a plan.</p>
+</main>
+
+<footer><div class="in">Research done 19 November 2026 with Tavily and TradeVerifyd. Diagram not to scale. Not affiliated with NASA. <a href="sources.html">All sources</a>.</div></footer>
+
+<script src="assets/data.js"></script>
+<script>
+(() => {
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("map");
+  const el = (tag, attrs = {}, parent = svg) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); parent.appendChild(n); return n; };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const S = k => srcList(k);
+
+  // ---------- layout (not to scale) ----------
+  const E = { x: 470, y: 300, r: 46 }, M = { x: 930, y: 300, r: 24 }, RX = 460, RY = 250;
+  const P = {
+    earth: [E.x, E.y], leo: [E.x + 66, E.y - 38], moon: [M.x, M.y],
+    L1: [845, 300], L2: [1030, 300], L3: [40, 300],
+    L4: [E.x + RX * .5, E.y - RY * .866], L5: [E.x + RX * .5, E.y + RY * .866],
+    nrho: [M.x + 8, M.y - 62], llo: [M.x - 2, M.y + 48],
+  };
+  const BOX = { x: 905, y: 420, w: 280, h: 180 }; // zoomed south-pole base
+
+  // stars
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const stars = el("g", { "aria-hidden": "true" });
+  for (let i = 0; i < 170; i++) el("circle", { cx: rnd() * 1200, cy: rnd() * 620, r: rnd() * 1.1 + .2, fill: "#fff", opacity: (rnd() * .5 + .15).toFixed(2) }, stars);
+
+  const defs = el("defs");
+  defs.innerHTML = `
+    <radialGradient id="gE" cx="35%" cy="35%"><stop offset="0" stop-color="#7fc4ff"/><stop offset=".55" stop-color="#1f5fae"/><stop offset="1" stop-color="#0a2346"/></radialGradient>
+    <radialGradient id="gM" cx="35%" cy="35%"><stop offset="0" stop-color="#f1efe9"/><stop offset=".7" stop-color="#a8a59e"/><stop offset="1" stop-color="#5d5b57"/></radialGradient>
+    <linearGradient id="gGround" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4844"/><stop offset="1" stop-color="#2b2a28"/></linearGradient>`;
+
+  // Moon's orbit + L-point triangles
+  const bg = el("g", { "aria-hidden": "true" });
+  el("ellipse", { cx: E.x, cy: E.y, rx: RX, ry: RY, fill: "none", stroke: "#24344b", "stroke-dasharray": "2 6" }, bg);
+  el("text", { x: E.x - RX * .62, y: E.y - RY * .86, class: "lbl sm" }, bg).textContent = "the Moon's orbit around Earth";
+  for (const L of ["L4", "L5"]) el("path", { d: `M${E.x},${E.y} L${P[L][0]},${P[L][1]} L${M.x},${M.y}`, fill: "none", stroke: "#3a2f10", "stroke-dasharray": "3 5" }, bg);
+  el("line", { x1: E.x, y1: E.y, x2: 1080, y2: E.y, stroke: "#1b2638" }, bg);
+  el("line", { x1: 60, y1: E.y, x2: E.x - E.r, y2: E.y, stroke: "#1b2638" }, bg);
+  el("circle", { cx: E.x, cy: E.y, r: 76, fill: "none", stroke: "#2b5a8a", "stroke-dasharray": "3 4" }, bg);
+  el("text", { x: E.x - 30, y: E.y + 96, class: "lbl sm" }, bg).textContent = "low Earth orbit";
+  // NRHO + LLO
+  el("ellipse", { cx: M.x + 4, cy: M.y - 30, rx: 13, ry: 46, fill: "none", stroke: "#4b5260", "stroke-dasharray": "3 3" }, bg);
+  el("circle", { cx: M.x, cy: M.y, r: 46, fill: "none", stroke: "#4b5260", "stroke-dasharray": "2 4" }, bg);
+  // Zoom box
+  el("line", { x1: M.x + 6, y1: M.y + M.r, x2: BOX.x + 40, y2: BOX.y, stroke: "#55606f", "stroke-dasharray": "2 3" }, bg);
+  el("rect", { x: BOX.x, y: BOX.y, width: BOX.w, height: BOX.h, fill: "#0a0d12", stroke: "#55606f" }, bg);
+  el("path", { d: `M${BOX.x},${BOX.y + 128} Q${BOX.x + 60},${BOX.y + 116} ${BOX.x + 110},${BOX.y + 126} T${BOX.x + 200},${BOX.y + 120} T${BOX.x + BOX.w},${BOX.y + 126} L${BOX.x + BOX.w},${BOX.y + BOX.h} L${BOX.x},${BOX.y + BOX.h} Z`, fill: "url(#gGround)" }, bg);
+  el("path", { d: `M${BOX.x + 200},${BOX.y + 124} q30,26 62,2`, fill: "#05070a", stroke: "#3b3a37" }, bg);
+  el("text", { x: BOX.x + 8, y: BOX.y + 16, class: "lbl sm" }, bg).textContent = "ZOOM: SOUTH POLE BASE (proposed)";
+  el("text", { x: BOX.x + 196, y: BOX.y + 166, class: "lbl sm" }, bg).textContent = "shadowed crater";
+
+  // ---------- objects ----------
+  const OBJ = {
+    earth: { at: P.earth, name: "Earth & launch pads", tag: ["now", "Today"],
+      what: "Every kilogram on the Moon so far left from here. Escaping Earth's gravity is the hardest part of the trip: about 9.3–10 km/s of speed just to reach low Earth orbit.",
+      who: ["Rockets from the US, China, India, Japan and Russia have launched Moon missions.", "SpaceX Starship and Blue Origin's New Glenn are the big new rockets for crewed landers."],
+      src: ["wikiDeltaV", "wikiMoonLanding", "astronomyRefuel"] },
+    leo: { at: P.leo, name: "Fuel depot in Earth orbit", tag: ["test", "Testing"],
+      what: "A tanker parks in low Earth orbit and other rockets fill it up. The big lander then takes on fuel there before heading to the Moon. This is how SpaceX's Starship lunar lander is meant to work.",
+      who: ["SpaceX's Starship lander needs about 10 tanker flights per Moon trip.", "Ship-to-ship fuel transfer has not happened yet. The test slipped from 2025 and is now targeted for the first half of 2027."],
+      src: ["slinewsRefuel", "astronomyRefuel"] },
+    L1: { at: P.L1, name: "L1: a possible Moon-fuel depot", tag: ["idea", "Proposed"], lp: true,
+      what: "L1 sits between Earth and the Moon, about 60,000 km from the Moon. From here, both the Moon and Earth orbits are easy to reach, so it is a classic proposed spot for a fuel station filled with propellant made from Moon ice.",
+      who: ["An industry-led study (including United Launch Alliance) modeled a commercial Moon-propellant market around depots like this.", "Lockheed Martin has proposed a 'water-based' Moon architecture built on the same idea."],
+      src: ["wikiLagrange", "ulaProp", "lmISRU"] },
+    L2: { at: P.L2, name: "L2: the far-side relay spot", tag: ["now", "Used"], lp: true,
+      what: "L2 is about 64,500 km beyond the Moon. A satellite circling L2 can see both Earth and the Moon's far side, which never faces Earth. That makes it a natural spot for a radio relay. It has also been called an ideal place for a fuel depot.",
+      who: ["China's Queqiao (2018) relayed signals for Chang'e-4, the first far-side landing, from a halo orbit about 65,000 km beyond the Moon. Its orbit is unstable, so it burned about 80 g of fuel every ~9 days to stay put."],
+      src: ["wikiLagrange", "rswLagrange", "queqiaoPlanetary"] },
+    L3: { at: P.L3, name: "L3: on the far side of Earth", tag: ["idea", "Little use"], lp: true,
+      what: "L3 lies on the Moon's orbit, directly opposite the Moon, behind Earth. It is unstable and far from everything useful, so there are no serious supply chain plans for it.",
+      who: ["No missions planned."], src: ["wikiLagrange"] },
+    L4: { at: P.L4, name: "L4: 60° ahead of the Moon", tag: ["idea", "Proposed"], lp: true,
+      what: "L4 and L5 form equal-sided triangles with Earth and the Moon. Spacecraft drift less here than at L1–L3, but the Sun's pull still disturbs them. They have been suggested as sites for probes and transfer stations for missions going deeper into space.",
+      who: ["Hungarian researchers reported in 2018 that they may have confirmed faint dust clouds here, first seen by Kazimierz Kordylewski in 1961. Whether the dust is a hazard to equipment is still being studied."],
+      src: ["rasKordylewski", "wikiLagrange"] },
+    L5: { at: P.L5, name: "L5: 60° behind the Moon", tag: ["idea", "Proposed"], lp: true,
+      what: "The twin of L4, trailing the Moon by 60°. Same pros and cons: steadier than L1–L3, a possible transfer station, and possibly dusty.",
+      who: ["Kordylewski first reported dust clouds at L5 in 1961."], src: ["rasKordylewski", "wikiLagrange"] },
+    gateway: { at: P.nrho, name: "Gateway station (paused)", tag: ["paused", "Paused 2026"],
+      what: "Gateway was to be a small space station in a long, stretched 'halo' orbit around the Moon, part of the same orbit family as L2. Crews would switch from Orion to a lander there.",
+      who: ["In March 2026 NASA paused Gateway 'in its current form' to put money into a base on the Moon's surface. One reason: landers needed a lot of fuel to go between that high orbit and the surface. NASA says it may revisit the idea later. Artemis 4, the first landing attempt (target 2028), no longer includes a Gateway stop."],
+      src: ["spaceGateway"] },
+    llo: { at: P.llo, name: "Relay in lunar orbit", tag: ["now", "In use"],
+      what: "A satellite in a stretched orbit around the Moon can relay signals for landers on the far side and at the south pole, without the station-keeping fuel a Lagrange point needs.",
+      who: ["China's Queqiao-2 (launched March 2024) uses this kind of orbit instead of an L2 halo. It relayed for Chang'e-6 and is planned to serve Chang'e-7 and -8."],
+      src: ["queqiao2Wiki", "queqiaoPlanetary"] },
+    moon: { at: P.moon, name: "The Moon", tag: ["now", "Destination"],
+      what: "Leaving the Moon takes far less effort than leaving Earth. Going from the surface to L1 needs about 2.5 km/s of speed, compared with 9.3–10 km/s just to reach orbit from Earth's surface. That gap is the whole case for making fuel on the Moon.",
+      who: ["Five countries have landed safely: the USSR/Russia, the United States, China, India and Japan. Private US landers have too."],
+      src: ["wikiDeltaV", "wikiMoonLanding"] },
+    lander: { at: [BOX.x + 46, BOX.y + 96], name: "Cargo landers", tag: ["now", "Flying"],
+      what: "Robotic landers carry the first tools, power and experiments to the surface. They are the 'trucks' of the supply chain today.",
+      who: ["NASA buys rides on private landers through its CLPS program: Intuitive Machines, Firefly (Blue Ghost) and Astrobotic (Griffin-1, now targeting January 2027).", "TradeVerifyd shows supplier links in trade records for Intuitive Machines and Blue Origin."],
+      src: ["clps2026", "bg1NASA", "griffin", "tvIM", "tvBlueOrigin"] },
+    dig: { at: [BOX.x + 140, BOX.y + 104], name: "Excavators", tag: ["test", "Prototypes"],
+      what: "Machines scoop up Moon soil, or dig into icy soil in shadowed craters. Nothing has mined the Moon yet; a NASA drill (PRIME-1) did test on the surface in 2025.",
+      who: ["Interlune is building helium-3 excavators with Vermeer; its prototype is designed for about 100 tonnes of soil an hour.", "NASA's PRIME-1 drill flew on IM-2."],
+      src: ["nasaPrime1", "interlunePlan", "vermeer"] },
+    plant: { at: [BOX.x + 232, BOX.y + 98], name: "Processing plant", tag: ["idea", "Proposed"],
+      what: "Turns raw soil and ice into products: water split into hydrogen and oxygen for rocket fuel, oxygen to breathe, or helium-3 gas separated out by chilling it to extreme cold.",
+      who: ["NASA studies rate making propellant from Moon water as promising but unproven.", "Interlune plans to sort, extract and separate helium-3 on the Moon."],
+      src: ["ntrsPropellant", "lmISRU", "interlunePlan"] },
+    he3: { at: [M.x - 70, M.y + 70], name: "Helium-3 return capsule", tag: ["plan", "Company plan"],
+      what: "The one Moon product with buyers on Earth today. Helium-3 is a gas, so a small amount is very valuable per kilogram, which makes shipping it back to Earth worth considering.",
+      who: ["Bluefors (Finland, quantum-computer fridges) agreed to buy up to 10,000 liters a year from Interlune for 2028–2037, before any has been mined.", "NASA funded an Interlune test payload (Prospect Moon) aimed at 2028."],
+      src: ["bluefors", "geekwireIL", "prospectMoon"] },
+  };
+
+  const objG = el("g");
+  const icon = (k, g) => {
+    const o = OBJ[k], [x, y] = o.at;
+    if (k === "earth") { el("circle", { cx: x, cy: y, r: E.r, fill: "url(#gE)", class: "ring", stroke: "#0a2346" }, g); el("path", { d: `M${x - 20},${y - 30} q12,8 6,22 q-10,10 4,22 M${x + 10},${y - 40} q16,14 4,30`, fill: "none", stroke: "#3c8f5a", "stroke-width": 5, "stroke-linecap": "round", opacity: .8 }, g); el("path", { d: `M${x - 6},${y - E.r - 2} l6,-18 l6,18 z`, fill: "#fff" }, g); return; }
+    if (k === "moon") { el("circle", { cx: x, cy: y, r: M.r, fill: "url(#gM)", class: "ring", stroke: "#5d5b57" }, g); el("circle", { cx: x - 7, cy: y - 5, r: 4, fill: "#8a877f" }, g); el("circle", { cx: x + 8, cy: y + 7, r: 3, fill: "#8a877f" }, g); return; }
+    if (o.lp) { el("circle", { cx: x, cy: y, r: 11, fill: "#1a1503", stroke: "#ffcf5a", class: "ring" }, g); el("text", { x: x - 8, y: y + 4.5, class: "lp", "font-size": 11 }, g).textContent = k; if (k === "L1") el("rect", { x: x - 5, y: y - 27, width: 10, height: 12, rx: 2, fill: "#fc3d21" }, g); if (k === "L2") el("path", { d: `M${x},${y - 14} l0,-10 m-7,-3 a8,8 0 0 0 14,0`, stroke: "#9cc8ff", fill: "none", "stroke-width": 2 }, g); return; }
+    if (k === "leo") { el("circle", { cx: x, cy: y, r: 10, fill: "#0f1724", stroke: "#9cc8ff", class: "ring" }, g); el("rect", { x: x - 6, y: y - 3, width: 12, height: 6, rx: 3, fill: "#9cc8ff" }, g); return; }
+    if (k === "gateway") { el("circle", { cx: x, cy: y, r: 9, fill: "#15181d", stroke: "#8b929c", class: "ring" }, g); el("rect", { x: x - 6, y: y - 2, width: 12, height: 4, fill: "#8b929c" }, g); el("rect", { x: x - 2, y: y - 7, width: 4, height: 14, fill: "#8b929c" }, g); return; }
+    if (k === "llo") { el("circle", { cx: x, cy: y, r: 8, fill: "#0f1724", stroke: "#9cc8ff", class: "ring" }, g); el("path", { d: `M${x - 4},${y + 1} a4,4 0 0 1 8,0`, stroke: "#9cc8ff", fill: "none", "stroke-width": 1.6 }, g); return; }
+    if (k === "he3") { el("circle", { cx: x, cy: y, r: 11, fill: "#1f1703", stroke: "#ffcf5a", class: "ring" }, g); el("path", { d: `M${x - 4},${y + 5} l4,-11 l4,11 z`, fill: "#ffcf5a" }, g); return; }
+    if (k === "lander") { el("rect", { x: x - 22, y: y - 22, width: 44, height: 40, fill: "transparent", class: "ring", stroke: "transparent" }, g); el("path", { d: `M${x - 10},${y - 4} h20 v-10 h-20 z M${x - 10},${y - 4} l-8,16 M${x + 10},${y - 4} l8,16 M${x - 4},${y - 14} l4,-6 l4,6`, fill: "#c9d4e0", stroke: "#c9d4e0", "stroke-width": 2 }, g); return; }
+    if (k === "dig") { el("rect", { x: x - 24, y: y - 22, width: 48, height: 40, fill: "transparent", class: "ring", stroke: "transparent" }, g); el("rect", { x: x - 16, y: y - 4, width: 22, height: 12, rx: 2, fill: "#ffd978" }, g); el("circle", { cx: x - 10, cy: y + 12, r: 4, fill: "#333" }, g); el("circle", { cx: x + 2, cy: y + 12, r: 4, fill: "#333" }, g); el("path", { d: `M${x + 6},${y - 2} l10,-10 l6,14 l-8,2 z`, fill: "#ffd978" }, g); return; }
+    if (k === "plant") { el("rect", { x: x - 26, y: y - 26, width: 52, height: 44, fill: "transparent", class: "ring", stroke: "transparent" }, g); el("rect", { x: x - 18, y: y - 6, width: 26, height: 18, fill: "#8fe3c4" }, g); el("rect", { x: x + 10, y: y - 18, width: 7, height: 30, fill: "#8fe3c4" }, g); el("path", { d: `M${x - 18},${y - 6} l13,-10 l13,10`, fill: "#5fbf9e" }, g); return; }
+  };
+  const nodes = {};
+  for (const k in OBJ) {
+    const o = OBJ[k], [x, y] = o.at;
+    const g = el("g", { class: "obj", tabindex: 0, role: "button", "aria-label": o.name, "data-k": k }, objG);
+    el("circle", { cx: x, cy: y, r: 26, class: "hit" }, g);
+    icon(k, g);
+    const below = ["L5", "earth", "llo", "he3"].includes(k);
+    const dy = k === "earth" ? E.r + 18 : k === "moon" ? -M.r - 10 : o.lp ? (k === "L4" || k === "L1" || k === "L2" ? (k === "L4" ? -18 : 26) : 27) : ["lander", "dig", "plant"].includes(k) ? 34 : below ? 26 : -16;
+    const short = { earth: "Earth", leo: "LEO depot", moon: "Moon", gateway: "Gateway (paused)", llo: "lunar-orbit relay", lander: "lander", dig: "excavator", plant: "plant", he3: "helium-3 capsule", L1: "", L2: "", L3: "", L4: "", L5: "" }[k];
+    if (short) { const t = el("text", { x, y: y + dy, class: "lbl", "text-anchor": "middle" }, g); t.textContent = short; }
+    g.addEventListener("click", () => show(k));
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(k); } });
+    nodes[k] = g;
+  }
+
+  // ---------- routes ----------
+  const C = { cargo: "#9cc8ff", fuel: "#fc3d21", moonfuel: "#ff8a3d", he3: "#ffcf5a", radio: "#8fe3c4", crew: "#e8e8e8" };
+  const [lx, ly] = P.leo, [x1, y1] = P.L1, [x2, y2] = P.L2, [mx, my] = P.moon, [nx, ny] = P.nrho, [ox, oy] = P.llo;
+  const surf = `M${M.x - 6},${M.y + M.r} L${BOX.x + 46},${BOX.y + 70}`;
+  const R = {
+    launch: { d: `M${E.x + 4},${E.y - E.r - 18} Q${E.x + 40},${E.y - 70} ${lx},${ly}`, c: "cargo" },
+    tankers: { d: `M${E.x + 30},${E.y - 36} Q${E.x + 66},${E.y - 10} ${lx},${ly}`, c: "fuel" },
+    leoMoon: { d: `M${lx},${ly} Q${720},${170} ${mx - M.r},${my - 4}`, c: "cargo" },
+    leoL1: { d: `M${lx},${ly} Q${700},${215} ${x1 - 11},${y1}`, c: "cargo" },
+    l1Moon: { d: `M${x1 + 11},${y1 - 4} L${mx - M.r},${my - 4}`, c: "cargo" },
+    moonL1: { d: `M${mx - M.r + 2},${my + 8} Q${885},${325} ${x1 + 6},${y1 + 10}`, c: "moonfuel" },
+    l1Leo: { d: `M${x1 - 8},${y1 + 10} Q${700},${360} ${lx + 6},${ly + 10}`, c: "moonfuel" },
+    down: { d: surf, c: "cargo" },
+    up: { d: `M${BOX.x + 232},${BOX.y + 72} L${M.x + 8},${M.y + M.r}`, c: "moonfuel" },
+    upHe3: { d: `M${BOX.x + 232},${BOX.y + 72} L${M.x + 8},${M.y + M.r}`, c: "he3" },
+    he3Home: { d: `M${mx - 16},${my + 18} Q${700},${450} ${E.x + 20},${E.y + E.r - 2}`, c: "he3" },
+    toGw: { d: `M${lx},${ly} Q${700},${150} ${nx - 8},${ny}`, c: "crew" },
+    gwDown: { d: `M${nx},${ny + 9} Q${mx + 22},${my - 30} ${mx + 6},${my - M.r}`, c: "crew" },
+    digPlant: { d: `M${BOX.x + 150},${BOX.y + 100} L${BOX.x + 210},${BOX.y + 100}`, c: "moonfuel" },
+    radioL2: { d: `M${E.x + 40},${E.y - 24} Q${760},${120} ${x2 - 8},${y2 - 12}`, c: "radio" },
+    farL2: { d: `M${x2 - 2},${y2 + 12} Q${1010},${y2 + 40} ${mx + M.r - 2},${my + 8}`, c: "radio" },
+    radioLlo: { d: `M${E.x + 40},${E.y + 24} Q${700},${400} ${ox - 8},${oy + 4}`, c: "radio" },
+    lloDown: { d: `M${ox + 6},${oy - 4} Q${mx + 30},${my + 30} ${BOX.x + 46},${BOX.y + 70}`, c: "radio" },
+  };
+
+  const SCEN = [
+    { id: "direct", name: "Today: launch everything", st: "how it works now", tag: ["now", "Today"],
+      routes: ["launch", "leoMoon", "down"], on: ["earth", "moon", "lander"],
+      sum: "Every mission so far has carried all its fuel and cargo from Earth. Simple, but a big rocket delivers only a small lander.",
+      chain: [["Launch", "a rocket lifts the lander off Earth"], ["Cruise", "the lander coasts out to the Moon"], ["Land", "the lander brakes and sets down"], ["Work", "it runs its experiments until it loses power"]],
+      src: ["wikiDeltaV", "clps2026"] },
+    { id: "leo", name: "Refuel in Earth orbit", st: "testing, target 2027", tag: ["test", "Testing"],
+      routes: ["launch", "tankers", "leoMoon", "down"], on: ["earth", "leo", "moon", "lander"],
+      sum: "A big lander is filled up in Earth orbit by many tanker flights, then flies to the Moon full. This is how SpaceX's Starship lander for NASA is meant to work; the key fuel-transfer test has not happened yet.",
+      chain: [["Launch the lander", "it reaches orbit nearly empty"], ["~10 tanker flights", "each tops up a depot in Earth orbit"], ["Fill up", "fuel is pumped ship to ship, never yet done at this scale"], ["Fly to the Moon", "with enough fuel to land a large load"]],
+      src: ["slinewsRefuel", "astronomyRefuel"] },
+    { id: "gateway", name: "Via a Moon station", st: "paused March 2026", tag: ["paused", "Paused"],
+      routes: ["launch", "toGw", "gwDown"], on: ["earth", "gateway", "moon"],
+      sum: "The Gateway plan: crews fly to a station in a high orbit around the Moon, then switch to a lander. NASA paused it in 2026, partly because landers needed a lot of fuel to go between that orbit and the surface.",
+      chain: [["Launch", "crew in Orion"], ["Dock at Gateway", "in a stretched halo orbit"], ["Switch to a lander", "and fly down"], ["Return", "back to Gateway, then Earth"]],
+      src: ["spaceGateway"] },
+    { id: "l1", name: "Moon fuel at L1", st: "proposed", tag: ["idea", "Proposed"],
+      routes: ["launch", "leoL1", "l1Moon", "down", "digPlant", "up", "moonL1", "l1Leo"], on: ["earth", "leo", "L1", "moon", "lander", "dig", "plant"],
+      sum: "Mine ice at the south pole, turn it into rocket fuel, and lift it to a depot at L1. Ships from Earth arrive lightly fueled, top up at L1, and continue. Some studies even send Moon fuel down to Earth orbit.",
+      chain: [["Dig icy soil", "in permanently shadowed craters"], ["Make fuel", "split water into hydrogen and oxygen"], ["Lift to L1", "about 2.5 km/s, a fraction of leaving Earth"], ["Refuel ships", "heading to the Moon, Earth orbit or beyond"]],
+      src: ["ulaProp", "lmISRU", "ntrsPropellant", "niaBreakeven", "wikiLagrange"] },
+    { id: "he3", name: "Moon → Earth: helium-3", st: "company plan, 2028+", tag: ["plan", "Company plan"],
+      routes: ["digPlant", "upHe3", "he3Home"], on: ["moon", "dig", "plant", "he3", "earth"],
+      sum: "The first Moon export may be helium-3, a gas with buyers on Earth already. Mine soil, heat or process it to release gas, separate the helium-3, and ship small, valuable cargo home.",
+      chain: [["Excavate", "about 100 tonnes of soil an hour (prototype goal)"], ["Extract & separate", "release trapped gas, chill to isolate helium-3"], ["Launch home", "a small return vehicle"], ["Deliver", "to buyers like Bluefors (deal for 2028–2037)"]],
+      src: ["interlunePlan", "bluefors", "vermeer", "prospectMoon"] },
+    { id: "relay", name: "Far-side & polar relay", st: "in use since 2018", tag: ["now", "In use"],
+      routes: ["radioL2", "farL2", "radioLlo", "lloDown"], on: ["earth", "L2", "llo", "moon", "lander"],
+      sum: "Any supply chain needs communications. The Moon's far side never sees Earth, so relay satellites pass messages along: first from L2 (Queqiao, 2018), now from a stable lunar orbit (Queqiao-2, 2024).",
+      chain: [["Earth ground station", "sends commands"], ["Relay satellite", "at L2 or in a stretched lunar orbit"], ["Lander or rover", "on the far side or at the south pole"], ["Data back", "the same path in reverse"]],
+      src: ["queqiaoPlanetary", "queqiao2Wiki", "rswLagrange"] },
+  ];
+
+  const routeG = el("g"); svg.insertBefore(routeG, objG);
+  let anim = [], cur = null;
+  function setScen(id) {
+    cur = SCEN.find(s => s.id === id) || SCEN[0];
+    document.querySelectorAll("#scen button").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === cur.id));
+    routeG.innerHTML = ""; anim = [];
+    for (const r of cur.routes) {
+      const def = R[r], col = C[def.c];
+      const p = el("path", { d: def.d, class: "route", stroke: col }, routeG);
+      const len = p.getTotalLength(), n = Math.max(1, Math.round(len / 160));
+      for (let i = 0; i < n; i++) {
+        const dot = el("circle", { r: def.c === "radio" ? 2.6 : 4, fill: col, class: "cargo" }, routeG);
+        anim.push({ p, len, dot, off: i / n });
+      }
+    }
+    for (const k in nodes) nodes[k].classList.toggle("dim", !cur.on.includes(k) && !OBJ[k].lp);
+    for (const k of ["L1", "L2", "L3", "L4", "L5"]) nodes[k].classList.toggle("dim", !cur.on.includes(k));
+    document.getElementById("scensum").innerHTML = `<span class="tag t-${cur.tag[0]}">${cur.tag[1]}</span><b>${cur.name}.</b> ${cur.sum} <span class="src">Sources: ${S(cur.src)}</span>`;
+    document.getElementById("chain").innerHTML = cur.chain.map(([a, b]) => `<li><b>${a}</b><br>${b}</li>`).join("");
+    const used = [...new Set(cur.routes.map(r => R[r].c))];
+    const names = { cargo: "cargo & landers", fuel: "fuel from Earth", moonfuel: "Moon-made fuel or ore", he3: "helium-3", radio: "radio signals", crew: "crew" };
+    document.getElementById("legend").innerHTML = used.map(c => `<span><i style="border-color:${C[c]}"></i>${names[c]}</span>`).join("") + `<span>not to scale</span>`;
+    tick(performance.now());
+    try { history.replaceState(null, "", "#" + cur.id); } catch (e) {}
+  }
+  function tick(t) {
+    for (const a of anim) {
+      const f = reduce ? a.off + .5 / (anim.length || 1) : ((t / 5200) + a.off) % 1;
+      const pt = a.p.getPointAtLength((f % 1) * a.len);
+      a.dot.setAttribute("cx", pt.x); a.dot.setAttribute("cy", pt.y);
+    }
+  }
+  if (!reduce) { const loop = t => { tick(t); requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+
+  function show(k) {
+    const o = OBJ[k];
+    for (const n in nodes) nodes[n].classList.toggle("sel", n === k);
+    document.getElementById("card").innerHTML = `<span class="tag t-${o.tag[0]}">${o.tag[1]}</span>
+      <h3>${o.name}</h3><p>${o.what}</p>
+      <div class="k">Who / what's happening</div><ul>${o.who.map(w => `<li>${w}</li>`).join("")}</ul>
+      <p class="src">Sources: ${S(o.src)}</p>`;
+  }
+
+  const sc = document.getElementById("scen");
+  sc.innerHTML = SCEN.map(s => `<button type="button" data-id="${s.id}" aria-pressed="false">${s.name}<span class="st">${s.st}</span></button>`).join("");
+  sc.addEventListener("click", e => { const b = e.target.closest("button"); if (b) setScen(b.dataset.id); });
+  document.getElementById("card").innerHTML = `<p class="eyebrow" style="color:#8ea2b8">How to use</p><h3>Click any object</h3><p>Earth, the Moon, the fuel depots, the five Lagrange points (gold), and the machines in the south-pole box each explain their role, who is building them, and how far along they are.</p><p><span class="tag t-now">Today</span><span class="tag t-test">Testing</span><span class="tag t-plan">Company plan</span><span class="tag t-idea">Proposed</span><span class="tag t-paused">Paused</span></p>`;
+  setScen((location.hash || "").slice(1));
+  const scn = document.querySelector(".scene"); if (scn.scrollWidth > scn.clientWidth) { scn.scrollLeft = (scn.scrollWidth - scn.clientWidth) * .55; document.getElementById("legend").insertAdjacentHTML("beforeend", "<span>swipe the map sideways</span>"); }
+
+  // ---------- Lagrange cards ----------
+  const LP = [
+    ["L1", "Unstable", "Between Earth and the Moon, about 60,000 km from the Moon.", "Easy access to both the Moon and Earth orbits. The classic proposed fuel-depot site."],
+    ["L2", "Unstable", "About 64,500 km beyond the Moon.", "Sees the far side and Earth at once. China's Queqiao relay used it in 2018; also proposed for depots."],
+    ["L3", "Unstable", "Opposite the Moon, on the far side of Earth.", "Far from everything useful. No supply chain role planned."],
+    ["L4", "Steadier", "60° ahead of the Moon on its orbit.", "Suggested for probes and transfer stations. May hold faint dust clouds."],
+    ["L5", "Steadier", "60° behind the Moon on its orbit.", "The twin of L4. Kordylewski first reported dust here in 1961."],
+  ];
+  document.getElementById("lgrid").innerHTML = LP.map(([n, s, where, use]) => `<div><div class="lpname">${n}<small><span class="stab">${s}</span></small></div><p><strong>${where}</strong></p><p class="muted">${use}</p></div>`).join("");
+  document.getElementById("s-lp").innerHTML = "Unstable points need small engine burns to stay in place; Queqiao used about 80 g of fuel every ~9 days. L4 and L5 drift less but are still disturbed by the Sun. Sources: " + S(["wikiLagrange", "rswLagrange", "keeptrackL", "queqiaoPlanetary", "rasKordylewski"]);
+
+  // ---------- calculator ----------
+  // delta-v legs, km/s (Wikipedia delta-v budget; Earth surface to LEO uses the low end, 9.3)
+  const DV = { surfLeo: 9.3, leoL1: 3.43, leoLlo: 4.04, l1Llo: 0.64, moonL1: 2.52, moonLlo: 1.87 };
+  const legs = {
+    l1:  { earth: [["Earth surface → low Earth orbit", DV.surfLeo], ["Low Earth orbit → L1", DV.leoL1]], moon: [["Moon surface → L1", DV.moonL1]] },
+    llo: { earth: [["Earth surface → low Earth orbit", DV.surfLeo], ["Low Earth orbit → low lunar orbit", DV.leoLlo]], moon: [["Moon surface → low lunar orbit", DV.moonLlo]] },
+    leo: { earth: [["Earth surface → low Earth orbit", DV.surfLeo]], moon: [["Moon surface → L1", DV.moonL1], ["L1 → low Earth orbit (no braking help from the air)", DV.leoL1]] },
+  };
+  function calc() {
+    const L = legs[document.getElementById("dest").value], isp = +document.getElementById("eng").value, ve = isp * 9.80665 / 1000;
+    const tot = a => a.reduce((s, l) => s + l[1], 0);
+    const te = tot(L.earth), tm = tot(L.moon), max = 13.5;
+    const row = (lbl, v, cls) => `<div class="bar ${cls}"><div class="t"><span>${lbl}</span><span>${v.toFixed(2)} km/s</span></div><div class="track"><div class="fill" style="width:${Math.min(100, v / max * 100)}%"></div></div></div>`;
+    document.getElementById("bars").innerHTML =
+      `<p class="eyebrow" style="margin:1.2rem 0 0">From Earth</p>` + L.earth.map(l => row(l[0], l[1], "")).join("") + (L.earth.length > 1 ? row("Total from Earth", te, "") : "") +
+      `<p class="eyebrow" style="margin:1.2rem 0 0;color:var(--red)">From the Moon</p>` + L.moon.map(l => row(l[0], l[1], "moon")).join("") + (L.moon.length > 1 ? row("Total from the Moon", tm, "moon") : "");
+    const re = Math.exp(te / ve), rm = Math.exp(tm / ve);
+    const fmt = v => v >= 10 ? v.toFixed(0) : v.toFixed(1);
+    document.getElementById("mEarth").textContent = fmt(re);
+    document.getElementById("mMoon").textContent = fmt(rm);
+    document.getElementById("calcnote").textContent = `To put 1 tonne where you chose, an ideal rocket would weigh about ${fmt(re)} tonnes at liftoff from Earth, versus about ${fmt(rm)} tonnes leaving the Moon: roughly ${Math.round(re / rm)}× less.`;
+  }
+  document.getElementById("dest").addEventListener("change", calc);
+  document.getElementById("eng").addEventListener("change", calc);
+  calc();
+  document.getElementById("s-dv").innerHTML = "Delta-v values: " + S(["wikiDeltaV", "projectRho"]) + ". Earth surface to orbit uses the low end (9.3 km/s) of the 9.3–10 range.";
+  document.getElementById("s-for").innerHTML = "Source: " + S(["ulaProp"]);
+  document.getElementById("s-against").innerHTML = "Source: " + S(["niaBreakeven"]);
+})();
+</script>
+</body>
+</html>

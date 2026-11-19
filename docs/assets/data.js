@@ -88,6 +88,19 @@ const SOURCES = {
   beresheetWiki:{ title: "Beresheet", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Beresheet", via: "Tavily" },
   spaceMoonRush:{ title: "Moon rush: These private spacecraft will attempt lunar landings in 2026", pub: "Space.com", url: "https://www.space.com/astronomy/moon/moon-rush-these-private-spacecraft-will-attempt-lunar-landings-in-2026", via: "Tavily" },
 
+  // Supply chain & Lagrange points (checked with Tavily, 19 Nov 2026)
+  wikiLagrange: { title: "Lagrange point (Earth–Moon distances and uses)", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Lagrange_point", via: "Tavily" },
+  rswLagrange:  { title: "Missions to Lagrangian points", pub: "RussianSpaceWeb", url: "https://www.russianspaceweb.com/lagrange.html", via: "Tavily" },
+  keeptrackL:   { title: "Lagrange Points, and Who Parks There", pub: "KeepTrack", url: "https://keeptrack.space/space-terms/lagrange-points", via: "Tavily" },
+  queqiaoPlanetary:{ title: "Queqiao-2: China's bridge for lunar exploration", pub: "The Planetary Society", url: "https://www.planetary.org/space-missions/queqiao-2-chinas-bridge-for-lunar-exploration", via: "Tavily" },
+  queqiao2Wiki: { title: "Queqiao-2 (relay orbits and fuel use)", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Queqiao-2", via: "Tavily" },
+  wikiDeltaV:   { title: "Delta-v budget (Earth–Moon table)", pub: "Wikipedia", url: "https://en.wikipedia.org/wiki/Delta-v_budget", via: "Tavily" },
+  projectRho:   { title: "Mission Table (delta-v maps)", pub: "Atomic Rockets", url: "https://www.projectrho.com/public_html/rocket/appmissiontable.php", via: "Tavily" },
+  spaceGateway: { title: "NASA's lunar Gateway space station is out. Moon bases are in.", pub: "Space.com, 2026", url: "https://www.space.com/space-exploration/artemis/nasas-lunar-gateway-space-station-is-out-moon-bases-are-in", via: "Tavily" },
+  slinewsRefuel:{ title: "Starship Propellant Transfer Demo: Why On-Orbit Refueling Is the Linchpin", pub: "Space Launch Industry News, 2026", url: "https://slinews.com/technology/starship-propellant-transfer-demo-on-orbit-refueling", via: "Tavily" },
+  astronomyRefuel:{ title: "Why we need in-orbit refueling to return to the Moon", pub: "Astronomy, 2026", url: "https://www.astronomy.com/space-exploration/why-we-need-in-orbit-refueling-to-return-to-the-moon", via: "Tavily" },
+  rasKordylewski:{ title: "Earth's dust cloud satellites confirmed", pub: "Royal Astronomical Society", url: "https://ras.ac.uk/news-and-press/research-highlights/earths-dust-cloud-satellites-confirmed", via: "Tavily" },
+
   // Helium-3 market
   geekwireIL:   { title: "Interlune reveals partners and customers for lunar helium-3", pub: "GeekWire, May 2025", url: "https://www.geekwire.com/2025/interlune-moon-mining-vermeer-maybell-quantum-doe", via: "Tavily" },
   bluefors:     { title: "Bluefors Enters Deal to Secure Lunar Helium-3 Supply From Interlune", pub: "The Quantum Insider, Sept 2025", url: "https://thequantuminsider.com/2025/09/17/bluefors-enters-deal-to-secure-lunar-helium-3-supply-from-interlune", via: "Tavily" },

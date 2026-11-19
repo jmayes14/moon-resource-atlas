@@ -98,3 +98,9 @@ h2 { font-size: clamp(1.4rem, 2.6vw, 2.2rem); line-height: 1.15; }
 .site-nav nav a { font-family: Orbitron, Inter, sans-serif; font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; font-weight: 700; }
 .tile .big, .country h3 > span:first-child { font-family: Orbitron, Inter, sans-serif; letter-spacing: 0; }
 .steps5 li::before { font-family: Orbitron, Inter, sans-serif; font-weight: 700; }
+
+/* 7-link menu: keep it on one line on laptop widths */
+.site-nav nav a, .site-nav .brand b { white-space: nowrap; }
+@media (max-width: 1240px) { .site-nav .in { gap: 1.4rem; } .site-nav nav { gap: 1.1rem; } .site-nav .brand small { display: none; } }
+
+@media (max-width: 1100px) { .site-nav .brand b { display: none; } }

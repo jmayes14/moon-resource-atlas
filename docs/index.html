@@ -180,6 +180,9 @@
   .nums b { font-size: clamp(1.8rem, 3.2vw, 2.8rem); } .fact .num { font-size: 2.2rem; }
   .brand b { font-family: Orbitron, Inter, sans-serif; letter-spacing: .05em; }
   header nav a { font-family: Orbitron, Inter, sans-serif; font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; }
+  header nav a, .brand b { white-space: nowrap; }
+  @media (max-width: 1240px) { header .wrap { gap: 1.4rem; } header nav { gap: 1.1rem; } .brand b small { display: none; } }
+  @media (max-width: 1100px) { .brand b { display: none; } }
   #info h2 { font-family: Orbitron, Inter, sans-serif; font-size: 1.2rem; letter-spacing: 0; }
 
   /* missions panel */
@@ -251,7 +254,7 @@
     <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="#d9d6cf"/><circle cx="12" cy="13" r="3.4" fill="#9d9a93"/><circle cx="21" cy="21" r="2.6" fill="#9d9a93"/><circle cx="20" cy="10" r="1.6" fill="#9d9a93"/><path d="M2 17a15 15 0 0 0 30 0" fill="none" stroke="#fc3d21" stroke-width="2.2"/></svg>
     <b>MOON RESOURCE ATLAS<small>Critical minerals · supply security</small></b>
   </a>
-  <nav><a class="on" href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="extraction.html">Extraction</a><a href="countries.html">Missions</a><a href="companies.html">Companies</a><a href="sources.html">Sources</a></nav>
+  <nav><a class="on" href="index.html">Explore</a><a href="helium3.html">Helium-3</a><a href="extraction.html">Extraction</a><a href="supplychain.html">Supply chain</a><a href="countries.html">Missions</a><a href="companies.html">Companies</a><a href="sources.html">Sources</a></nav>
 </div></header>
 
 <section class="hero"><div class="wrap">
@@ -344,7 +347,7 @@
 
 <footer><div class="wrap">
   <div><b>Moon Resource Atlas</b><p>An independent student research project. Not affiliated with NASA. Photos courtesy of NASA, used under its public media guidelines. Research done 19 November 2026 with Tavily and TradeVerifyd.</p></div>
-  <div><b>Explore</b><a href="index.html#explore">Moon map</a><a href="index.html#facts">Resource fact sheet</a><a href="helium3.html">Why helium-3?</a><a href="extraction.html">How to extract</a><a href="countries.html">Missions</a></div>
+  <div><b>Explore</b><a href="index.html#explore">Moon map</a><a href="index.html#facts">Resource fact sheet</a><a href="helium3.html">Why helium-3?</a><a href="extraction.html">How to extract</a><a href="supplychain.html">Earth–Moon supply chain</a><a href="countries.html">Missions</a></div>
   <div><b>About</b><a href="companies.html">Companies</a><a href="sources.html">Sources &amp; method</a><a href="https://github.com/jmayes14/moon-resource-atlas">GitHub</a></div>
 </div></footer>
 
