@@ -426,8 +426,8 @@
     const ll = m.ll || (m.region && [m.region[0], m.region[1]]);
     if (!ll) return;
     const polarZ = Math.abs(ll[1]) > 70;
-    if (!visible(ll) || d3.geoDistance(ll, [state.lon, state.lat]) > 0.3 || state.zoom < (polarZ ? 2 : 1.4))
-      fly(ll[0], Math.max(-84, Math.min(84, ll[1])), Math.max(state.zoom, polarZ ? 2.6 : 1.7));
+    if (!visible(ll) || d3.geoDistance(ll, [state.lon, state.lat]) > 0.3 || state.zoom < (polarZ ? 2 : 1.2))
+      fly(ll[0], Math.max(-84, Math.min(84, ll[1])), polarZ ? 2.3 : 1.35);
   }
 
   function select(sel) {
