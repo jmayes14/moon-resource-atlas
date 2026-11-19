@@ -39,6 +39,20 @@ const SOURCES = {
   ce5Soil:      { title: "Characteristics of the lunar samples returned by the Chang'E-5 mission", pub: "National Science Review, 2022", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC8974359", via: "Tavily" },
   nasaShackleton:{ title: "Shackleton Crater's Illuminated Rim & Shadowed Interior", pub: "NASA Science", url: "https://science.nasa.gov/resource/shackleton-craters-illuminated-rim-shadowed-interior", via: "Tavily" },
 
+  // Extraction methods (checked with Tavily extract, 19 Nov 2026)
+  nasaWaterQA:  { title: "Is There Water on the Moon? We Asked a NASA Scientist", pub: "NASA", url: "https://www.nasa.gov/general/is-there-water-on-the-moon-we-asked-a-nasa-scientist-episode-27", via: "Tavily" },
+  sofia:        { title: "NASA's SOFIA Discovers Water on Sunlit Surface of Moon", pub: "NASA, 2020", url: "https://www.nasa.gov/news-release/nasas-sofia-discovers-water-on-sunlit-surface-of-moon", via: "Tavily" },
+  mitIce:       { title: "Here's how we could mine the moon for rocket fuel", pub: "MIT Technology Review, 2020", url: "https://www.technologyreview.com/2020/05/19/1001857/how-moon-lunar-mining-water-ice-rocket-fuel", via: "Tavily" },
+  ntrsMicrowave:{ title: "Microwave Extraction of Water from Lunar Regolith Simulant", pub: "NASA Marshall Space Flight Center (NTRS), 2007", url: "https://ntrs.nasa.gov/api/citations/20070018802/downloads/20070018802.pdf", via: "Tavily" },
+  nasaThermal:  { title: "Thermal Mining of Ices on Cold Solar System Bodies (NIAC study, Colorado School of Mines)", pub: "NASA", url: "https://www.nasa.gov/general/thermal-mining-of-ices-on-cold-solar-system-bodies", via: "Tavily" },
+  ntrsPropellant:{ title: "Technology Assessment for Producing Propellant From Lunar Water", pub: "NASA Technical Reports Server, 2023", url: "https://ntrs.nasa.gov/citations/20230010039", via: "Tavily" },
+  nasaPrime1:   { title: "NASA's Lunar Drill Technology Passes Tests on the Moon (PRIME-1)", pub: "NASA, 2025", url: "https://www.nasa.gov/missions/artemis/nasas-lunar-drill-technology-passes-tests-on-the-moon", via: "Tavily" },
+  ntrsIlmenite: { title: "Energy study: lunar oxygen from hydrogen reduction of ilmenite", pub: "NASA Technical Reports Server, 1991", url: "https://ntrs.nasa.gov/api/citations/19910015902/downloads/19910015902.pdf", via: "Tavily" },
+  spaceMaunaKea:{ title: "How NASA Hopes to Mine Water on the Moon", pub: "Space.com", url: "https://www.space.com/7350-nasa-hopes-water-moon.html", via: "Tavily" },
+  aiaaMRE:      { title: "From moon dust to moon colonies (molten regolith electrolysis)", pub: "Aerospace America (AIAA)", url: "https://aerospaceamerica.aiaa.org/departments/from-moon-dust-to-moon-colonies", via: "Tavily" },
+  magnaFAQ:     { title: "Magna Petra FAQ", pub: "Magna Petra (company's own claim)", url: "https://magnapetra.com/faq", via: "Tavily" },
+  mdpiREE:      { title: "Sources of Extraterrestrial Rare Earth Elements: To the Moon and Beyond", pub: "Resources (MDPI), 2017", url: "https://www.mdpi.com/2079-9276/6/3/40", via: "Tavily" },
+
   // Helium-3 market
   geekwireIL:   { title: "Interlune reveals partners and customers for lunar helium-3", pub: "GeekWire, May 2025", url: "https://www.geekwire.com/2025/interlune-moon-mining-vermeer-maybell-quantum-doe", via: "Tavily" },
   bluefors:     { title: "Bluefors Enters Deal to Secure Lunar Helium-3 Supply From Interlune", pub: "The Quantum Insider, Sept 2025", url: "https://thequantuminsider.com/2025/09/17/bluefors-enters-deal-to-secure-lunar-helium-3-supply-from-interlune", via: "Tavily" },
