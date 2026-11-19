@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sources and Method</title>
+<meta name="description" content="How the Moon Resource Atlas was researched, checked and built, and every source it uses.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<nav class="site-nav" aria-label="Main"><div class="in">
+  <b>Moon <span>Resource</span> Atlas</b>
+  <a href="index.html">Atlas</a>
+  <a href="helium3.html">Why helium-3?</a>
+  <a href="countries.html">Who's going</a>
+  <a href="companies.html">Companies</a>
+  <a href="sources.html" aria-current="page">Sources &amp; method</a>
+</div></nav>
+
+<main style="max-width:56rem">
+  <span class="eyebrow">Sources &amp; method</span>
+  <h1>How this was made</h1>
+  <p class="lede">The research question: <strong>Why is the Moon becoming a strategic prize, where are its resources, and who is racing to reach them?</strong></p>
+
+  <h2>1. Finding facts (Tavily)</h2>
+  <p>Tavily, an AI search engine, was used for every web fact. Searches focused on recent news (2026) because Moon plans change often. Several plans changed this year: Artemis III became a test flight in orbit around Earth, Chang'e-7 slipped to 2027, and Russia pushed its missions back. Key pages were opened in full with Tavily's extract tool to check exact numbers and coordinates. Government sources (NASA, USGS, CNSA), science journals and established news outlets came first. A company's own announcements are labeled as its own claims.</p>
+
+  <h2>2. Following companies (TradeVerifyd)</h2>
+  <p>TradeVerifyd is a database of company registrations, ownership links and international trade records. Each company was matched by its official registration numbers, not just its name, because many companies share similar names. For example, a French hotel is also called "Interlune." The records show who supplies each company and who it sells to, with customs product codes. Each company was also checked for sanctions and forced-labor warnings. None were found.</p>
+  <p>Sayari, a second company-records database, was planned for this step but was not available; its connection needs to be renewed. Adding it is listed as a next step.</p>
+
+  <h2>3. Building the map</h2>
+  <ul>
+    <li>The Moon picture is NASA's Lunar Reconnaissance Orbiter color map, from NASA's Scientific Visualization Studio. It is drawn as a globe in the browser.</li>
+    <li>Landing sites use published coordinates (NASA for Apollo; mission records for the others). Sites marked "approximate" are the named area, not an exact spot.</li>
+    <li>Planned missions without an exact site are drawn as dashed areas, or listed without a dot.</li>
+    <li>Resource areas are simple circles traced from published maps (USGS helium-3 model, NASA ice maps, Lunar Prospector thorium data). They show where resources are most likely, not exact borders.</li>
+  </ul>
+
+  <h2>4. Rules for fairness</h2>
+  <ul>
+    <li>Dates for future missions are targets. Many slip.</li>
+    <li>Numbers about helium-3 vary a lot between studies, so ranges are shown.</li>
+    <li>A trade record is not proof of what was shipped. The product codes are customs categories.</li>
+    <li>No company is called good or bad. The site reports what the sources show.</li>
+  </ul>
+
+  <h2>5. Use of AI</h2>
+  <p>Claude, an AI assistant, helped run the searches, write the code and draft the text. Every fact links to a source, and claims that could not be backed by a source were removed.</p>
+
+  <h2>6. What is still unknown</h2>
+  <div class="note">
+    <p><strong>How much helium-3 can really be collected.</strong> Estimates range from 1 to 2.5 million tonnes in total, but the U.S. Geological Survey calls it an "inferred unrecoverable resource" for now.</p>
+    <p><strong>Exact landing sites</strong> for Blue Ghost 2, Interlune's tests, China's first crewed landing, and LUPEX are not public.</p>
+    <p style="margin:0"><strong>Full supply chains.</strong> Trade records show only cross-border shipments, and new companies have no records yet.</p>
+  </div>
+
+  <h2>All sources</h2>
+  <p class="muted"><span class="via via-tavily">via Tavily</span> web research · <span class="via via-tradeverifyd">via TradeVerifyd</span> company records (account needed to open)</p>
+  <ol id="list" class="small" style="padding-left:1.2rem"></ol>
+</main>
+
+<footer><div class="in">Research done 19 November 2026. Code: <a href="https://github.com/jmayes14/moon-resource-atlas">GitHub</a>.</div></footer>
+
+<script src="assets/data.js"></script>
+<script>
+  document.getElementById("list").innerHTML = Object.values(SOURCES).map(s =>
+    `<li style="margin:.4rem 0">${s.url ? `<a href="${s.url}" target="_blank" rel="noopener">${s.title}</a>` : s.title}. ${s.pub}. <span class="via via-${s.via.toLowerCase()}">via ${s.via}</span></li>`).join("");
+</script>
+</body>
+</html>

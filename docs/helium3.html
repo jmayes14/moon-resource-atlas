@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why Helium-3</title>
+<meta name="description" content="How the Sun's solar wind put helium-3 into Moon soil, why Earth has almost none, and why companies already want to buy it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<nav class="site-nav" aria-label="Main"><div class="in">
+  <b>Moon <span>Resource</span> Atlas</b>
+  <a href="index.html">Atlas</a>
+  <a href="helium3.html" aria-current="page">Why helium-3?</a>
+  <a href="countries.html">Who's going</a>
+  <a href="companies.html">Companies</a>
+  <a href="sources.html">Sources &amp; method</a>
+</div></nav>
+
+<main>
+  <span class="eyebrow">Why helium-3?</span>
+  <h1>The Sun has been filling the Moon with helium-3 for billions of years</h1>
+  <p class="lede">Helium-3 is a rare, light form of helium. Earth has almost none. The Moon has much more, because nothing protects it from the Sun's "solar wind."</p>
+
+  <figure class="sw-wrap" style="margin:1.5rem 0 0">
+    <canvas id="sw" width="1200" height="520" role="img" aria-label="Animation: particles stream from the Sun. Earth's magnetic shield pushes them around Earth. The Moon has no shield, so particles hit it and gold helium-3 dots build up in its soil."></canvas>
+  </figure>
+
+  <ol class="steps5">
+    <li><strong>The Sun blows a wind.</strong> It sends out a constant stream of tiny charged particles, called the solar wind. A very small share of it is helium-3.</li>
+    <li><strong>Earth is shielded.</strong> Earth's magnetic field and thick air keep the solar wind from reaching the ground. So almost no helium-3 lands here.</li>
+    <li><strong>The Moon is not.</strong> It has no global magnetic field and almost no air. The solar wind hits its surface directly, except for a few days each month when it passes behind Earth.</li>
+    <li><strong>Helium-3 gets stuck.</strong> The particles bury themselves a tiny distance into soil grains, about 26 nanometers deep. A titanium mineral called ilmenite holds on to them best.</li>
+    <li><strong>Heat lets it out.</strong> Heating the soil to around 700 °C releases the trapped gas, along with hydrogen, water and other helium.</li>
+  </ol>
+  <div class="src">Sources: <span id="s-steps"></span></div>
+
+  <h2>Zoom in: one grain of Moon soil</h2>
+  <div class="cmp">
+    <figure class="figure" style="margin:0">
+      <svg viewBox="0 0 420 300" class="chain" role="img" aria-label="A soil grain. Helium-3 sits only in a thin outer skin of the grain.">
+        <defs>
+          <radialGradient id="gr" cx="40%" cy="38%"><stop offset="0" stop-color="#5b5a57"/><stop offset="1" stop-color="#2a2927"/></radialGradient>
+        </defs>
+        <g transform="translate(150 150)">
+          <circle r="112" fill="url(#gr)"/>
+          <circle r="112" fill="none" stroke="#ffcf5a" stroke-width="12" stroke-opacity=".35"/>
+          <g fill="#ffcf5a" id="atoms"></g>
+        </g>
+        <g font-family="Inter, sans-serif" font-size="14" fill="#f2f5f8">
+          <text x="278" y="58" font-weight="700" fill="#ffcf5a">Thin outer skin</text>
+          <text x="278" y="77" fill="#a3b0bc">helium-3 sits here,</text>
+          <text x="278" y="95" fill="#a3b0bc">~26 nanometers deep</text>
+          <path d="M276 66 L252 82" stroke="#ffcf5a" stroke-width="1.5"/>
+          <text x="278" y="200" font-weight="700">Inside of the grain</text>
+          <text x="278" y="219" fill="#a3b0bc">little or none</text>
+          <path d="M276 196 L200 175" stroke="#a3b0bc" stroke-width="1.5"/>
+        </g>
+      </svg>
+      <figcaption>Not to scale. Because the gas sits only on the surface, the smallest grains hold the most helium-3 for their size. In one Apollo 11 sample, about 88% of the helium was in grains smaller than 0.1 mm.</figcaption>
+    </figure>
+    <div>
+      <h3 style="margin-top:0">Why some places have more</h3>
+      <p>The amount of helium-3 depends on three things:</p>
+      <ul>
+        <li><strong>Titanium.</strong> Ilmenite, a titanium-iron mineral, holds helium much better than other minerals. Dark lava plains rich in titanium have more.</li>
+        <li><strong>Time in the sun.</strong> Soil that has sat at the surface longer has caught more wind.</li>
+        <li><strong>How much wind arrives.</strong> The far side gets more, because the near side spends a few days each month shielded behind Earth.</li>
+      </ul>
+      <p>That is why the U.S. Geological Survey model puts the richest soil in the titanium-rich plains of the near side and the lava plains of the far side.</p>
+      <p><a class="btn" href="index.html">See these areas on the Moon →</a></p>
+      <div class="src">Sources: <span id="s-where"></span></div>
+    </div>
+  </div>
+
+  <h2>Earth vs. the Moon</h2>
+  <div class="grid">
+    <div class="tile"><div class="big">&lt; 10 kg</div><p>All the helium-3 reserves on Earth, about 5 parts per trillion. That is why it is so expensive.</p><div class="src" id="s-earth"></div></div>
+    <div class="tile"><div class="big">4–8 ppb</div><p>Careful estimate of helium-3 in Moon soil: 3.7 parts per billion in the highlands, 7.8 in the lava plains. Some Apollo soils reached about 20 ppb.</p><div class="src" id="s-ppb"></div></div>
+    <div class="tile"><div class="big">11.8 ppb</div><p>Average helium-3 measured in Neil Armstrong's Apollo 11 soil sample from the Sea of Tranquility.</p><div class="src" id="s-a11"></div></div>
+    <div class="tile"><div class="big">1–2.5 million t</div><p>Estimates of all the helium-3 on the Moon. Chinese scientists say "at least 1 million tonnes." A 2007 study estimated about 2.5 million. Nobody knows how much can really be collected.</p><div class="src" id="s-total"></div></div>
+  </div>
+
+  <h2>The catch: you have to dig a lot of dirt</h2>
+  <div class="card">
+    <p style="font-size:1.15rem"><strong>To get 1 kg of helium-3, you would need to process 100,000 to 1,000,000 tonnes of Moon soil.</strong></p>
+    <svg viewBox="0 0 900 150" class="chain" role="img" aria-label="Bar comparing 1 kilogram of helium-3 to 100,000 to 1,000,000 tonnes of soil">
+      <g font-family="Inter, sans-serif" font-size="14">
+        <rect x="0" y="20" width="900" height="44" rx="8" fill="#2a3747"/>
+        <rect x="0" y="20" width="90" height="44" rx="8" fill="#8f8a80"/>
+        <rect x="90" y="20" width="810" height="44" rx="8" fill="#8f8a80" fill-opacity=".45"/>
+        <text x="10" y="47" fill="#0b1118" font-weight="800">100,000 t</text>
+        <text x="890" y="47" fill="#f2f5f8" font-weight="800" text-anchor="end">up to 1,000,000 t of soil</text>
+        <circle cx="6" cy="104" r="3" fill="#ffcf5a"/>
+        <text x="18" y="109" fill="#ffcf5a" font-weight="700">1 kg of helium-3 (the tiny gold dot)</text>
+        <text x="0" y="140" fill="#a3b0bc">A full-size Moon excavator prototype built by Interlune and Vermeer handles about 100 tonnes of soil an hour.</text>
+      </g>
+    </svg>
+    <p style="margin-top:1rem">At that speed, one machine digging nonstop would need about <strong>1,000 to 10,000 hours</strong>, roughly 6 weeks to 14 months, to gather 1 kg. That is why companies plan fleets of machines.</p>
+    <p class="muted small">The calculation: 100,000 t ÷ 100 t per hour = 1,000 hours; 1,000,000 t ÷ 100 t per hour = 10,000 hours.</p>
+    <div class="src" id="s-dig"></div>
+  </div>
+
+  <h2>Why anyone would pay for it</h2>
+  <div class="cmp">
+    <div class="card">
+      <h3 style="margin-top:0">What helium-3 is used for</h3>
+      <ul>
+        <li><strong>Quantum computers.</strong> Their chips must be cooled to nearly absolute zero. The refrigerators that do this need helium-3.</li>
+        <li><strong>Neutron detectors.</strong> Used to detect nuclear material.</li>
+        <li><strong>Medical imaging.</strong> Used in some kinds of body scans.</li>
+        <li><strong>Fusion power, someday.</strong> Helium-3 could fuel a cleaner kind of fusion, but no reactor can do it yet.</li>
+      </ul>
+      <div class="src" id="s-uses"></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">What it costs, and who is buying</h3>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div><div class="big" style="font-size:1.6rem;font-weight:800;color:var(--accent)">~$2,500</div><p class="small muted">per liter of gas (about 7,400 liters in 1 kg)</p></div>
+        <div><div class="big" style="font-size:1.6rem;font-weight:800;color:var(--accent)">~$20M</div><p class="small muted">per kilogram, the price Interlune uses</p></div>
+      </div>
+      <p style="margin-top:.8rem">Buyers have already signed up for helium-3 that has not been mined yet. Bluefors agreed to buy up to <strong>10,000 liters a year</strong> from 2028 to 2037. The U.S. Department of Energy agreed to buy 3 liters by April 2029.</p>
+      <p><a href="companies.html">See the companies →</a></p>
+      <div class="src" id="s-price"></div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:2rem">
+    <strong>Keep in mind:</strong> the U.S. Geological Survey calls Moon helium-3 an "inferred unrecoverable resource." It is there and measurable, but there is not yet enough data to prove it can be mined at a profit. The first tests on the Moon are planned for 2027 and 2028.
+    <div class="src" id="s-catch"></div>
+  </div>
+</main>
+
+<footer><div class="in">Research done 19 November 2026 with Tavily. <a href="sources.html">All sources</a>.</div></footer>
+
+<script src="assets/data.js"></script>
+<script>
+  const put = (id, keys, pre = "Source: ") => { const el = document.getElementById(id); if (el) el.innerHTML = (el.tagName === "SPAN" ? "" : pre) + srcList(keys); };
+  put("s-steps", ["nasaSolarWind", "svsMagnetotail", "ntrsHe3", "natureHe3"]);
+  put("s-where", ["usgsHe3Map", "natureHe3"]);
+  put("s-earth", ["natureHe3"]);
+  put("s-ppb", ["natureHe3", "usgsHe3Map"]);
+  put("s-a11", ["ntrsHe3"]);
+  put("s-total", ["cnsaHe3", "lpscReserves"]);
+  put("s-dig", ["spacenewsUsgs", "hackadayHe3"]);
+  put("s-uses", ["natureHe3", "bluefors"]);
+  put("s-price", ["geekwireIL", "bluefors"]);
+  put("s-catch", ["spacenewsUsgs", "prospectMoon"]);
+  // scatter helium-3 atoms in the outer skin of the grain diagram
+  const g = document.getElementById("atoms");
+  for (let i = 0; i < 70; i++) {
+    const a = Math.random() * Math.PI * 2, r = 106 + Math.random() * 6;
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    c.setAttribute("cx", (Math.cos(a) * r).toFixed(1)); c.setAttribute("cy", (Math.sin(a) * r).toFixed(1)); c.setAttribute("r", 2.4);
+    g.appendChild(c);
+  }
+</script>
+<script src="assets/solarwind.js"></script>
+</body>
+</html>

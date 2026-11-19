@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Resource Atlas</title>
+<meta name="description" content="An interactive Moon globe showing where helium-3, water ice and rare earths are, and which countries plan to go there.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<nav class="site-nav" aria-label="Main"><div class="in">
+  <b>Moon <span>Resource</span> Atlas</b>
+  <a href="index.html" aria-current="page">Atlas</a>
+  <a href="helium3.html">Why helium-3?</a>
+  <a href="countries.html">Who's going</a>
+  <a href="companies.html">Companies</a>
+  <a href="sources.html">Sources &amp; method</a>
+</div></nav>
+
+<main>
+  <span class="eyebrow">Critical minerals &amp; strategic supply security</span>
+  <h1>The race for the Moon's resources</h1>
+  <p class="lede">The Moon holds things Earth is short on: helium-3, water ice, and rare earth elements. Drag the Moon to explore where they are, and which countries and companies plan to land there.</p>
+
+  <div class="atlas">
+    <div id="globe" class="globe-box" aria-label="Interactive Moon globe. Drag to turn it. Use the list beside it to jump to a mission.">
+      <canvas></canvas>
+      <svg role="img" aria-label="Resource areas and landing sites"></svg>
+      <div class="globe-tools" role="group" aria-label="Jump to a view">
+        <button type="button" data-view="near" aria-pressed="true">Near side</button>
+        <button type="button" data-view="far" aria-pressed="false">Far side</button>
+        <button type="button" data-view="south" aria-pressed="false">South pole</button>
+        <button type="button" data-view="north" aria-pressed="false">North pole</button>
+      </div>
+      <div class="zoom"><button type="button" data-zoom="in" aria-label="Zoom in">+</button><button type="button" data-zoom="out" aria-label="Zoom out">−</button></div>
+      <div class="hint">Drag to spin · click a dot or area</div>
+    </div>
+
+    <aside class="side">
+      <div class="card info" id="info" aria-live="polite">
+        <span class="eyebrow">How to read the map</span>
+        <h2>Click anything to learn more</h2>
+        <div class="legend-row"><svg width="22" height="16"><circle cx="11" cy="8" r="6" fill="#4ea1ff" stroke="#05080c" stroke-width="2"/></svg>Landed</div>
+        <div class="legend-row"><svg width="22" height="16"><path d="M6,3L16,13M16,3L6,13" stroke="#4ea1ff" stroke-width="3" stroke-linecap="round"/></svg>Crashed</div>
+        <div class="legend-row"><svg width="22" height="16"><circle cx="11" cy="8" r="6" fill="#05080c" stroke="#4ea1ff" stroke-width="2.6"/></svg>Planned</div>
+        <div class="legend-row"><svg width="22" height="16"><circle cx="11" cy="8" r="6.5" fill="#4ea1ff" fill-opacity=".1" stroke="#4ea1ff" stroke-width="1.6" stroke-dasharray="2 3"/></svg>Planned area, no exact site yet</div>
+        <div class="legend-row"><svg width="22" height="16"><rect x="2" y="2" width="18" height="12" rx="6" fill="#ffcf5a" fill-opacity=".25" stroke="#ffcf5a" stroke-dasharray="4 3"/></svg>Resource area (color = resource)</div>
+        <p class="small muted" style="margin-top:.6rem">Dot color shows the country. Resource areas are simplified from published maps.</p>
+      </div>
+
+      <div class="card">
+        <h3>Resources</h3>
+        <div class="chips" id="f-layers"></div>
+        <h3 style="margin-top:1rem">Countries</h3>
+        <div class="chips" id="f-who"></div>
+        <h3 style="margin-top:1rem">Status</h3>
+        <div class="chips" id="f-status"></div>
+      </div>
+    </aside>
+  </div>
+
+  <h2>Why these three resources matter</h2>
+  <div class="grid">
+    <div class="tile" style="border-top:4px solid var(--he3)"><div class="big" style="color:var(--he3)">Helium-3</div>
+      <p>Cools quantum computers and powers neutron detectors. It is a possible future fusion fuel. Earth has less than 10 kg in reserves. The Moon has far more, because the Sun has been dusting it with helium-3 for billions of years.</p>
+      <p><a href="helium3.html">See how the Sun put it there →</a></p>
+      <div class="src">${0}</div></div>
+    <div class="tile" style="border-top:4px solid var(--ice)"><div class="big" style="color:var(--ice)">Water ice</div>
+      <p>Drinking water, air to breathe, and rocket fuel. Fuel made on the Moon means not hauling it from Earth. The ice sits in dark craters at the poles, so the south pole has become the most wanted place on the Moon.</p>
+      <div class="src"></div></div>
+    <div class="tile" style="border-top:4px solid var(--ree)"><div class="big" style="color:var(--ree)">Rare earths</div>
+      <p>Needed for magnets in electric cars, wind turbines and weapons. China supplies most of the world's refined rare earths today. Moon rock called KREEP is rich in them, but no one knows yet whether mining it could ever pay off.</p>
+      <div class="src"></div></div>
+  </div>
+
+  <h2>Every mission on the map</h2>
+  <p class="muted">Click a name to find it on the Moon. The list follows the filters above.</p>
+  <div class="card"><ul class="mlist" id="mlist"></ul></div>
+</main>
+
+<footer><div class="in">Moon picture: NASA Scientific Visualization Studio (LRO camera). Research done 19 November 2026 with Tavily and TradeVerifyd. <a href="sources.html">All sources</a>.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="assets/data.js"></script>
+<script>
+  // fill the tile sources
+  const tiles = document.querySelectorAll(".tile .src");
+  tiles[0].innerHTML = "Source: " + srcList(["natureHe3"]);
+  tiles[1].innerHTML = "Source: " + srcList(["nasaWater"]);
+  tiles[2].innerHTML = "Source: " + srcList(["usgsREE"]);
+</script>
+<script src="assets/atlas.js"></script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who's Going</title>
+<meta name="description" content="Which countries plan to land on the Moon, when, and where, and the two groups competing to set the rules.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<nav class="site-nav" aria-label="Main"><div class="in">
+  <b>Moon <span>Resource</span> Atlas</b>
+  <a href="index.html">Atlas</a>
+  <a href="helium3.html">Why helium-3?</a>
+  <a href="countries.html" aria-current="page">Who's going</a>
+  <a href="companies.html">Companies</a>
+  <a href="sources.html">Sources &amp; method</a>
+</div></nav>
+
+<main>
+  <span class="eyebrow">Who's going</span>
+  <h1>Two teams, one small target</h1>
+  <p class="lede">The United States and China lead two rival groups of countries. Both plan bases near the Moon's south pole in the 2030s, because that is where the ice is.</p>
+
+  <h2>The two groups</h2>
+  <div class="bloc">
+    <div class="card" style="border-top:4px solid #4ea1ff">
+      <h3 style="margin-top:0">Artemis Accords (led by the United States)</h3>
+      <div class="big" style="font-size:2.4rem;font-weight:800;color:#4ea1ff">78 countries</div>
+      <p class="muted">as of 28 October 2026, when Vietnam joined. 17 countries signed in 2026 alone, the most in any year.</p>
+      <p>A set of shared, non-binding rules for exploring the Moon. They say countries and companies may use resources they collect, while still following the 1967 Outer Space Treaty, which says no country can own the Moon.</p>
+      <div class="src" id="s-acc"></div>
+    </div>
+    <div class="card" style="border-top:4px solid #ff4d5e">
+      <h3 style="margin-top:0">International Lunar Research Station (led by China and Russia)</h3>
+      <div class="big" style="font-size:2.4rem;font-weight:800;color:#ff4d5e">13 countries</div>
+      <p class="muted">as tracked in mid-2026, plus several organizations.</p>
+      <p>A plan for a shared base at the south pole, with a basic version by about 2035. Partners named in public reports include Pakistan, Azerbaijan, South Africa, Nicaragua and the United Arab Emirates. Fewer details of its rules are public.</p>
+      <div class="src" id="s-ilrs"></div>
+    </div>
+  </div>
+  <p class="muted small" style="margin-top:.8rem">A few countries, such as Thailand and Senegal, have signed both. <span id="s-both"></span></p>
+
+  <h2>Who plans to land, and when</h2>
+  <p class="muted">Each dot is one planned mission. Hover or tap a dot for its name. Dates are targets and often slip.</p>
+  <div class="card" style="padding:1rem .5rem">
+    <svg id="timeline" class="chain" role="img" aria-label="Timeline of planned Moon missions by country, 2026 to 2036"></svg>
+  </div>
+
+  <h2>Country by country</h2>
+  <div class="grid" id="cards" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,22rem),1fr))"></div>
+
+  <div class="note" style="margin-top:2rem">
+    <strong>Why the south pole?</strong> It has ice in craters that never see sunlight, and nearby ridges that get sunlight almost all the time for solar power. Good landing spots there are few. The United States, China, India and Russia all plan to land within a few hundred kilometers of each other.
+    <a href="index.html?view=south">See it on the Moon →</a>
+  </div>
+</main>
+
+<footer><div class="in">Research done 19 November 2026 with Tavily. <a href="sources.html">All sources</a>.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="assets/data.js"></script>
+<script>
+  document.getElementById("s-acc").innerHTML = "Sources: " + srcList(["accords78", "spoAccords"]);
+  document.getElementById("s-ilrs").innerHTML = "Sources: " + srcList(["spoAccords", "diaSpace", "asiaTimes"]);
+  document.getElementById("s-both").innerHTML = "Source: " + srcList(["britAccords"]);
+
+  // ---- timeline ----
+  const order = ["us", "cn", "in", "ru", "jp", "kr"];
+  const plans = MISSIONS.filter(m => m.status === "planned").concat(UNMAPPED.map(m => ({ ...m, status: "planned", unmapped: true })));
+  const W = 1000, rowH = 54, topY = 30, left = 130, right = 20;
+  const H = topY + order.length * rowH + 30;
+  const x = d3.scaleLinear().domain([2026, 2036]).range([left, W - right]);
+  const svg = d3.select("#timeline").attr("viewBox", `0 0 ${W} ${H}`);
+  svg.append("g").selectAll("line").data(d3.range(2026, 2037)).join("line")
+    .attr("x1", d => x(d)).attr("x2", d => x(d)).attr("y1", topY - 8).attr("y2", H - 24).attr("stroke", "#2a3747");
+  svg.append("g").selectAll("text").data(d3.range(2026, 2037, 2)).join("text")
+    .attr("x", d => x(d)).attr("y", H - 6).attr("text-anchor", "middle").attr("fill", "#a3b0bc").attr("font-size", 13).text(d => d);
+  // today marker
+  svg.append("line").attr("x1", x(2026.88)).attr("x2", x(2026.88)).attr("y1", topY - 12).attr("y2", H - 24).attr("stroke", "#ffcf5a").attr("stroke-dasharray", "3 3");
+  svg.append("text").attr("x", x(2026.88) + 4).attr("y", topY - 14).attr("fill", "#ffcf5a").attr("font-size", 12).text("today");
+  order.forEach((k, i) => {
+    const y = topY + i * rowH + rowH / 2;
+    svg.append("text").attr("x", 8).attr("y", y + 5).attr("fill", COUNTRIES[k].color).attr("font-weight", 700).attr("font-size", 15).text(COUNTRIES[k].name.replace(" / USSR", ""));
+    const rows = plans.filter(m => m.who === k).sort((a, b) => a.year - b.year);
+    const seen = {};
+    rows.forEach(m => {
+      const n = seen[m.year] = (seen[m.year] || 0) + 1;
+      const cx = x(m.year) + (n - 1) * 16;
+      const g = svg.append("g").attr("transform", `translate(${cx},${y})`).style("cursor", "default");
+      g.append("circle").attr("r", 8).attr("fill", "#0b1118").attr("stroke", COUNTRIES[k].color).attr("stroke-width", 3);
+      g.append("title").text(`${m.name} (${m.year})`);
+    });
+    if (!rows.length) svg.append("text").attr("x", left).attr("y", y + 5).attr("fill", "#a3b0bc").attr("font-size", 13).text("No Japanese lander announced; partner in LUPEX with India (see India)");
+  });
+
+  // ---- country cards ----
+  const notes = {
+    us: "Artemis II flew astronauts around the Moon in April 2026. Artemis III became a 2027 test flight in orbit around Earth, so the first landing is now Artemis IV in 2028. NASA plans a Moon Base at the south pole, with landings every six months after Artemis V.",
+    cn: "China has landed four times without a failure, including the first far-side landings. Chang'e-7 was delayed from August 2026 to 2027. China plans astronauts on the Moon before 2030 and a shared base with Russia by about 2035.",
+    in: "India landed Chandrayaan-3 near the south pole in 2023. Next is a sample return (Chandrayaan-4, 2028) and a joint ice rover with Japan (LUPEX).",
+    ru: "Luna 25 crashed in 2023. Russia pushed its next mission, an orbiter, to 2028, then landers at the south pole (2029) and north pole (2030). It plans a nuclear power plant for the China-led base.",
+    jp: "Japan's SLIM landed in 2024. The private company ispace crashed twice (2023, 2025). Japan works with the United States on Artemis and with India on LUPEX.",
+    kr: "South Korea plans its first lander in 2032, with six candidate sites announced in March 2026. It is also weighing a company-built rover by 2030.",
+  };
+  const noteSrc = { us: ["bbcArtemis", "spoArtemis", "nasaMoonBase", "skyIgnition"], cn: ["ce7Delay", "asiaTimes", "wikiObjects"], in: ["hinduCh4"], ru: ["elpaisRussia", "neiRussia"], jp: ["wikiObjects", "britAccords"], kr: ["koreaSites", "koreaHerald"] };
+  const cards = document.getElementById("cards");
+  for (const k of order) {
+    const c = COUNTRIES[k];
+    const past = MISSIONS.filter(m => m.who === k && m.status !== "planned");
+    const next = plans.filter(m => m.who === k).sort((a, b) => a.year - b.year);
+    const div = document.createElement("div");
+    div.className = "card country"; div.style.setProperty("--c", c.color);
+    div.innerHTML = `<h3><span>${c.name}</span><span class="small muted">${c.bloc === "artemis" ? "Artemis Accords" : "ILRS (China-led)"}</span></h3>
+      <p class="small">${notes[k]}</p>
+      <strong class="small">Next</strong><ul>${next.map(m => `<li>${m.year}: ${m.name}${m.ll || m.region ? ` <a href="index.html?m=${m.id}" class="small">map</a>` : ""}</li>`).join("") || "<li>No new landing announced</li>"}</ul>
+      <strong class="small">Past</strong><ul>${past.map(m => `<li>${m.year}: ${m.name}${m.status === "crashed" ? " (crashed)" : ""}</li>`).join("")}</ul>
+      <div class="src">Sources: ${srcList(noteSrc[k])}</div>`;
+    cards.appendChild(div);
+  }
+</script>
+</body>
+</html>

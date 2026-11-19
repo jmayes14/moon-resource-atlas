@@ -1,0 +1,53 @@
+{
+  "project": "Moon Resource Atlas",
+  "theme": "Critical minerals & strategic supply security",
+  "research_date": "2026-11-19",
+  "question": "Why is the Moon becoming a strategic prize, where are its resources, and who is racing to reach them?",
+  "tools": {
+    "tavily": "All web facts. tavily_search (advanced) for recent news; tavily_extract to confirm coordinates and key numbers (NASA NSSDC Apollo coordinates, Wikipedia list of objects on the Moon).",
+    "tradeverifyd": "Company matching by registration number, trade relationships (suppliers/customers with HS codes), affiliate links, annotation counts (sanctions, forced labor).",
+    "sayari": "Not used in this version: connection needed re-authorization."
+  },
+  "key_changes_found_in_2026": [
+    "Artemis II flew around the Moon in April 2026 (splashdown 10 April).",
+    "Artemis III became a 2027 crewed test flight in low Earth orbit; first landing moved to Artemis IV in 2028.",
+    "NASA announced a south-pole Moon Base at its 'Ignition' event on 24 March 2026 (phases: to 2029, 2029-2032, from 2032).",
+    "Chang'e-7 did not launch in its August 2026 window; delayed to 2027. Target near Shackleton crater (88.8 S, 123.4 E).",
+    "Chang'e-8 payloads may move to a 2030/31 timeline after China merged its robotic and crewed lunar programs.",
+    "Russia pushed Luna-26 to 2028, Luna-27A (south pole) to 2029, Luna-27B (north pole) to 2030, Luna-28 to 2036.",
+    "Griffin-1 now targets January 2027; every other U.S. CLPS lander slipped to 2027.",
+    "Artemis Accords reached 78 signatories on 28 October 2026 (Vietnam). ILRS: 13 countries as tracked mid-2026.",
+    "India chose site MM-4 near Mons Mouton for Chandrayaan-4 (2028).",
+    "South Korea named six candidate sites for its 2032 lander (25 March 2026)."
+  ],
+  "helium3_facts": {
+    "earth_reserves": "less than 10 kg (about 5 parts per trillion) - Nature Comms Earth & Env 2024",
+    "moon_soil": "3.7 ppb highlands, 7.8 ppb maria (conservative); Apollo 11 sample 10084 averaged 11.8 ppb; some soils ~20 ppb",
+    "total_on_moon": "at least 1 million t (CNSA); about 2.47 million t (LPSC 2007 estimate)",
+    "soil_per_kg": "100,000 to 1,000,000 t of regolith per kg (USGS, via SpaceNews)",
+    "excavator_rate": "about 100 t of regolith per hour (Interlune/Vermeer prototype)",
+    "derived_math": "1,000 to 10,000 machine-hours per kg (100,000/100 and 1,000,000/100)",
+    "price": "~$2,500 per liter; ~$20M per kg; ~7,400 liters per kg",
+    "deals": "Bluefors up to 10,000 L/yr 2028-2037 (>$300M); Maybell Quantum multi-year; DOE 3 L by April 2029",
+    "usgs_status": "inferred unrecoverable resource"
+  },
+  "tradeverifyd_findings": {
+    "Interlune Corporation (US, f1ac12e7)": "Registered; no trade or affiliate records. Note: a French hotel named INTERLUNE exists; matched by company number instead.",
+    "Blue Origin, LLC (US, 28a20e06)": "28 supplier links incl. MT Aerospace AG (HS 761210 aluminum containers, 880790 spacecraft parts), KME Germany (740919 copper), Nikon SLM Solutions, Starrag, Beyond Gravity Sweden, Hangzhou Sheyin Technology (CN), Nantong Reoo Technology (CN), SGC Energy, E One Moli Energy.",
+    "Intuitive Machines, Inc. (US, d53e652a)": "4 suppliers, all India: Astratek Precision Manufacturer (titanium 8108, aluminum 7616), Accura Global Tech (titanium 8108), Dhaval Electromech (aluminum), Numato Systems (electronics 8542).",
+    "Firefly Aerospace Inc. (US, 50351d9e)": "2 suppliers: Ets Solutions China Ltd (no HS code), Losyco GmbH. Affiliate links: Firefly Space Transport Services, Firefly Aerospace Ukraine LLC, Spaceflight Inc., SciTec Innovations.",
+    "Bluefors Oy (FI, 92e38e5c)": "5 customers: Indian Institute of Science, IIT Bombay, Tata Institute of Fundamental Research, IISER, Victura Technologies (HS 9027 instruments). 1 supplier: Bajeria Industries.",
+    "Maybell Quantum Industries (US, 2a8e4059)": "2 suppliers: Highlight Tech Corp, Guan Ming Singapore.",
+    "ispace, inc. (JP, 680957ce)": "1 supplier: iGlobal Embedded Solutions (electronics).",
+    "Vermeer Corporation (US, c5857bde)": "48 inbound, 14 outbound trade links.",
+    "Astrobotic Technology (US, d0705c71)": "No trade links; affiliate Astrobotic Real Estate Holdings.",
+    "Magna Petra Corp (US, 3019f960)": "Registered; no trade records.",
+    "annotations": "All companies above: annotation_count 0 (no sanctions or forced-labor flags)."
+  },
+  "limits": [
+    "Trade records show cross-border shipments only; HS codes are customs categories, not exact parts.",
+    "Resource areas on the map are simplified circles traced from published maps.",
+    "Some coordinates are approximate (marked on the site).",
+    "Several planned landing sites are not public."
+  ]
+}
