@@ -8,6 +8,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/site.css">
+<style>
+  .analogy { display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); border-top: 1px solid var(--ink); }
+  .an { padding: 1.4rem 1.4rem 1.4rem 0; border-bottom: 1px solid var(--rule); }
+  .an + .an { padding-left: 1.4rem; border-left: 1px solid var(--rule); }
+  .an-ic { font-size: 2rem; display: block; }
+  .an h3 { margin-top: .4rem; }
+  .an p { font-size: .97rem; }
+  .an .muted { font-size: .9rem; }
+  .shield { padding: 1rem; }
+  .shield-ctl { display: grid; gap: .4rem; margin-top: .6rem; color: #f2f5f8; }
+  .shield-ctl input { width: 100%; accent-color: #ffcf5a; }
+  .moon-status { font: 600 1rem Inter, sans-serif; }
+  .moon-status .tag { display: inline-block; font: 700 .7rem "DM Mono", monospace; letter-spacing: .06em; text-transform: uppercase; padding: .15rem .5rem; margin-right: .5rem; color: #0b1118; }
+  @media (max-width: 760px) { .an + .an { padding-left: 0; border-left: 0; } }
+</style>
 </head>
 <body>
 <nav class="site-nav" aria-label="Main"><div class="in">
@@ -32,6 +47,45 @@
     <li><strong>Heat lets it out.</strong> Heating the soil to around 700 °C releases the trapped gas, along with hydrogen, water and other helium.</li>
   </ol>
   <div class="src">Sources: <span id="s-steps"></span></div>
+
+  <h2>Earth's magnetic shield, explained with everyday things</h2>
+  <p class="lede">Earth's magnetic field is invisible, so it helps to picture it as something familiar. Here are three ways to think about it.</p>
+  <div class="analogy">
+    <div class="an">
+      <span class="an-ic" aria-hidden="true">🪨</span>
+      <h3>A rock in a stream</h3>
+      <p>Picture the solar wind as a river and Earth's magnetic field as a big rock in it. The water piles up in front of the rock, splits, and flows around it, leaving a long, calm wake behind.</p>
+      <p class="muted">Space scientists use this exact comparison. The "pile-up" in front is called the <b>bow shock</b>. On the Sun side, the shield is squeezed to about 6–10 times Earth's radius (roughly 40,000–64,000 km). The wake, called the <b>magnetotail</b>, stretches out hundreds of Earth radii, well past the Moon's orbit at about 60.</p>
+      <p class="src" id="s-an1"></p>
+    </div>
+    <div class="an">
+      <span class="an-ic" aria-hidden="true">☂️</span>
+      <h3>An umbrella in sideways rain</h3>
+      <p>Earth stands under a huge umbrella, so the "rain" of solar wind particles mostly blows past. The Moon has no umbrella of its own, so for most of the month it gets soaked. That soaking, over billions of years, is how helium-3 built up in its soil.</p>
+      <p class="muted">For a few days each month, around full Moon, the Moon drifts into the dry patch behind Earth's umbrella, the magnetotail, and is partly sheltered. The umbrella also leaks a little: some solar wind energy and particles still get inside Earth's shield.</p>
+      <p class="src" id="s-an2"></p>
+    </div>
+    <div class="an">
+      <span class="an-ic" aria-hidden="true">🍲</span>
+      <h3>A pot boiling on a stove</h3>
+      <p>Where does the shield come from? Deep inside Earth, the outer core is liquid iron. Heat makes it churn like boiling water in a pot, and Earth's spin swirls it. Moving metal makes electric currents, and those make the magnetic field.</p>
+      <p class="muted">It works like a giant bicycle-light dynamo, turning motion into electricity and magnetism. The result is that Earth acts a bit like a huge bar magnet. The Moon has no global magnetic field like this, so it has no shield.</p>
+      <p class="src" id="s-an3"></p>
+    </div>
+  </div>
+
+  <figure class="figure shield" style="margin:1.6rem 0 0">
+    <svg id="shield" viewBox="0 0 900 380" class="chain" role="img" aria-labelledby="shieldDesc">
+      <desc id="shieldDesc">Diagram, not to scale: the solar wind flows from the left. Earth's magnetic shield is a bubble squeezed on the Sun side, with a long tail stretching right, past the Moon's orbit. Drag the slider to move the Moon around its orbit and see whether it is shielded or exposed.</desc>
+    </svg>
+    <div class="shield-ctl">
+      <label for="moonAng"><b>Move the Moon around its orbit</b></label>
+      <input type="range" id="moonAng" min="0" max="359" value="200" aria-describedby="moonStatus">
+      <div id="moonStatus" class="moon-status" aria-live="polite"></div>
+    </div>
+    <figcaption>Not to scale: the real tail is far longer, and the Moon's orbit is about 60 Earth radii across the middle. The tail's edge is drawn as a simple cone; the real boundary shifts constantly with the solar wind.</figcaption>
+  </figure>
+  <p class="src" id="s-shield"></p>
 
   <h2>Zoom in: one grain of Moon soil</h2>
   <div class="cmp">
@@ -135,6 +189,58 @@
 <script>
   const put = (id, keys, pre = "Source: ") => { const el = document.getElementById(id); if (el) el.innerHTML = (el.tagName === "SPAN" ? "" : pre) + srcList(keys); };
   put("s-steps", ["nasaSolarWind", "svsMagnetotail", "ntrsHe3", "natureHe3"]);
+  put("s-an1", ["noaaMagneto", "nasaMagneto"]);
+  put("s-an2", ["nasaSolarWind", "svsMagnetotail", "noaaMagneto"]);
+  put("s-an3", ["nasaCoreField", "esaAnatomy", "nasaSolarWind"]);
+  put("s-shield", ["noaaMagneto", "nasaMagneto", "svsMagnetotail", "esaAnatomy"]);
+  (function shieldDiagram() {
+    const svg = document.getElementById("shield"); if (!svg) return;
+    const NS = "http://www.w3.org/2000/svg", ex = 330, ey = 190, R = 150;   // Earth position, Moon orbit radius (not to scale)
+    const el = (t, a, p = svg) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); p.appendChild(n); return n; };
+    el("rect", { width: 900, height: 380, fill: "#05070c" });
+    // one shape for the shield: half-width of the magnetopause at position x (nose just Sun-side of Earth)
+    const x0 = ex - 60, HM = 95;
+    const hw = x => x <= x0 ? 0 : HM * Math.sqrt(1 - Math.exp(-(x - x0) / 45));
+    // solar wind streamlines: flow around the shield (start bending ~45 px upstream, at the bow shock)
+    for (const d of [8, 30, 54, 80, 108, 138, 170]) for (const sg of [-1, 1]) {
+      let path = "";
+      for (let x = 10; x <= 900; x += 10) { const off = Math.sqrt(d * d + Math.pow(hw(x + 45) + 8, 2)); path += (x === 10 ? "M" : "L") + x + " " + (ey + sg * off).toFixed(1); }
+      el("path", { d: path, fill: "none", stroke: "#ffcf5a", "stroke-opacity": .22 + .25 * (d / 170), "stroke-width": 1.4 });
+    }
+    el("text", { x: 18, y: 30, fill: "#ffcf5a", "font-size": 15, "font-family": "Inter, sans-serif", "font-weight": 700 }).textContent = "Solar wind (the stream) →";
+    // magnetosphere outline from the same formula
+    let top = "", bot = "";
+    for (let x = x0; x <= 900; x += 6) { top += `L${x} ${(ey - hw(x)).toFixed(1)} `; bot = `L${x} ${(ey + hw(x)).toFixed(1)} ` + bot; }
+    el("path", { d: `M${x0} ${ey} ${top} L900 ${ey + hw(900)} ${bot} Z`, fill: "#3d8bff", "fill-opacity": .14, stroke: "#7fb2ff", "stroke-width": 1.6 });
+    el("path", { d: `M${x0 - 30} ${ey - 150} Q ${x0 - 75} ${ey}, ${x0 - 30} ${ey + 150}`, fill: "none", stroke: "#ff9f7a", "stroke-width": 2, "stroke-dasharray": "6 5" });
+    const lab = (x, y, t, c = "#c9d6e4", w = 600) => { const n = el("text", { x, y, fill: c, "font-size": 13, "font-family": "Inter, sans-serif", "font-weight": w }); n.textContent = t; return n; };
+    lab(x0 - 225, ey + 178, "Bow shock (the pile-up)", "#ff9f7a", 700);
+    lab(ex + 40, ey - 70, "Earth's magnetic shield", "#7fb2ff", 700);
+    lab(660, ey + 6, "Magnetotail (the calm wake) →", "#7fb2ff", 700);
+    // Moon orbit
+    el("circle", { cx: ex, cy: ey, r: R, fill: "none", stroke: "#8b97a6", "stroke-dasharray": "3 6" });
+    // Earth
+    el("circle", { cx: ex, cy: ey, r: 22, fill: "#2a6fdb" });
+    el("path", { d: `M${ex - 10} ${ey - 14} q8 6 3 14 q-7 7 3 14`, fill: "none", stroke: "#4fae6a", "stroke-width": 4, "stroke-linecap": "round" });
+    lab(ex - 18, ey + 44, "Earth", "#fff", 700);
+    const moon = el("circle", { r: 11, fill: "#d9d6cf", stroke: "#fff", "stroke-width": 0 });
+    const dust = el("g", {});
+    const status = document.getElementById("moonStatus"), inp = document.getElementById("moonAng");
+    function draw() {
+      const a = +inp.value * Math.PI / 180;           // 0° = Sun side (left), 180° = night side (right)
+      const mx = ex - R * Math.cos(a), my = ey - R * Math.sin(a);
+      moon.setAttribute("cx", mx); moon.setAttribute("cy", my);
+      const deg = ((+inp.value % 360) + 360) % 360, inTail = mx > x0 && Math.abs(my - ey) < hw(mx);
+      moon.setAttribute("stroke-width", inTail ? 0 : 3); moon.setAttribute("stroke", "#ffcf5a");
+      dust.innerHTML = "";
+      if (!inTail) for (let i = 0; i < 6; i++) el("circle", { cx: mx - 14 - i * 9, cy: my - 10 + (i % 3) * 10, r: 2, fill: "#ffcf5a", opacity: 1 - i * .14 }, dust);
+      const phase = deg < 30 || deg > 330 ? "new Moon" : inTail ? "full Moon" : (deg < 180 ? "between new and full" : "between full and new");
+      status.innerHTML = inTail
+        ? `<span class="tag" style="background:#7fb2ff">Sheltered</span>Inside Earth's magnetotail (${phase}). Little solar wind reaches the surface.`
+        : `<span class="tag" style="background:#ffcf5a">Exposed</span>Outside the shield (${phase}). Solar wind hits the soil directly, adding helium-3.`;
+    }
+    inp.addEventListener("input", draw); draw();
+  })();
   put("s-where", ["usgsHe3Map", "natureHe3"]);
   put("s-earth", ["natureHe3"]);
   put("s-ppb", ["natureHe3", "usgsHe3Map"]);

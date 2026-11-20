@@ -10,6 +10,10 @@ const SOURCES = {
   lpscReserves: { title: "The estimation of helium-3 probable reserves in lunar regolith", pub: "Lunar and Planetary Science Conference, 2007", url: "https://www.lpi.usra.edu/meetings/lpsc2007/pdf/2175.pdf", via: "Tavily" },
   spacenewsUsgs:{ title: "Interlune plans to gather scarce lunar Helium-3 for quantum computing on Earth", pub: "SpaceNews", url: "https://spacenews.com/interlune-plans-to-gather-scarce-lunar-helium-3-for-quantum-computing-on-earth", via: "Tavily" },
   nasaSolarWind:{ title: "Solar Wind on the Moon", pub: "NASA Science", url: "https://science.nasa.gov/moon/solar-wind", via: "Tavily" },
+  noaaMagneto:  { title: "Earth's Magnetosphere", pub: "NOAA Space Weather Prediction Center", url: "https://www.swpc.noaa.gov/phenomena/earths-magnetosphere", via: "Tavily" },
+  nasaMagneto:  { title: "Earth's Magnetosphere (bow shock, magnetopause, magnetotail)", pub: "NASA", url: "https://www.nasa.gov/image-article/earths-magnetosphere-3", via: "Tavily" },
+  nasaCoreField:{ title: "Earth's Magnetosphere: Protecting Our Planet from Harmful Space Energy", pub: "NASA Science", url: "https://science.nasa.gov/science-research/earth-science/earths-magnetosphere-protecting-our-planet-from-harmful-space-energy", via: "Tavily" },
+  esaAnatomy:   { title: "Anatomy of Earth's magnetosphere", pub: "ESA, 2026", url: "https://www.esa.int/ESA_Multimedia/Images/2026/02/Anatomy_of_Earth_s_magnetosphere", via: "Tavily" },
   svsMagnetotail:{ title: "The Moon Passes In and Out of Earth's Magnetosphere", pub: "NASA Scientific Visualization Studio, July 2026", url: "https://svs.gsfc.nasa.gov/5648", via: "Tavily" },
   cnsaHe3:      { title: "New mineral found by Chinese scientists (Chang'e-5 samples and helium-3)", pub: "China National Space Administration", url: "https://www.cnsa.gov.cn/english/n6465652/n6465653/c6840851/content.html", via: "Tavily" },
 
